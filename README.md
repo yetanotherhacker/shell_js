@@ -14,8 +14,10 @@ i.e.
     	ls()
     	}
     }
+```
 
 -- `ls()` returns x and y
+
 -- the entire 'script' runs in local scope
 
 Set `Shell.environment` to `GLOBAL` for use in Node.js or `window` for use in the browser. The default is Node.js's `GLOBAL`.
@@ -26,5 +28,7 @@ cd	cp	ls	mkdir	pwd	reload	rm
 A few differences from the shell:
 
 `ls()` is implemented partially - it takes no arguments
+
 `mkdir()` is extended to take advantage of Javascript's prototyping system - see the source for details
+
 `cp()` uses jQuery for its deep copy functionality when copying objects
