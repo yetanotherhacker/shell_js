@@ -14,6 +14,7 @@ i.e.
     	ls()
     	}
     }
+```
 
 -- `ls()` returns x and y
 -- the entire 'script' runs in local scope
