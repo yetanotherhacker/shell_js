@@ -115,14 +115,11 @@ Shell.cp = function(x,y)
 	}
 }
 
-Shell.ls = function()
+Shell.ls = function(key)
 {
 	//declare contents of current path's object
-	if(Shell.path=="")
-		return Object.keys(Shell.environment).sort();
-		//use Object.getOwnPropertyNames for hidden properties
-	else
-		return Object.keys(Shell.reference(Shell.path)).sort();
+	//use Object.getOwnPropertyNames for hidden properties
+	return Object.keys(Shell.reference(Shell.path)[key]).sort();
 }
 
 Shell.mkdir = function(son, father)

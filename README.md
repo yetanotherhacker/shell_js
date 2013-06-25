@@ -27,8 +27,6 @@ cd	cp	ls	mkdir	pwd	reload	rm
 
 A few differences from the shell:
 
-`ls()` is implemented partially - it takes no arguments
-
 `mkdir()` is extended to take advantage of Javascript's prototyping system - see the source for details
 
 `cp()` uses jQuery for its deep copy functionality when copying objects
