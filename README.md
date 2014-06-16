@@ -5,15 +5,14 @@ Objects act like folders. So `Shell.cd(x.y)` will shift to `{current_object}.x.y
 
 i.e.
 ```javascript
-    with(Shell) {
-    	with(Shell.reference(Shell.path)) {
-    	mkdir('x');
-    	x.y = 4;
-    	x.z = 6;
-    	cd('x');
-    	ls()
-    	}
-    }
+    with (Shell) {
+        with(Shell.reference(Shell.path)) {
+            mkdir('x');
+            x.y = 4;
+            x.z = 6;
+            cd('x');
+            ls();
+        } {}
 ```
 
 -- `ls()` returns x and y
@@ -23,7 +22,7 @@ i.e.
 Set `Shell.environment` to `GLOBAL` for use in Node.js or `window` for use in the browser. The default is Node.js's `GLOBAL`.
 
 Functions implemented:
-cd	cp	ls	mkdir	pwd	reload	rm
+cd  cp  ls  mkdir   pwd reload  rm
 
 A few differences from the shell:
 
