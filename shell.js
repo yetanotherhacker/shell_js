@@ -1,9 +1,9 @@
 //Shell.js - a library to treat the browser javascript environment like a unix shell.
-//Copyright 2011-2014 by Julius D'souza. Licensed under GPL 3.0
+//Copyright 2011-2014 by Julius D'souza. Licensed under GPL 3.0.
 //Uses jQuery for deep copy in the cp() function.
-//
+
 Shell = {path: ''};
-//The path is of the form "x.y.z"
+//Shell.path is of the form "x.y.z"
 
 Shell.environment = GLOBAL;
 //GLOBAL for node.js
@@ -40,7 +40,12 @@ Shell.cp = function(x, y) {
     //hard copy from x to y
     //slightly hairy, but copying is a hairy operation anyway
     //in a dynamic language with "interesting" moduling and scoping
-    var X = ''; var Y = '';
+    var X = '',
+        Y = '',
+        yson = [],
+        ypaths = y.split("."),
+        yfather = '';
+
     if (Shell.reference(Shell.path + '.' + x) != undefined) {
         //check if the string refers to something local
         X = Shell.reference(Shell.path + '.' + x);
@@ -49,23 +54,23 @@ Shell.cp = function(x, y) {
         X = Shell.reference(x);
     } else {
         return x + " doesn't exist!";
-    } //check to see if the parent of the stuff we're copying to exists:
+    }
+
+    //check to see if the parent of the stuff we're copying to exists:
     //(can't copy to a non-existent directory!)
-    var ypaths = y.split(".");
-    var yfather = '';
-    var yson = ypaths.pop();
+    yson = ypaths.pop();
     if (ypaths != '') {
         yfather = ypaths.reduce(function(x,y){ return x.concat(".",y);});
     }
     if (yfather == '') {
         Y = Shell.reference(Shell.path);
-        //A local reference
+        //a local reference
     } else if (typeof(Shell.reference(Shell.path + '.' + yfather)) === 'object') {
         Y = Shell.reference(Shell.path + '.' + yfather);
-        //Traverse and create a local reference
+        //traverse and create a local reference
     } else if (typeof(Shell.reference(yfather)) === 'object') {
         Y = Shell.reference(yfather);
-        //Create global reference
+        //create global reference
     } else {
         return yfather + " is not an object.";
     }
@@ -120,9 +125,10 @@ Shell.pwd = function() {
 
 Shell.reference = function(x) {
     //takes a path string and returns what it refers to if it exists
+    var array_path, ref;
     if (x !== '') {
-        var array_path = x.split(".");
-        var ref = Shell.environment;
+        array_path = x.split(".");
+        ref = Shell.environment;
     //if next token is an object, shift to it and repeat
         while ((array_path.length) && (typeof(ref) === 'object')) {
             ref = ref[array_path.shift()];
