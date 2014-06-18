@@ -5,7 +5,9 @@
 Shell = {path: ''};
 //Shell.path is of the form "x.y.z"
 
-Shell.environment = GLOBAL;
+Shell.environment = this;
+//check for no this['Shell']? and return?
+//Shell.environment = this['window'] ? window : GLOBAL;
 //GLOBAL for node.js
 //window for the browser
 
@@ -24,7 +26,7 @@ Shell.cd = function(x) {
             //pops the array and reforms the path string
             paths = Shell.path.split(".");
             paths.pop();
-            Shell.path = paths.reduce(function(x,y){ return x.concat(".",y);});
+            Shell.path = paths.reduce(function(x, y){ return x.concat(".", y);});
         } } else if (x == "") {
         Shell.path = ""; //move to the top
     } else if (typeof(Shell.reference(Shell.path + "." + x)) === 'object') {
@@ -60,7 +62,7 @@ Shell.cp = function(x, y) {
     //(can't copy to a non-existent directory!)
     yson = ypaths.pop();
     if (ypaths != '') {
-        yfather = ypaths.reduce(function(x,y){ return x.concat(".",y);});
+        yfather = ypaths.reduce(function(x, y){ return x.concat(".", y);});
     }
     if (yfather == '') {
         Y = Shell.reference(Shell.path);
@@ -96,10 +98,10 @@ Shell.ls = function(key) {
 }
 
 Shell.mkdir = function(son, father) {
-    //mkdir(a) makes an empty object
-    //mkdir(a,b) makes an object a with b as the prototype
-    //so a inherits b's properties
-    //in addition, a.proto gives the path to b
+    //mkdir(son) makes an empty object
+    //mkdir(son, father) makes an object son with father as the prototype
+    //so son inherits father's properties
+    //in addition, son.proto gives the path to father
     if (father == null) {
         //normal mkdir behavior
         Shell.reference(Shell.path)[son] = {};
