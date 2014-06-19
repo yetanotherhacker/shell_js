@@ -1,11 +1,23 @@
-//Shell.js - a library to treat the browser javascript environment like a unix shell.
+//Shell.js - a library to treat a javascript environment like a unix shell.
 //Copyright 2011-2014 by Julius D'souza. Licensed under GPL 3.0.
 //Uses jQuery for deep copy in the cp() function.
 
 Shell = {path: ''};
-//Shell.path is of the form "x.y.z"
+//Shell.path is of the form 'x.y.z'
 
-Shell.environment = this;
+/*(function(obj){
+    var exports = this['exports'];
+    if (exports) {
+        //CommonJS module handling
+        exports.Shell = obj;
+    }
+})(Shell);*/
+
+Shell.environment = (this['window'] ? window : GLOBAL);
+
+if (!Shell.environment['Shell']) {
+    console.warn('Can\'t access top level objects.');
+}
 //check for no this['Shell']? and return?
 //Shell.environment = this['window'] ? window : GLOBAL;
 //GLOBAL for node.js
@@ -23,29 +35,29 @@ Shell.cd = function(x) {
         } else {
             //move up the object chain: x.y.z -> x.y
             //tokenizes the path by '.' into an array,
-            //pops the array and reforms the path string
-            paths = Shell.path.split(".");
+            //pops the array and recreates the path string
+            paths = Shell.path.split('.');
             paths.pop();
-            Shell.path = paths.reduce(function(x, y){ return x.concat(".", y);});
-        } } else if (x == "") {
-        Shell.path = ""; //move to the top
-    } else if (typeof(Shell.reference(Shell.path + "." + x)) === 'object') {
-        Shell.path = Shell.path + "." + x; //move to local object
+            Shell.path = paths.reduce(function(x, y){ return x.concat('.', y);});
+        } } else if (x == '') {
+        Shell.path = ''; //move to the top
+    } else if (typeof(Shell.reference(Shell.path + '.' + x)) === 'object') {
+        Shell.path = Shell.path + '.' + x; //move to local object
     } else if (typeof(Shell.reference(x)) === 'object') {
         Shell.path = x; //move to global object
     } else {
-        return "No such object exists.";
+        return 'No such object exists.';
     }
 }
 
 Shell.cp = function(x, y) {
     //hard copy from x to y
     //slightly hairy, but copying is a hairy operation anyway
-    //in a dynamic language with "interesting" moduling and scoping
+    //in a dynamic language with 'interesting' moduling and scoping
     var X = '',
         Y = '',
         yson = [],
-        ypaths = y.split("."),
+        ypaths = y.split('.'),
         yfather = '';
 
     if (Shell.reference(Shell.path + '.' + x) != undefined) {
@@ -55,14 +67,14 @@ Shell.cp = function(x, y) {
         //check if the string refers to something global
         X = Shell.reference(x);
     } else {
-        return x + " doesn't exist!";
+        return x + ' doesn\'t exist!';
     }
 
     //check to see if the parent of the stuff we're copying to exists:
     //(can't copy to a non-existent directory!)
     yson = ypaths.pop();
     if (ypaths != '') {
-        yfather = ypaths.reduce(function(x, y){ return x.concat(".", y);});
+        yfather = ypaths.reduce(function(x, y){ return x.concat('.', y);});
     }
     if (yfather == '') {
         Y = Shell.reference(Shell.path);
@@ -74,7 +86,7 @@ Shell.cp = function(x, y) {
         Y = Shell.reference(yfather);
         //create global reference
     } else {
-        return yfather + " is not an object.";
+        return yfather + ' is not an object.';
     }
     if ((typeof(X) == 'function')||(typeof(X) == 'string')||(typeof(X) == 'number')) {
         //about everything except objects does copy by value
@@ -91,10 +103,12 @@ Shell.cp = function(x, y) {
     }
 }
 
-Shell.ls = function(key) {
+Shell.ls = function(key, params) {
     //declare contents of current path's object
+    var keyPath = Shell.path + (key ? '.' + key : ''),
+        currentObj = Shell.reference(keyPath) || {};
     //use Object.getOwnPropertyNames for hidden properties
-    return Object.keys(Shell.reference(Shell.path)[key]).sort();
+    return Object.keys(currentObj).sort();
 }
 
 Shell.mkdir = function(son, father) {
@@ -108,7 +122,7 @@ Shell.mkdir = function(son, father) {
     } else if (typeof(Shell.reference(Shell.path)[father]) === 'object') {
         //local extension
         Shell.reference(Shell.path)[son] = Object.create(Shell.reference(Shell.path)[father]);
-        Shell.reference(Shell.path)[son].proto = Shell.path + "." + father;
+        Shell.reference(Shell.path)[son].proto = Shell.path + '.' + father;
     } else if (typeof(Shell.reference(father) === 'object')) {
         //global extension
         Shell.reference(Shell.path)[son] = Object.create(Shell.reference(father));
@@ -118,8 +132,8 @@ Shell.mkdir = function(son, father) {
 }
 
 Shell.pwd = function() {
-    if (Shell.path === "") {
-        return "top";
+    if (Shell.path === '') {
+        return 'top';
     } else {
         return Shell.path;
     }
@@ -129,7 +143,7 @@ Shell.reference = function(x) {
     //takes a path string and returns what it refers to if it exists
     var array_path, ref;
     if (x !== '') {
-        array_path = x.split(".");
+        array_path = x.split('.');
         ref = Shell.environment;
     //if next token is an object, shift to it and repeat
         while ((array_path.length) && (typeof(ref) === 'object')) {
