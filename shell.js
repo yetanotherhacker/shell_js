@@ -50,56 +50,57 @@ Shell.cd = function(x) {
     }
 }
 
-Shell.cp = function(x, y) {
-    //hard copy from x to y
+Shell.cp = function(origin, finish) {
+    //hard copy from origin to destination
     //slightly hairy, but copying is a hairy operation anyway
     //in a dynamic language with 'interesting' moduling and scoping
-    var X = '',
-        Y = '',
-        yson = [],
-        ypaths = y.split('.'),
-        yfather = '';
+    var newObj = '',
+        destinationContext = '',
+        local = [],
+        destinationPathArray = finish.split('.'),
+        destinationPathString = '';
 
-    if (Shell.reference(Shell.path + '.' + x) != undefined) {
+    if (Shell.reference(Shell.path + '.' + origin) != undefined) {
         //check if the string refers to something local
-        X = Shell.reference(Shell.path + '.' + x);
-    } else if (Shell.reference(x) != undefined) {
+        newObj = Shell.reference(Shell.path + '.' + origin);
+    } else if (Shell.reference(origin) != undefined) {
         //check if the string refers to something global
-        X = Shell.reference(x);
+        newObj = Shell.reference(origin);
     } else {
-        return x + ' doesn\'t exist!';
+        return origin + ' doesn\'t exist!';
     }
 
     //check to see if the parent of the stuff we're copying to exists:
     //(can't copy to a non-existent directory!)
-    yson = ypaths.pop();
-    if (ypaths != '') {
-        yfather = ypaths.reduce(function(x, y){ return x.concat('.', y);});
+    local = destinationPathArray.pop();
+    if (destinationPathArray != '') {
+        destinationPathString = destinationPathArray.reduce(function(x, y){ return x.concat('.', y);});
     }
-    if (yfather == '') {
-        Y = Shell.reference(Shell.path);
+    if (destinationPathString == '') {
+        destinationContext = Shell.reference(Shell.path);
         //a local reference
-    } else if (typeof(Shell.reference(Shell.path + '.' + yfather)) === 'object') {
-        Y = Shell.reference(Shell.path + '.' + yfather);
+    } else if (typeof(Shell.reference(Shell.path + '.' + destinationPathString)) === 'object') {
+        destinationContext = Shell.reference(Shell.path + '.' + destinationPathString);
         //traverse and create a local reference
-    } else if (typeof(Shell.reference(yfather)) === 'object') {
-        Y = Shell.reference(yfather);
+    } else if (typeof(Shell.reference(destinationPathString)) === 'object') {
+        destinationContext = Shell.reference(destinationPathString);
         //create global reference
     } else {
-        return yfather + ' is not an object.';
+        return destinationPathString + ' is not an object.';
     }
-    if ((typeof(X) == 'function')||(typeof(X) == 'string')||(typeof(X) == 'number')) {
+    if ((typeof(newObj) == 'function')||(typeof(newObj) == 'string')||(typeof(newObj) == 'number')) {
         //about everything except objects does copy by value
         //objects do copy by reference
-        Y[yson] = X;
-    } else if (typeof(X) === 'object') {
+        destinationContext[local] = newObj;
+    } else if (typeof(newObj) === 'object') {
         //deep copy's hard due to prototypes and dangling references
         //after chatting around on freenode, I've been convinced
         //that it's hard to beat jQuery's own implementation
-        if (Y[yson] == undefined)
-            Y[yson] = $.extend(true, {}, X);
+        //TODO: add $.extend check or make a deep copy function
+        if (destinationContext[local] == undefined)
+            destinationContext[local] = $.extend(true, {}, newObj);
         else
-            Y[yson] = $.extend(true, Y[yson], X);
+            destinationContext[local] = $.extend(true, destinationContext[local], newObj);
     }
 }
 
