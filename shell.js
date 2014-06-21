@@ -23,13 +23,13 @@ if (!Shell.environment['Shell']) {
 //GLOBAL for node.js
 //window for the browser
 
-Shell.cd = function(x) {
+Shell.cd = function(obj) {
     var paths =[];
     //change working object (directory)
     //cd() acts like cd ..
     //cd($string) switches to the object
     // -- local scoping followed by global scoping
-    if (x == null) { //default no argument behavior
+    if (obj == null) { //default no argument behavior
         if (Shell.path.indexOf('.') === -1) {
             Shell.path = ''; //ensure that path's a string
         } else {
@@ -39,12 +39,12 @@ Shell.cd = function(x) {
             paths = Shell.path.split('.');
             paths.pop();
             Shell.path = paths.reduce(function(x, y){ return x.concat('.', y);});
-        } } else if (x == '') {
+        } } else if (obj == '') {
         Shell.path = ''; //move to the top
-    } else if (typeof(Shell.reference(Shell.path + '.' + x)) === 'object') {
-        Shell.path = Shell.path + '.' + x; //move to local object
-    } else if (typeof(Shell.reference(x)) === 'object') {
-        Shell.path = x; //move to global object
+    } else if (typeof(Shell.reference(Shell.path + '.' + obj)) === 'object') {
+        Shell.path = Shell.path + '.' + obj; //move to local object
+    } else if (typeof(Shell.reference(obj)) === 'object') {
+        Shell.path = obj; //move to global object
     } else {
         return 'No such object exists.';
     }
@@ -112,24 +112,24 @@ Shell.ls = function(key, params) {
     return Object.keys(currentObj).sort();
 }
 
-Shell.mkdir = function(son, father) {
-    //mkdir(son) makes an empty object
-    //mkdir(son, father) makes an object son with father as the prototype
-    //so son inherits father's properties
-    //in addition, son.proto gives the path to father
-    if (father == null) {
+Shell.mkdir = function(obj, protoObj) {
+    //mkdir(obj) makes an empty object
+    //mkdir(obj, protoObj) makes an object obj with protoObj as the prototype
+    //so obj inherits protoObj's properties
+    //in addition, obj.proto gives the path to protoObj
+    if (protoObj == null) {
         //normal mkdir behavior
-        Shell.reference(Shell.path)[son] = {};
-    } else if (typeof(Shell.reference(Shell.path)[father]) === 'object') {
+        Shell.reference(Shell.path)[obj] = {};
+    } else if (typeof(Shell.reference(Shell.path)[protoObj]) === 'object') {
         //local extension
-        Shell.reference(Shell.path)[son] = Object.create(Shell.reference(Shell.path)[father]);
-        Shell.reference(Shell.path)[son].proto = Shell.path + '.' + father;
-    } else if (typeof(Shell.reference(father) === 'object')) {
+        Shell.reference(Shell.path)[obj] = Object.create(Shell.reference(Shell.path)[protoObj]);
+        Shell.reference(Shell.path)[obj].proto = Shell.path + '.' + protoObj;
+    } else if (typeof(Shell.reference(protoObj) === 'object')) {
         //global extension
-        Shell.reference(Shell.path)[son] = Object.create(Shell.reference(father));
-        Shell.reference(Shell.path)[son].proto = father;
+        Shell.reference(Shell.path)[obj] = Object.create(Shell.reference(protoObj));
+        Shell.reference(Shell.path)[obj].proto = protoObj;
     }
-    return son;
+    return obj;
 }
 
 Shell.pwd = function() {
@@ -140,15 +140,15 @@ Shell.pwd = function() {
     }
 }
 
-Shell.reference = function(x) {
+Shell.reference = function(path) {
     //takes a path string and returns what it refers to if it exists
-    var array_path, ref;
-    if (x !== '') {
-        array_path = x.split('.');
+    var pathArray, ref;
+    if (path !== '') {
+        pathArray = path.split('.');
         ref = Shell.environment;
     //if next token is an object, shift to it and repeat
-        while ((array_path.length) && (typeof(ref) === 'object')) {
-            ref = ref[array_path.shift()];
+        while ((pathArray.length) && (typeof(ref) === 'object')) {
+            ref = ref[pathArray.shift()];
         }
         return ref;
     } else {
@@ -161,14 +161,14 @@ Shell.reload = function() {
     location.reload();
 }
 
-Shell.rm = function(x) {
+Shell.rm = function(obj) {
     //do nothing if there's nothing to delete
-    if (x == null) {
+    if (obj == null) {
         //clear out local variable
         return;
-    } else if (typeof(Shell.reference(Shell.path)[x]) != 'undefined') {
-        delete Shell.reference(Shell.path)[x]; //otherwise, clear out global variable
-    } else if (typeof(Shell.reference(x)) != 'undefined') {
-        delete Shell.environment[x];
+    } else if (typeof(Shell.reference(Shell.path)[obj]) != 'undefined') {
+        delete Shell.reference(Shell.path)[obj]; //otherwise, clear out global variable
+    } else if (typeof(Shell.reference(obj)) != 'undefined') {
+        delete Shell.environment[obj];
     }
 }
