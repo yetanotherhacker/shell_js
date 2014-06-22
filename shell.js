@@ -5,6 +5,7 @@
 Shell = {path: ''};
 //Shell.path is of the form 'x.y.z'
 
+//TODO: make the Shell object a function return or an environment-agnostic export
 /*(function(obj){
     var exports = this['exports'];
     if (exports) {
@@ -23,13 +24,13 @@ if (!Shell.environment['Shell']) {
 //GLOBAL for node.js
 //window for the browser
 
-Shell.cd = function(obj) {
-    var paths =[];
+Shell.cd = function(objString) {
+    var paths = [];
     //change working object (directory)
     //cd() acts like cd ..
     //cd($string) switches to the object
     // -- local scoping followed by global scoping
-    if (obj == null) { //default no argument behavior
+    if (objString === null) { //default no argument behavior
         if (Shell.path.indexOf('.') === -1) {
             Shell.path = ''; //ensure that path's a string
         } else {
@@ -39,12 +40,12 @@ Shell.cd = function(obj) {
             paths = Shell.path.split('.');
             paths.pop();
             Shell.path = paths.reduce(function(x, y){ return x.concat('.', y);});
-        } } else if (obj == '') {
+        } } else if (objString === '') {
         Shell.path = ''; //move to the top
-    } else if (typeof(Shell.reference(Shell.path + '.' + obj)) === 'object') {
-        Shell.path = Shell.path + '.' + obj; //move to local object
-    } else if (typeof(Shell.reference(obj)) === 'object') {
-        Shell.path = obj; //move to global object
+    } else if (typeof(Shell.reference(Shell.path + '.' + objString)) === 'object') {
+        Shell.path = Shell.path + '.' + objStringj; //move to local object
+    } else if (typeof(Shell.reference(objString)) === 'object') {
+        Shell.path = objStringj; //move to global object
     } else {
         return 'No such object exists.';
     }
@@ -60,10 +61,10 @@ Shell.cp = function(origin, finish) {
         destinationPathArray = finish.split('.'),
         destinationPathString = '';
 
-    if (Shell.reference(Shell.path + '.' + origin) != undefined) {
+    if (Shell.reference(Shell.path + '.' + origin) !==undefined) {
         //check if the string refers to something local
         newObj = Shell.reference(Shell.path + '.' + origin);
-    } else if (Shell.reference(origin) != undefined) {
+    } else if (Shell.reference(origin) !==undefined) {
         //check if the string refers to something global
         newObj = Shell.reference(origin);
     } else {
@@ -73,10 +74,10 @@ Shell.cp = function(origin, finish) {
     //check to see if the parent of the stuff we're copying to exists:
     //(can't copy to a non-existent directory!)
     local = destinationPathArray.pop();
-    if (destinationPathArray != '') {
+    if (destinationPathArray !=='') {
         destinationPathString = destinationPathArray.reduce(function(x, y){ return x.concat('.', y);});
     }
-    if (destinationPathString == '') {
+    if (destinationPathString === '') {
         destinationContext = Shell.reference(Shell.path);
         //a local reference
     } else if (typeof(Shell.reference(Shell.path + '.' + destinationPathString)) === 'object') {
@@ -88,7 +89,7 @@ Shell.cp = function(origin, finish) {
     } else {
         return destinationPathString + ' is not an object.';
     }
-    if ((typeof(newObj) == 'function')||(typeof(newObj) == 'string')||(typeof(newObj) == 'number')) {
+    if ((typeof(newObj) === 'function')||(typeof(newObj) === 'string')||(typeof(newObj) === 'number')) {
         //about everything except objects does copy by value
         //objects do copy by reference
         destinationContext[local] = newObj;
@@ -96,8 +97,8 @@ Shell.cp = function(origin, finish) {
         //deep copy's hard due to prototypes and dangling references
         //after chatting around on freenode, I've been convinced
         //that it's hard to beat jQuery's own implementation
-        //TODO: add $.extend check or make a deep copy function
-        if (destinationContext[local] == undefined)
+        //TODO: figure out how to do this cleanly in node
+        if (destinationContext[local] === undefined)
             destinationContext[local] = $.extend(true, {}, newObj);
         else
             destinationContext[local] = $.extend(true, destinationContext[local], newObj);
@@ -112,24 +113,24 @@ Shell.ls = function(key, params) {
     return Object.keys(currentObj).sort();
 }
 
-Shell.mkdir = function(obj, protoObj) {
-    //mkdir(obj) makes an empty object
-    //mkdir(obj, protoObj) makes an object obj with protoObj as the prototype
-    //so obj inherits protoObj's properties
-    //in addition, obj.proto gives the path to protoObj
-    if (protoObj == null) {
+Shell.mkdir = function(newObj, protoObj) {
+    //mkdir(newObj) makes an empty object
+    //mkdir(newObj, protoObj) makes an object newObj with protoObj as the prototype
+    //so newObj inherits protoObj's properties
+    //in addition, newObj.proto gives the path to protoObj
+    if (protoObj === null) {
         //normal mkdir behavior
-        Shell.reference(Shell.path)[obj] = {};
+        Shell.reference(Shell.path)[newObj] = {};
     } else if (typeof(Shell.reference(Shell.path)[protoObj]) === 'object') {
         //local extension
-        Shell.reference(Shell.path)[obj] = Object.create(Shell.reference(Shell.path)[protoObj]);
-        Shell.reference(Shell.path)[obj].proto = Shell.path + '.' + protoObj;
+        Shell.reference(Shell.path)[newObj] = Object.create(Shell.reference(Shell.path)[protoObj]);
+        Shell.reference(Shell.path)[newObj].proto = Shell.path + '.' + protoObj;
     } else if (typeof(Shell.reference(protoObj) === 'object')) {
         //global extension
-        Shell.reference(Shell.path)[obj] = Object.create(Shell.reference(protoObj));
-        Shell.reference(Shell.path)[obj].proto = protoObj;
+        Shell.reference(Shell.path)[newObj] = Object.create(Shell.reference(protoObj));
+        Shell.reference(Shell.path)[newObj].proto = protoObj;
     }
-    return obj;
+    return newObj;
 }
 
 Shell.pwd = function() {
@@ -158,17 +159,18 @@ Shell.reference = function(path) {
 
 Shell.reload = function() {
     //equivalent to clearing the environment
+    //@TODO: determine if this is really needed, this is browser-specific
     location.reload();
 }
 
 Shell.rm = function(obj) {
     //do nothing if there's nothing to delete
-    if (obj == null) {
+    if (obj === null) {
         //clear out local variable
         return;
-    } else if (typeof(Shell.reference(Shell.path)[obj]) != 'undefined') {
+    } else if (typeof(Shell.reference(Shell.path)[obj]) !=='undefined') {
         delete Shell.reference(Shell.path)[obj]; //otherwise, clear out global variable
-    } else if (typeof(Shell.reference(obj)) != 'undefined') {
+    } else if (typeof(Shell.reference(obj)) !=='undefined') {
         delete Shell.environment[obj];
     }
 }
