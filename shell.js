@@ -1,13 +1,13 @@
-//Shell.js - a library to treat a javascript environment like a unix shell.
-//Copyright 2011-2014 by Julius D'souza. Licensed under GPL 3.0.
-//Uses jQuery for deep copy in the cp() function.
+//Shell.js - a library to treat a JavaScript environment like a unix shell.
+//Copyright 2011-2014 by Julius D'souza. Licensed under GPL 3.0
+//Currently uses jQuery for deep copy in the cp() function.
 
 Shell = {path: ''};
 //Shell.path is of the form 'x.y.z'
 
 //TODO: make the Shell object a function return or an environment-agnostic export
 /*(function(obj){
-    var exports = this['exports'];
+    var exports = this['modules'] && modules['exports'];
     if (exports) {
         //CommonJS module handling
         exports.Shell = obj;
@@ -52,7 +52,7 @@ Shell.cd = function(objString) {
 }
 
 Shell.cp = function(origin, finish) {
-    //hard copy from origin to destination
+    //hard copy from origin to finish
     //slightly hairy, but copying is a hairy operation anyway
     //in a dynamic language with 'interesting' moduling and scoping
     var newObj = '',
@@ -74,7 +74,7 @@ Shell.cp = function(origin, finish) {
     //check to see if the parent of the stuff we're copying to exists:
     //(can't copy to a non-existent directory!)
     local = destinationPathArray.pop();
-    if (destinationPathArray !=='') {
+    if (destinationPathArray !== '') {
         destinationPathString = destinationPathArray.reduce(function(x, y){ return x.concat('.', y);});
     }
     if (destinationPathString === '') {
@@ -89,7 +89,7 @@ Shell.cp = function(origin, finish) {
     } else {
         return destinationPathString + ' is not an object.';
     }
-    if ((typeof(newObj) === 'function')||(typeof(newObj) === 'string')||(typeof(newObj) === 'number')) {
+    if ((typeof(newObj) === 'function') || (typeof(newObj) === 'string') || (typeof(newObj) === 'number')) {
         //about everything except objects does copy by value
         //objects do copy by reference
         destinationContext[local] = newObj;
@@ -108,9 +108,10 @@ Shell.cp = function(origin, finish) {
 Shell.ls = function(key, params) {
     //declare contents of current path's object
     var keyPath = Shell.path + (key ? '.' + key : ''),
+        lsMethod = /h/.test(params) ? Object.getOwnPropertyNames : Object.keys,
         currentObj = Shell.reference(keyPath) || {};
-    //use Object.getOwnPropertyNames for hidden properties
-    return Object.keys(currentObj).sort();
+    //use Object.getOwnPropertyNames for hidden properties with the 'h' - hidden parameter
+    return lsMethod(currentObj).sort();
 }
 
 Shell.mkdir = function(newObj, protoObj) {
@@ -164,13 +165,11 @@ Shell.reload = function() {
 }
 
 Shell.rm = function(obj) {
-    //do nothing if there's nothing to delete
-    if (obj === null) {
-        //clear out local variable
-        return;
-    } else if (typeof(Shell.reference(Shell.path)[obj]) !=='undefined') {
-        delete Shell.reference(Shell.path)[obj]; //otherwise, clear out global variable
-    } else if (typeof(Shell.reference(obj)) !=='undefined') {
-        delete Shell.environment[obj];
+    if (!obj) {
+        return;     //do nothing if there's nothing to delete
+    } else if (typeof(Shell.reference(Shell.path)[obj]) !== 'undefined') {
+        delete Shell.reference(Shell.path)[obj];    //clear local variable
+    } else if (typeof(Shell.reference(obj)) !== 'undefined') {
+        delete Shell.environment[obj];  //clear out global variable
     }
 }
