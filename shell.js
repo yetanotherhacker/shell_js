@@ -43,9 +43,9 @@ Shell.cd = function(objString) {
         } } else if (objString === '') {
         Shell.path = ''; //move to the top
     } else if (typeof(Shell.reference(Shell.path + '.' + objString)) === 'object') {
-        Shell.path = Shell.path + '.' + objStringj; //move to local object
+        Shell.path = Shell.path + '.' + objString; //move to local object
     } else if (typeof(Shell.reference(objString)) === 'object') {
-        Shell.path = objStringj; //move to global object
+        Shell.path = objString; //move to global object
     } else {
         return 'No such object exists.';
     }
@@ -98,10 +98,11 @@ Shell.cp = function(origin, finish) {
         //after chatting around on freenode, I've been convinced
         //that it's hard to beat jQuery's own implementation
         //TODO: figure out how to do this cleanly in node
-        if (destinationContext[local] === undefined)
+        if (destinationContext[local] === undefined) {
             destinationContext[local] = $.extend(true, {}, newObj);
-        else
+        } else {
             destinationContext[local] = $.extend(true, destinationContext[local], newObj);
+        }
     }
 }
 
@@ -158,18 +159,15 @@ Shell.reference = function(path) {
     }
 }
 
-Shell.reload = function() {
-    //equivalent to clearing the environment
-    //@TODO: determine if this is really needed, this is browser-specific
-    location.reload();
-}
-
-Shell.rm = function(obj) {
-    if (!obj) {
+Shell.rm = function(keyString) {
+    if (!keyString) {
+        console.warn('rm: missing operand');
         return;     //do nothing if there's nothing to delete
-    } else if (typeof(Shell.reference(Shell.path)[obj]) !== 'undefined') {
-        delete Shell.reference(Shell.path)[obj];    //clear local variable
-    } else if (typeof(Shell.reference(obj)) !== 'undefined') {
-        delete Shell.environment[obj];  //clear out global variable
+    } else if (typeof(Shell.reference(Shell.path)[keyString]) !== 'undefined') {
+        delete Shell.reference(Shell.path)[keyString];    //clear local variable
+    } else if (typeof(Shell.reference(keyString)) !== 'undefined') {
+        delete Shell.environment[keyString];  //clear out global variable
+    } else {
+        console.warn('rm: could not find item');
     }
 }
