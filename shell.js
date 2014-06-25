@@ -27,23 +27,27 @@ if (!Shell.environment['Shell']) {
 Shell.cd = function(objString) {
     var paths = [];
     //change working object (directory)
-    //cd() acts like cd ..
+    //cd('..') acts like cd ..
     //cd($string) switches to the object
     // -- local scoping followed by global scoping
+
+    if (Shell.path.indexOf('.') === -1) {
+        Shell.path = ''; //ensure that path's a string
+    }
+
     if (objString === null) { //default no argument behavior
-        if (Shell.path.indexOf('.') === -1) {
-            Shell.path = ''; //ensure that path's a string
-        } else {
-            //move up the object chain: x.y.z -> x.y
-            //tokenizes the path by '.' into an array,
-            //pops the array and recreates the path string
-            paths = Shell.path.split('.');
-            paths.pop();
-            Shell.path = paths.reduce(function(x, y){ return x.concat('.', y);});
-        } } else if (objString === '') {
+        return;
+    } else if (objString === '') {
         Shell.path = ''; //move to the top
-    } else if (typeof(Shell.reference(Shell.path + '.' + objString)) === 'object') {
-        Shell.path = Shell.path + '.' + objString; //move to local object
+    } else if (objString === '..') {
+        //move up the object chain: x.y.z -> x.y
+        //tokenizes the path by '.' into an array,
+        //pops the array and recreates the path string
+        paths = Shell.path.split('.');
+        paths.pop();
+        Shell.path = paths.reduce(function(pathChain, pathLink){ return pathChain.concat('.', pathLink);});
+    } else if (typeof(Shell.reference([Shell.path, '.', objString].join(''))) === 'object') {
+        Shell.path = Shell.reference([Shell.path, '.', objString].join('')); //move to local object
     } else if (typeof(Shell.reference(objString)) === 'object') {
         Shell.path = objString; //move to global object
     } else {
@@ -58,37 +62,40 @@ Shell.cp = function(origin, finish) {
     var newObj = '',
         destinationContext = '',
         local = [],
+        localPath = [Shell.path, '.', origin].join(''),
         destinationPathArray = finish.split('.'),
         destinationPathString = '';
 
-    if (Shell.reference(Shell.path + '.' + origin) !==undefined) {
+    if (Shell.reference(localPath) !== undefined) {
         //check if the string refers to something local
-        newObj = Shell.reference(Shell.path + '.' + origin);
-    } else if (Shell.reference(origin) !==undefined) {
+        newObj = Shell.reference(localPath);
+    } else if (Shell.reference(origin) !== undefined) {
         //check if the string refers to something global
         newObj = Shell.reference(origin);
     } else {
         return origin + ' doesn\'t exist!';
     }
 
-    //check to see if the parent of the stuff we're copying to exists:
-    //(can't copy to a non-existent directory!)
+    //check to see if the parent of the what we're copying to exists:
+    //(can't copy to a non-existent path!)
     local = destinationPathArray.pop();
     if (destinationPathArray !== '') {
         destinationPathString = destinationPathArray.reduce(function(x, y){ return x.concat('.', y);});
     }
+
     if (destinationPathString === '') {
-        destinationContext = Shell.reference(Shell.path);
         //a local reference
-    } else if (typeof(Shell.reference(Shell.path + '.' + destinationPathString)) === 'object') {
-        destinationContext = Shell.reference(Shell.path + '.' + destinationPathString);
+        destinationContext = Shell.reference(Shell.path);
+    } else if (typeof(Shell.reference([Shell.path, '.', destinationPathString].join(''))) === 'object') {
         //traverse and create a local reference
+        destinationContext = Shell.reference([Shell.path, '.', destinationPathString]);
     } else if (typeof(Shell.reference(destinationPathString)) === 'object') {
-        destinationContext = Shell.reference(destinationPathString);
         //create global reference
+        destinationContext = Shell.reference(destinationPathString);
     } else {
         return destinationPathString + ' is not an object.';
     }
+
     if ((typeof(newObj) === 'function') || (typeof(newObj) === 'string') || (typeof(newObj) === 'number')) {
         //about everything except objects does copy by value
         //objects do copy by reference
@@ -126,7 +133,7 @@ Shell.mkdir = function(newObj, protoObj) {
     } else if (typeof(Shell.reference(Shell.path)[protoObj]) === 'object') {
         //local extension
         Shell.reference(Shell.path)[newObj] = Object.create(Shell.reference(Shell.path)[protoObj]);
-        Shell.reference(Shell.path)[newObj].proto = Shell.path + '.' + protoObj;
+        Shell.reference(Shell.path)[newObj].proto = [Shell.path, '.', protoObj].join('');
     } else if (typeof(Shell.reference(protoObj) === 'object')) {
         //global extension
         Shell.reference(Shell.path)[newObj] = Object.create(Shell.reference(protoObj));
