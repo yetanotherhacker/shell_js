@@ -32,7 +32,7 @@ Shell.cd = function(objString) {
     // -- local scoping followed by global scoping
 
     if (Shell.path.indexOf('.') === -1) {
-        Shell.path = ''; //ensure that path's a string
+        Shell.path = ''; //ensure that the path is a string
     }
 
     if (objString === null) { //default no argument behavior
@@ -168,13 +168,13 @@ Shell.reference = function(path) {
 
 Shell.rm = function(keyString) {
     if (!keyString) {
-        console.warn('rm: missing operand');
-        return;     //do nothing if there's nothing to delete
+        //do nothing if there's nothing to delete
+        return 'rm: missing operand';
     } else if (typeof(Shell.reference(Shell.path)[keyString]) !== 'undefined') {
         delete Shell.reference(Shell.path)[keyString];    //clear local variable
     } else if (typeof(Shell.reference(keyString)) !== 'undefined') {
         delete Shell.environment[keyString];  //clear out global variable
     } else {
-        console.warn('rm: could not find item');
+        return 'rm: could not find item';
     }
 }
