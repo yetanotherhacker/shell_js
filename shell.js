@@ -2,27 +2,31 @@
 //Copyright 2011-2014 by Julius D'souza. Licensed under GPL 3.0
 //Currently uses jQuery for deep copy in the cp() function.
 
-Shell = {path: ''};
+//Shell = {path: ''};
 //Shell.path is of the form 'x.y.z'
 
-//TODO: make the Shell object a function return or an environment-agnostic export
-/*(function(obj){
-    var exports = this['modules'] && modules['exports'];
+//TODO: wrap this in a self-executing anonymous function like every good library
+//TODO: need a unix-style parameters handling function
+
+var Shell = (function(){
+    var obj = {path: ''},
+        exports = this['modules'] && modules['exports'],
+        returnObj;
     if (exports) {
         //CommonJS module handling
         exports.Shell = obj;
+        return exports.Shell;
+    } else {
+        this['Shell'] = obj;
+        return this['Shell'];
     }
-})(Shell);*/
+})();
 
 Shell.environment = (this['window'] ? window : GLOBAL);
 
 if (!Shell.environment['Shell']) {
     console.warn('Can\'t access top level objects.');
 }
-//check for no this['Shell']? and return?
-//Shell.environment = this['window'] ? window : GLOBAL;
-//GLOBAL for node.js
-//window for the browser
 
 Shell.cd = function(objString) {
     var paths = [];
@@ -45,7 +49,9 @@ Shell.cd = function(objString) {
         //pops the array and recreates the path string
         paths = Shell.path.split('.');
         paths.pop();
-        Shell.path = paths.reduce(function(pathChain, pathLink){ return pathChain.concat('.', pathLink);});
+        Shell.path = paths.reduce(function(pathChain, pathLink) {
+            return pathChain.concat('.', pathLink);
+        });
     } else if (typeof(Shell.reference([Shell.path, '.', objString].join(''))) === 'object') {
         Shell.path = Shell.reference([Shell.path, '.', objString].join('')); //move to local object
     } else if (typeof(Shell.reference(objString)) === 'object') {
