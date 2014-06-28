@@ -1,7 +1,7 @@
 ##Shell.js##
 Shell.js: treat Javascript environments like a unix shell. GPL 3.0.
 
-The main paradigm is that objects act like folders. So `Shell.cd(x.y)` will shift to `{current_object}.x.y` and `Shell.ls()` will give the contents of the current object. Using the `with()` keyword in appropriate places gives shell scripting functionality.
+Paradigm: objects act like folders. So `Shell.cd(x.y)` will shift to `{current_object}.x.y` and `Shell.ls()` will give the contents of the current object. Using the `with()` keyword in appropriate places gives shell scripting functionality.
 
 i.e.
 ```javascript
@@ -20,10 +20,12 @@ i.e.
 -- the entire 'script' runs in local scope
 
 Functions implemented:
-cd  cp  ls  mkdir   pwd reload  rm
+cd  cp  ls  mkdir	pwd	reload  rm
 
 A few differences from the shell:
 
 `mkdir()` is extended to take advantage of Javascript's prototyping system - see the source for details
 
-`cp()` uses jQuery for its deep copy functionality when copying objects
+`cp()` assumes jQuery for its deep copy functionality when copying objects for now
+
+`ls` is naive and only takes the `-h` parameter for now
