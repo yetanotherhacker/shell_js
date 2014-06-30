@@ -12,7 +12,8 @@ i.e.
             x.z = 6;
             cd('x');
             ls();
-        } {}
+        }
+    }
 ```
 
 -- `ls()` returns x and y
@@ -20,12 +21,14 @@ i.e.
 -- the entire 'script' runs in local scope
 
 Functions implemented:
-cd  cp  ls  mkdir	pwd	reload  rm
+cd  cp  ls  mkdir   pwd reload  rm
 
 A few differences from the shell:
 
 `mkdir()` is extended to take advantage of Javascript's prototyping system - see the source for details
 
+`pwd()` returns a reference to the current path. `Shell.path` returns the path in `String` form
+
 `cp()` assumes jQuery for its deep copy functionality when copying objects for now
 
-`ls` is naive and only takes the `-h` parameter for now
+`ls` is naive and only takes the `-h` parameter for now; this a pure `/h/` search. You could pass in `happy`
