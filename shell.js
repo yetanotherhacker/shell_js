@@ -5,8 +5,9 @@
 //Shell = {path: ''};
 //Shell.path is of the form 'x.y.z'
 
-//TODO: wrap this in a self-executing anonymous function like every good library
+//TODO: wrap this in a self-executing anonymous function like every js good library
 //TODO: need a unix-style parameters handling function
+//TODO: change ls() and pwd() to return a reference or string on demand
 
 var Shell = (function(){
     var obj = {path: ''},
@@ -53,7 +54,7 @@ Shell.cd = function(objString) {
             return pathChain.concat('.', pathLink);
         });
     } else if (typeof(Shell.reference([Shell.path, '.', objString].join(''))) === 'object') {
-        Shell.path = Shell.reference([Shell.path, '.', objString].join('')); //move to local object
+        Shell.path = [Shell.path, '.', objString].join(''); //move to local object
     } else if (typeof(Shell.reference(objString)) === 'object') {
         Shell.path = objString; //move to global object
     } else {
@@ -133,7 +134,7 @@ Shell.mkdir = function(newObj, protoObj) {
     //mkdir(newObj, protoObj) makes an object newObj with protoObj as the prototype
     //so newObj inherits protoObj's properties
     //in addition, newObj.proto gives the path to protoObj
-    if (protoObj === null) {
+    if (typeof(protoObj) === 'undefined') {
         //normal mkdir behavior
         Shell.reference(Shell.path)[newObj] = {};
     } else if (typeof(Shell.reference(Shell.path)[protoObj]) === 'object') {
@@ -150,9 +151,9 @@ Shell.mkdir = function(newObj, protoObj) {
 
 Shell.pwd = function() {
     if (Shell.path === '') {
-        return 'top';
+        return this;
     } else {
-        return Shell.path;
+        return Shell.reference(Shell.path);
     }
 }
 
