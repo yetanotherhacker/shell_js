@@ -31,4 +31,4 @@ A few differences from the shell:
 
 `cp()` assumes jQuery for its deep copy functionality when copying objects for now
 
-`ls` is naive and only takes the `-h` parameter for now; this a pure `/h/` search. You could pass in `happy`
+`ls` is naive and only takes the `-a` parameter for now; this a pure `/a/` search. You could pass in `happy` and it would pass.
