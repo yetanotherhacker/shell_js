@@ -30,15 +30,11 @@ if (!Shell.environment['Shell']) {
 }
 
 Shell.cd = function(objString) {
-    var paths = [];
+    var pathObjects = [];
     //change working object (directory)
     //cd('..') acts like cd ..
     //cd($string) switches to the object
     // -- local scoping followed by global scoping
-
-    if (Shell.path.indexOf('.') === -1) {
-        Shell.path = ''; //ensure that the path is a string
-    }
 
     if (objString === null) { //default no argument behavior
         return;
@@ -48,11 +44,15 @@ Shell.cd = function(objString) {
         //move up the object chain: x.y.z -> x.y
         //tokenizes the path by '.' into an array,
         //pops the array and recreates the path string
-        paths = Shell.path.split('.');
-        paths.pop();
-        Shell.path = paths.reduce(function(pathChain, pathLink) {
-            return pathChain.concat('.', pathLink);
-        });
+        pathObjects = Shell.path.split('.');
+        pathObjects.pop();
+        if (pathObjects.length) {
+            Shell.path = pathObjects.reduce(function(pathChain, pathLink) {
+                return pathChain.concat('.', pathLink);
+            });
+        } else {
+            Shell.path = '';
+        }
     } else if (typeof(Shell.reference([Shell.path, '.', objString].join(''))) === 'object') {
         Shell.path = [Shell.path, '.', objString].join(''); //move to local object
     } else if (typeof(Shell.reference(objString)) === 'object') {
@@ -122,10 +122,10 @@ Shell.cp = function(origin, finish) {
 
 Shell.ls = function(key, params) {
     //declare contents of current path's object
+    //use Object.getOwnPropertyNames for hidden properties with the 'a' - hidden parameter
     var keyPath = Shell.path + (key ? '.' + key : ''),
-        lsMethod = /h/.test(params) ? Object.getOwnPropertyNames : Object.keys,
+        lsMethod = /a/.test(params) ? Object.getOwnPropertyNames : Object.keys,
         currentObj = Shell.reference(keyPath) || {};
-    //use Object.getOwnPropertyNames for hidden properties with the 'h' - hidden parameter
     return lsMethod(currentObj).sort();
 }
 
@@ -149,12 +149,22 @@ Shell.mkdir = function(newObj, protoObj) {
     return newObj;
 }
 
-Shell.pwd = function() {
-    if (Shell.path === '') {
-        return this;
+Shell.pwd = function(stringFlag) {
+    var result;
+    if (stringFlag) {
+        if (Shell.path === '') {
+            result = 'this';
+        } else {
+            result = Shell.path;
+        }
     } else {
-        return Shell.reference(Shell.path);
+        if (Shell.path === '') {
+            result = this;
+        } else {
+            result = Shell.reference(Shell.path);
+        }
     }
+    return result;
 }
 
 Shell.reference = function(path) {
