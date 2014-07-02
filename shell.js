@@ -1,13 +1,17 @@
 //Shell.js - a library to treat a JavaScript environment like a unix shell.
-//Copyright 2011-2014 by Julius D'souza. Licensed under GPL 3.0
+//Copyright 2011-2014 by Julius D'souza. Licensed under GPL 3.0.
 //Currently uses jQuery for deep copy in the cp() function.
 
 //Shell = {path: ''};
 //Shell.path is of the form 'x.y.z'
 
-//TODO: wrap this in a self-executing anonymous function like every js good library
-//TODO: need a unix-style parameters handling function
-//TODO: change ls() and pwd() to return a reference or string on demand
+/* TODOS
+TODO: wrap this in a self-executing anonymous function like every js good library
+TODO: implement a unix-style parameters handling function
+TODO: parse array references properly in reference()
+-- It's horrible, but you should be able to "cd(x.y[2].z)"
+TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery dependency
+*/
 
 var Shell = (function(){
     var obj = {path: ''},
@@ -111,7 +115,7 @@ Shell.cp = function(origin, finish) {
         //deep copy's hard due to prototypes and dangling references
         //after chatting around on freenode, I've been convinced
         //that it's hard to beat jQuery's own implementation
-        //TODO: figure out how to do this cleanly in node
+        //edit: not so convinced anymore, need to figure out a clean way to do this
         if (destinationContext[local] === undefined) {
             destinationContext[local] = $.extend(true, {}, newObj);
         } else {
@@ -122,7 +126,7 @@ Shell.cp = function(origin, finish) {
 
 Shell.ls = function(key, params) {
     //declare contents of current path's object
-    //use Object.getOwnPropertyNames for hidden properties with the 'a' - hidden parameter
+    //use Object.getOwnPropertyNames for hidden properties with the 'a' parameter
     var keyPath = Shell.path + (key ? '.' + key : ''),
         lsMethod = /a/.test(params) ? Object.getOwnPropertyNames : Object.keys,
         currentObj = Shell.reference(keyPath) || {};
