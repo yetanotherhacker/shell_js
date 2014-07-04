@@ -7,7 +7,6 @@
 
 /* TODOS
 TODO: wrap this in a self-executing anonymous function like every js good library
-TODO: implement a unix-style parameters handling function
 TODO: parse array references properly in reference()
 -- It's horrible, but you should be able to "cd(x.y[2].z)"
 TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery dependency
@@ -124,11 +123,28 @@ Shell.cp = function(origin, finish) {
     }
 }
 
-Shell.ls = function(key, params) {
+Shell.validateOptions = function(paramString) {
+   if (/(((^|\s)-[\w]+|--[\w-]+)(\s)?)+$/.test(paramString)) {
+        return true;
+   } else {
+        console.warn("invalid option(s)");
+        return false;
+   }
+}
+
+Shell.handleOption = function(singleParams, literalParams) {
+    //example usage: Shell.handleOption('[xy]','(--x-option|--y-option)')
+    return RegExp('((^|\\s)-[\\w]?' + singleParams + '[\\w]?)|(' + doubleParams + '(\\s|$))'); 
+}
+
+Shell.ls = function(key, paramString) {
     //declare contents of current path's object
     //use Object.getOwnPropertyNames for hidden properties with the 'a' parameter
+    if (!Shell.validateOptions) {
+        return;
+    }
     var keyPath = Shell.path + (key ? '.' + key : ''),
-        lsMethod = /a/.test(params) ? Object.getOwnPropertyNames : Object.keys,
+        lsMethod = Shell.handleOption('a','--all').test(paramString) ? Object.getOwnPropertyNames : Object.keys,
         currentObj = Shell.reference(keyPath) || {};
     return lsMethod(currentObj).sort();
 }
