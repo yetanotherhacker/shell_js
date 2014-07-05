@@ -124,12 +124,13 @@ Shell.cp = function(origin, finish) {
 }
 
 Shell.validateOptions = function(paramString) {
-   if (/(((^|\s)-[\w]+|--[\w-]+)(\s)?)+$/.test(paramString)) {
+    //ensure that options are of form -[letters] or --word1-word2
+    if (/(((^|\s)-[\w]+|--[\w-]+)(\s)?)+$/.test(paramString)) {
         return true;
-   } else {
+    } else {
         console.warn("invalid option(s)");
         return false;
-   }
+    }
 }
 
 Shell.handleOption = function(singleParams, literalParams) {
