@@ -123,7 +123,7 @@ Shell.cp = function(origin, finish) {
     }
 }
 
-Shell.validateOptions = function(paramString) {
+Shell._validateOptions = function(paramString) {
     //ensure that options are of form -[letters] or --word1-word2
     if (/(((^|\s)-[\w]+|--[\w-]+)(\s)?)+$/.test(paramString)) {
         return true;
@@ -133,19 +133,19 @@ Shell.validateOptions = function(paramString) {
     }
 }
 
-Shell.handleOption = function(singleParams, literalParams) {
-    //example usage: Shell.handleOption('[xy]','(--x-option|--y-option)')
+Shell._handleOption = function(singleParams, literalParams) {
+    //example usage: Shell._handleOption('[xy]','(--x-option|--y-option)')
     return RegExp('((^|\\s)-[\\w]?' + singleParams + '[\\w]?)|(' + doubleParams + '(\\s|$))'); 
 }
 
 Shell.ls = function(key, paramString) {
     //declare contents of current path's object
     //use Object.getOwnPropertyNames for hidden properties with the 'a' parameter
-    if (!Shell.validateOptions) {
+    if (!Shell._validateOptions) {
         return;
     }
     var keyPath = Shell.path + (key ? '.' + key : ''),
-        lsMethod = Shell.handleOption('a','--all').test(paramString) ? Object.getOwnPropertyNames : Object.keys,
+        lsMethod = Shell._handleOption('a','--all').test(paramString) ? Object.getOwnPropertyNames : Object.keys,
         currentObj = Shell.reference(keyPath) || {};
     return lsMethod(currentObj).sort();
 }
