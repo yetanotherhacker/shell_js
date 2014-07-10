@@ -29,6 +29,6 @@ A few differences from the shell:
 
 `pwd()` returns a reference to the current path. `Shell.path` returns the path in `String` form
 
-`cp()` assumes jQuery for its deep copy functionality when copying objects for now
+`cp()` assumes jQuery for its deep copy functionality when copying objects for now and acts like `-r`
 
 `ls` only supports `-a` for now which is equivalent to `-A`.
