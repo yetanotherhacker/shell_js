@@ -12,19 +12,13 @@ TODO: parse array references properly in reference()
 TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery dependency
 */
 
-var Shell = (function(){
-    var obj = {path: ''},
-        exports = this['modules'] && modules['exports'],
-        returnObj;
-    if (exports) {
-        //CommonJS module handling
-        exports.Shell = obj;
-        return exports.Shell;
-    } else {
-        this['Shell'] = obj;
-        return this['Shell'];
-    }
-})();
+var Shell = {path: ''};
+
+if (this['modules'] && modules['exports']) {
+    exports.Shell = Shell;
+} else {
+    this['Shell'] = Shell;
+}
 
 Shell.environment = (this['window'] ? window : GLOBAL);
 
