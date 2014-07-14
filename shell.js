@@ -13,14 +13,14 @@ TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery d
 */
 
 var Shell = {path: ''};
+Shell.environment = (this['window'] ? window : GLOBAL);
 
-if (this['modules'] && modules['exports']) {
-    exports.Shell = Shell;
+if (Shell.environment['module'] && module['exports']) {
+    module.exports = Shell;
 } else {
     this['Shell'] = Shell;
 }
 
-Shell.environment = (this['window'] ? window : GLOBAL);
 
 if (!Shell.environment['Shell']) {
     console.warn('Can\'t access top level objects.');
