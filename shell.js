@@ -12,15 +12,13 @@ TODO: parse array references properly in reference()
 TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery dependency
 */
 
-var Shell = {path: ''};
-Shell.environment = (this['window'] ? window : GLOBAL);
+var Shell = {path: '', environment: (this['window'] ? window : GLOBAL)};
 
 if (Shell.environment['module'] && module['exports']) {
     module.exports = Shell;
 } else {
-    this['Shell'] = Shell;
+    Shell.environment['Shell'] = Shell;
 }
-
 
 if (!Shell.environment['Shell']) {
     console.warn('Can\'t access top level objects.');
