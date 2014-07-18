@@ -188,7 +188,14 @@ Shell.reference = function(path) {
         ref = Shell.environment;
     //if next token is an object, shift to it and repeat
         while ((pathArray.length) && (typeof(ref) === 'object')) {
-            ref = ref[pathArray.shift()];
+            var arrayRegex = /\[([^\]]+)\]/g,
+                startRegex = /^(\w+)\[/,
+                currentReference = pathArray.shift(),
+                innerRef, outerRef;
+
+            /*innerRef = startRegex.exec(currentReference)[1];
+            outerRef = currentReference.match(arrayRegex).map(function(i){ return i.slice(1, i.length - 1);});*/
+            ref = ref[currentReference];
         }
         return ref;
     } else {
