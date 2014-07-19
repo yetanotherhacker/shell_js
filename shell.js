@@ -194,8 +194,11 @@ Shell.reference = function(path) {
                 innerRef, outerRef;
 
             /*innerRef = startRegex.exec(currentReference)[1];
-            outerRef = currentReference.match(arrayRegex).map(function(i){ return i.slice(1, i.length - 1);});*/
+            outerRef = currentReference.match(arrayRegex).map(function(i){ return i.slice(1, i.length - 1);});
             ref = ref[currentReference];
+            while (outerRef.length && ref[currentReference] && ref[currentReference][outerRef[0]]) {
+                ref = ref[currentReference][outerRef.shift()];
+            }*/
         }
         return ref;
     } else {
