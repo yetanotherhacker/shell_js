@@ -23,12 +23,14 @@ i.e.
 Functions implemented:
 cd  cp  ls  mkdir   pwd reload  rm
 
-A few differences from the shell:
+Current quirks:
+
+`cp()` assumes jQuery for its deep copy functionality when copying objects and acts like `cp -r`
+
+`ls` only supports `-a` for now which is equivalent to `-A`.
 
 `mkdir()` is extended to take advantage of Javascript's prototyping system - see the source for details
 
 `pwd()` returns a reference to the current path. `Shell.path` returns the path in `String` form
 
-`cp()` assumes jQuery for its deep copy functionality when copying objects and acts like `cp -r`
-
-`ls` only supports `-a` for now which is equivalent to `-A`.
+'reference()' passes the last valid object possible
