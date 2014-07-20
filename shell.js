@@ -193,12 +193,13 @@ Shell.reference = function(path) {
                 currentReference = pathArray.shift(),
                 innerRef, outerRef;
 
-            /*innerRef = startRegex.exec(currentReference)[1];
-            outerRef = currentReference.match(arrayRegex).map(function(i){ return i.slice(1, i.length - 1);});
-            ref = ref[currentReference];
-            while (outerRef.length && ref[currentReference] && ref[currentReference][outerRef[0]]) {
-                ref = ref[currentReference][outerRef.shift()];
-            }*/
+            innerRef = startRegex.exec(currentReference);
+            innerRef = innerRef && innerRef[1];
+            outerRef = (currentReference.match(arrayRegex) || []).map(function(i){ return i.slice(1, i.length - 1);});
+            ref = ref[innerRef || currentReference];
+            while (innerRef && outerRef.length && ref && ref[outerRef[0]]) {
+                ref = ref[outerRef.shift()];
+            }
         }
         return ref;
     } else {
