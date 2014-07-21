@@ -33,4 +33,4 @@ Current quirks:
 
 `pwd()` returns a reference to the current path. `Shell.path` returns the path in `String` form
 
-'reference()' passes the last valid object possible
+`reference()` passes the last valid object encountered in the path
