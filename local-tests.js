@@ -1,5 +1,5 @@
 // TODO: figure out scoping weirdness with GLOBAL and this
-shell = require('./shell.js');
+shell = new (require('./shell.js'))();
 testHash = {a: [ 1, [ 2 ], { b: [ 3, [ 4, 5 ] ] } ] };
 allPass = true;
 tests = {
