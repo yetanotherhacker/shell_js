@@ -1,4 +1,4 @@
-//this.js - a library to treat a JavaScript environment like a unix this.
+//shell.js - a library to treat a JavaScript environment like a unix shell.
 //Copyright 2011-2014 by Julius D'souza. Licensed under GPL 3.0.
 
 /* TODOS
