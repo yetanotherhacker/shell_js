@@ -111,7 +111,7 @@ Shell = function(){
         }
     };
 
-    this._handleOption = function(singleParams, literalParams) {
+    this._handleOption = function(singleParams, doubleParams) {
         //example usage: this._handleOption('[xy]','(--x-option|--y-option)')
         return RegExp('((^|\\s)-[\\w]?' + singleParams + '[\\w]?)|(' + doubleParams + '(\\s|$))'); 
     };
