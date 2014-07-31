@@ -6,10 +6,10 @@ tests = {
     checkRefs: function() {
         return [4 == shell.reference('testHash.a[2].b[1][0]'), 'array and object referencing'];
     },
-    mkdirRegular: function() {
+    mkdirLocal: function() {
         shell.cd('testHash.a[2]');
         shell.mkdir('testDir');
-        return [2 == Object.keys(shell.reference('testHash.a[2]')).length, Object.keys(shell.reference('testHash.a[2]'))];
+        return [2 == Object.keys(shell.reference('testHash.a[2]')).length, 'local scope mkdir()'];
     }
 };
 
