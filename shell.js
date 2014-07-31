@@ -40,12 +40,13 @@ Shell = function(){
         } else {
             return 'No such object exists.';
         }
-    }
+    };
 
     this.cp = function(origin, finish) {
+        if (typeof origin !== 'string' || typeof finish !== 'string') {
+            return;
+        }
         //hard copy from origin to finish
-        //slightly hairy, but copying is a hairy operation anyway
-        //in a dynamic language with 'interesting' moduling and scoping
         var newObj = '',
             destinationContext = '',
             local = [],
@@ -98,7 +99,7 @@ Shell = function(){
                 destinationContext[local] = $.extend(true, destinationContext[local], newObj);
             }
         }
-    }
+    };
 
     this._validateOptions = function(paramString) {
         //ensure that options are of form -[letters] or --word1-word2
@@ -108,12 +109,12 @@ Shell = function(){
             console.warn("invalid option(s)");
             return false;
         }
-    }
+    };
 
     this._handleOption = function(singleParams, literalParams) {
         //example usage: this._handleOption('[xy]','(--x-option|--y-option)')
         return RegExp('((^|\\s)-[\\w]?' + singleParams + '[\\w]?)|(' + doubleParams + '(\\s|$))'); 
-    }
+    };
 
     this.ls = function(key, paramString) {
         //declare contents of current path's object
@@ -125,27 +126,35 @@ Shell = function(){
             lsMethod = this._handleOption('a','--all').test(paramString) ? Object.getOwnPropertyNames : Object.keys,
             currentObj = this.reference(keyPath) || {};
         return lsMethod(currentObj).sort();
-    }
+    };
 
     this.mkdir = function(newObj, protoObj) {
+        //TODO: referenced mkdir's
+        // ---- i.e. mkdir('x.y') with a path of 'z' makes x.y.z = {}
         //mkdir(newObj) makes an empty object
         //mkdir(newObj, protoObj) makes an object newObj with protoObj as the prototype
         //so newObj inherits protoObj's properties
-        //in addition, newObj.proto gives the path to protoObj
-        if (typeof(protoObj) === 'undefined') {
+        var objCreated;
+        if (typeof protoObj === 'string') {
+            //TODO fix scoping for prototype object
+            //TODO make new .proto property
+            //objCreated = Object.create(this.reference(protoObj));
+            objCreated = Object.create(this.reference(this.path)[protoObj]);
+        } else {
+            objCreated = {};
+        }
+        if (typeof(this.reference(newObj)) === 'undefined') {
             //normal mkdir behavior
-            this.reference(this.path)[newObj] = {};
-        } else if (typeof(this.reference(this.path)[protoObj]) === 'object') {
+            this.reference(this.path)[newObj] = objCreated;
+        } else if (typeof(this.reference(this.path)[newObj]) === 'object') {
             //local extension
-            this.reference(this.path)[newObj] = Object.create(this.reference(this.path)[protoObj]);
-            this.reference(this.path)[newObj].proto = [this.path, '.', protoObj].join('');
-        } else if (typeof(this.reference(protoObj) === 'object')) {
+            this.reference(this.path)[newObj] = objCreated;
+        } else if (typeof(this.reference(newObj) === 'object')) {
             //global extension
-            this.reference(this.path)[newObj] = Object.create(this.reference(protoObj));
-            this.reference(this.path)[newObj].proto = protoObj;
+            this.reference(newObj) = objCreated;
         }
         return newObj;
-    }
+    };
 
     this.pwd = function(stringFlag) {
         var result;
@@ -163,7 +172,7 @@ Shell = function(){
             }
         }
         return result;
-    }
+    };
 
     this.reference = function(path) {
         //takes a path string and returns what it refers to if it exists
@@ -190,7 +199,7 @@ Shell = function(){
         } else {
             return this.environment;
         }
-    }
+    };
 
     this.rm = function(keyString) {
         if (!keyString) {
@@ -203,7 +212,7 @@ Shell = function(){
         } else {
             return 'rm: could not find item';
         }
-    }
+    };
 }
 
 //return function if in a browser, export a module with a new object if in node

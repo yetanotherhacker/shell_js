@@ -32,7 +32,7 @@ Current quirks:
 
 `ls` only supports `-a` for now which is equivalent to `-A`.
 
-`mkdir()` is extended to take advantage of Javascript's prototyping system - see the source for details
+`mkdir()` supports prototypes as a second parameter but has limited scope for now - see source for details
 
 `pwd()` returns a reference to the current path. `foo.path` returns the path in `String` form
 
