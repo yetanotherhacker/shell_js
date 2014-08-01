@@ -4,12 +4,23 @@ testHash = {a: [ 1, [ 2 ], { b: [ 3, [ 4, 5 ] ] } ] };
 allPass = true;
 tests = {
     checkRefs: function() {
+        shell.cd('');
         return [4 == shell.reference('testHash.a[2].b[1][0]'), 'array and object referencing'];
     },
     mkdirLocal: function() {
+        shell.cd('');
         shell.cd('testHash.a[2]');
         shell.mkdir('testDir');
         return [2 == Object.keys(shell.reference('testHash.a[2]')).length, 'local scope mkdir()'];
+    },
+    globalMakeRemove: function() {
+        var isDirMade, isDirRemoved;
+        shell.cd('');
+        shell.mkdir('emptyTestHash');
+        isDirMade = GLOBAL['emptyTestHash'] && !Object.keys(emptyTestHash).length;
+        shell.rm('emptyTestHash');
+        isDirRemoved = !GLOBAL['emptyTestHash'];
+        return [isDirMade && isDirRemoved, 'global make and remove directory'];
     }
 };
 
