@@ -131,6 +131,7 @@ Shell = function(){
     this.mkdir = function(newObj, protoObj) {
         //TODO: referenced mkdir's
         // ---- i.e. mkdir('x.y') with a path of 'z' makes x.y.z = {}
+        //TODO: check if overwriting an existing object
         //mkdir(newObj) makes an empty object
         //mkdir(newObj, protoObj) makes an object newObj with protoObj as the prototype
         //so newObj inherits protoObj's properties
