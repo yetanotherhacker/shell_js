@@ -13,6 +13,29 @@ tests = {
         shell.mkdir('testDir');
         return [2 == Object.keys(shell.reference('testHash.a[2]')).length, 'local scope mkdir()'];
     },
+    mkdirScoping: function() {
+        var passTest = true;
+        shell.cd('');
+        shell.mkdir('testHashA');
+        passTest &= !Object.keys(testHashA).length;
+        shell.mkdir('testHashB');
+        passTest &= !Object.keys(testHashB).length;
+        shell.mkdir('testHashA.c');
+        passTest &= Object.keys(testHashA).length == 1;
+        shell.cd('testHashA');
+        shell.mkdir('d');
+        passTest &= Object.keys(testHashA).length == 2;
+        shell.mkdir('d.e');
+        passTest &= Object.keys(testHashA.d).length == 1;
+        shell.mkdir('testHashB.d');
+        passTest &= Object.keys(testHashB).length == 1;
+        shell.mkdir('testHashB.d.e');
+        passTest &= Object.keys(testHashB.d).length == 1;
+        shell.cd('');
+        shell.rm('testHashA');
+        shell.rm('testHashB');
+        return [passTest, 'global and local scoping for mkdir()']
+    },
     globalMakeRemove: function() {
         var isDirMade, isDirRemoved;
         shell.cd('');
@@ -20,7 +43,7 @@ tests = {
         isDirMade = GLOBAL['emptyTestHash'] && !Object.keys(emptyTestHash).length;
         shell.rm('emptyTestHash');
         isDirRemoved = !GLOBAL['emptyTestHash'];
-        return [isDirMade && isDirRemoved, 'global make and remove directory'];
+        return [isDirMade && isDirRemoved, 'global make and remove object'];
     }
 };
 
