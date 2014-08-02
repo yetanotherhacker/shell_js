@@ -16,7 +16,7 @@ Shell = function(){
         //cd($string) switches to the object
         // -- local scoping followed by global scoping
 
-        if (objString === null) { //default no argument behavior
+        if (objString === null) { //default no argument behaviour
             return;
         } else if (objString === '') {
             this.path = ''; //move to the top
@@ -129,13 +129,21 @@ Shell = function(){
     };
 
     this.mkdir = function(newObj, protoObj) {
-        //TODO: referenced mkdir's
-        // ---- i.e. mkdir('x.y') with a path of 'z' makes x.y.z = {}
-        //TODO: check if overwriting an existing object
+        //TODO: move scoping functionality to separate function
+        //TODO: figure out overwriting options / what to do if existing entry is not an object
         //mkdir(newObj) makes an empty object
         //mkdir(newObj, protoObj) makes an object newObj with protoObj as the prototype
         //so newObj inherits protoObj's properties
-        var objCreated;
+        var objCreated,
+            globalPathEnvironment = newObj.split('.'),
+            globalPathObject = globalPathEnvironment.pop(),
+            localPathEnvironment = [this.path, newObj].join('.').split('.'),
+            localPathObject = localPathEnvironment.pop(),
+            isLocalObj = this.reference('') !== this.reference(this.path) && !/\./.test(newObj);
+
+        globalPathEnvironment = this.reference(globalPathEnvironment.join('.'));
+        localPathEnvironment = this.reference(localPathEnvironment.join('.'));
+
         if (typeof protoObj === 'string') {
             //TODO fix scoping for prototype object
             //TODO make new .proto property
@@ -144,17 +152,14 @@ Shell = function(){
         } else {
             objCreated = {};
         }
-        if (typeof(this.reference(newObj)) === 'undefined') {
-            //normal mkdir behavior
-            this.reference(this.path)[newObj] = objCreated;
-        } else if (typeof(this.reference(this.path)[newObj]) === 'object') {
-            //local extension
-            this.reference(this.path)[newObj] = objCreated;
-        } else if (typeof(this.reference(newObj) === 'object')) {
-            //global extension
-            this.reference(newObj) = objCreated;
+
+        if (!isLocalObj && typeof(globalPathEnvironment) === 'object' && typeof(this.reference(newObj)) === 'undefined') {
+            //global mkdir behaviour
+            return globalPathEnvironment[globalPathObject] = objCreated;
+        } else if (typeof(localPathEnvironment) === 'object' && typeof(localPathEnvironment[localPathObject]) === 'undefined') {
+            //local mkdir behaviour
+            return localPathEnvironment[localPathObject] = objCreated;
         }
-        return newObj;
     };
 
     this.pwd = function(stringFlag) {
