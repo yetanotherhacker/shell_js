@@ -34,7 +34,7 @@ tests = {
         shell.cd('');
         shell.rm('testHashA');
         shell.rm('testHashB');
-        return [passTest, 'global and local scoping for mkdir()']
+        return [passTest, 'global and local scoping for mkdir()'];
     },
     globalMakeRemove: function() {
         var isDirMade, isDirRemoved;
@@ -44,6 +44,13 @@ tests = {
         shell.rm('emptyTestHash');
         isDirRemoved = !GLOBAL['emptyTestHash'];
         return [isDirMade && isDirRemoved, 'global make and remove object'];
+    },
+    lsOpts: function() {
+        var zeroOpt = shell.ls().length,
+            singleOpt = shell.ls('', '-a').length,
+            doubleOpt = shell.ls('', '--all').length;
+
+        return [(singleOpt === doubleOpt) && (singleOpt > zeroOpt), 'ls opts work'];
     }
 };
 
