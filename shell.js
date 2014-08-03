@@ -119,8 +119,8 @@ Shell = function(){
     this.ls = function(key, paramString) {
         //declare contents of current path's object
         //use Object.getOwnPropertyNames for hidden properties with the 'a' parameter
-        if (!this._validateOptions) {
-            return;
+        if (paramString && !this._validateOptions(paramString)) {
+            return [];
         }
         var keyPath = this.path + (key ? '.' + key : ''),
             lsMethod = this._handleOption('a','--all').test(paramString) ? Object.getOwnPropertyNames : Object.keys,
