@@ -46,11 +46,17 @@ tests = {
         return [isDirMade && isDirRemoved, 'global make and remove object'];
     },
     lsOpts: function() {
-        var zeroOpt = shell.ls().length,
-            singleOpt = shell.ls('', '-a').length,
-            doubleOpt = shell.ls('', '--all').length;
+        var zeroOpt, singleOpt, doubleOpt;
+        shell.cd('');
+        zeroOpt = shell.ls().length;
+        singleOpt = shell.ls('', '-a').length;
+        doubleOpt = shell.ls('', '--all').length;
 
-        return [(singleOpt === doubleOpt) && (singleOpt > zeroOpt), 'ls opts work'];
+        return [(singleOpt === doubleOpt) && (singleOpt > zeroOpt), 'ls() valid opts'];
+    },
+    lsInvalidOpts: function() {
+        shell.cd('');
+        return [!(shell.ls('','s').length || shell.ls('--a').length || shell.ls('---').length), 'ls() invalid options']
     }
 };
 

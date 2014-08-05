@@ -4,6 +4,7 @@
 /* TODOS
 TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery dependency
 TODO: return a function wrapping the object like all those nice js libraries
+TODO: make a dev. mode option for console warnings
 */
 Shell = function(){
     this.path = '';
@@ -103,10 +104,10 @@ Shell = function(){
 
     this._validateOptions = function(paramString) {
         //ensure that options are of form -[letters] or --word1-word2
-        if (/(((^|\s)-[\w]+|--[\w-]+)(\s)?)+$/.test(paramString)) {
+        if (/(((^|\s)-[\w]+|--[\w][\w-]+)(\s)?)+$/.test(paramString)) {
             return true;
         } else {
-            console.warn("invalid option(s)");
+            //console.warn("invalid option(s)");
             return false;
         }
     };
