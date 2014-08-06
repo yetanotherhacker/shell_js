@@ -17,9 +17,7 @@ Shell = function(){
         //cd($string) switches to the object
         // -- local scoping followed by global scoping
 
-        if (objString === null) { //default no argument behaviour
-            return;
-        } else if (objString === '') {
+        if (!objString) {
             this.path = ''; //move to the top
         } else if (objString === '..') {
             //move up the object chain: x.y.z -> x.y
@@ -69,7 +67,7 @@ Shell = function(){
         //(can't copy to a non-existent path!)
         local = destinationPathArray.pop();
         if (destinationPathArray !== '') {
-            destinationPathString = destinationPathArray.reduce(function(x, y){ return x.concat('.', y);});
+            destinationPathString = destinationPathArray.reduce(function(x, y){ return x.concat('.', y);}, '');
         }
 
         if (destinationPathString === '') {
@@ -85,7 +83,7 @@ Shell = function(){
             return destinationPathString + ' is not an object.';
         }
 
-        if ((typeof(newObj) === 'function') || (typeof(newObj) === 'string') || (typeof(newObj) === 'number')) {
+        if (/(function|number|string)/.test(typeof(newObj))) {
             //about everything except objects does copy by value
             //objects do copy by reference
             destinationContext[local] = newObj;
@@ -94,10 +92,13 @@ Shell = function(){
             //after chatting around on freenode, I've been convinced
             //that it's hard to beat jQuery's own implementation
             //edit: not so convinced anymore, need to figure out a clean way to do this
-            if (destinationContext[local] === undefined) {
-                destinationContext[local] = $.extend(true, {}, newObj);
+            if (!shell.reference()['jQuery']) {
+                return;
+            }
+            if (!destinationContext[local]) {
+                destinationContext[local] = jQuery.extend(true, {}, newObj);
             } else {
-                destinationContext[local] = $.extend(true, destinationContext[local], newObj);
+                destinationContext[local] = jQuery.extend(true, destinationContext[local], newObj);
             }
         }
     };
@@ -135,19 +136,19 @@ Shell = function(){
         //mkdir(newObj) makes an empty object
         //mkdir(newObj, protoObj) makes an object newObj with protoObj as the prototype
         //so newObj inherits protoObj's properties
-        var objCreated,
-            globalPathEnvironment = newObj.split('.'),
+        var globalPathEnvironment = newObj.split('.'),
             globalPathObject = globalPathEnvironment.pop(),
+            isLocalObj = this.reference('') !== this.reference(this.path) && !/\./.test(newObj),
             localPathEnvironment = [this.path, newObj].join('.').split('.'),
             localPathObject = localPathEnvironment.pop(),
-            isLocalObj = this.reference('') !== this.reference(this.path) && !/\./.test(newObj);
+            objCreated;
 
         globalPathEnvironment = this.reference(globalPathEnvironment.join('.'));
         localPathEnvironment = this.reference(localPathEnvironment.join('.'));
 
         if (typeof protoObj === 'string') {
             //TODO fix scoping for prototype object
-            //TODO make new .proto property
+            //TODO make new .proto property as an option
             //objCreated = Object.create(this.reference(protoObj));
             objCreated = Object.create(this.reference(this.path)[protoObj]);
         } else {
@@ -163,9 +164,9 @@ Shell = function(){
         }
     };
 
-    this.pwd = function(stringFlag) {
+    this.pwd = function(returnString) {
         var result;
-        if (stringFlag) {
+        if (returnString) {
             if (this.path === '') {
                 result = 'this';
             } else {
@@ -183,17 +184,15 @@ Shell = function(){
 
     this.reference = function(path) {
         //takes a path string and returns what it refers to if it exists
-        var pathArray, ref;
-        if (path !== '') {
+        var pathArray, ref, innerRef, outerRef, currentReference,
+            arrayRegex = /\[([^\]]+)\]/g,
+            startRegex = /^(\w+)\[/;
+        if (path) {
             pathArray = path.split('.');
             ref = this.environment;
         //if next token is an object, shift to it and repeat
             while ((pathArray.length) && (typeof(ref) === 'object')) {
-                var arrayRegex = /\[([^\]]+)\]/g,
-                    startRegex = /^(\w+)\[/,
-                    currentReference = pathArray.shift(),
-                    innerRef, outerRef;
-
+                currentReference = pathArray.shift(),
                 innerRef = startRegex.exec(currentReference);
                 innerRef = innerRef && innerRef[1];
                 outerRef = (currentReference.match(arrayRegex) || []).map(function(i){ return i.slice(1, i.length - 1);});
@@ -209,6 +208,7 @@ Shell = function(){
     };
 
     this.rm = function(keyString) {
+        //todo check scoping works
         if (!keyString) {
             //do nothing if there's nothing to delete
             return 'rm: missing operand';
