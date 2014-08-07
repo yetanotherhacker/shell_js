@@ -6,7 +6,7 @@ allPass = true;
 tests = {
     mkdirScoping: function() {
         //check global and local scoping work for mkdir()
-        //todo repeat for rm() once supported
+        //todo repeat scoping checks for rm() once supported
         var passTest = true;
         shell.cd();
         shell.mkdir('testHashA');
@@ -34,9 +34,9 @@ tests = {
         var isDirMade, isDirRemoved;
         shell.cd();
         shell.mkdir('emptyTestHash');
-        isDirMade = shell.reference('')['emptyTestHash'] && !Object.keys(emptyTestHash).length;
+        isDirMade = shell.reference()['emptyTestHash'] && !Object.keys(emptyTestHash).length;
         shell.rm('emptyTestHash');
-        isDirRemoved = !shell.reference('')['emptyTestHash'];
+        isDirRemoved = !shell.reference()['emptyTestHash'];
         return [isDirMade && isDirRemoved, 'global make and remove object'];
     },
     lsOpts: function() {
@@ -56,7 +56,7 @@ tests = {
         //simple does reference() work check
         //checks initial conditions - keeping this way to make sure all variables are removed cleanly
         shell.cd();
-        return [4 == shell.reference('testHash.a[2].b[1][0]'), 'array and object referencing'];
+        return [4 == shell.reference('testHash.a[2].b[1][0]'), 'array and object mixed referencing'];
     },
 };
 

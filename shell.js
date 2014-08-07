@@ -66,11 +66,11 @@ Shell = function(){
         //check to see if the parent of the what we're copying to exists:
         //(can't copy to a non-existent path!)
         local = destinationPathArray.pop();
-        if (destinationPathArray !== '') {
+        if (destinationPathArray !== []) {
             destinationPathString = destinationPathArray.reduce(function(x, y){ return x.concat('.', y);}, '');
         }
 
-        if (destinationPathString === '') {
+        if (!destinationPathString) {
             //a local reference
             destinationContext = this.reference(this.path);
         } else if (typeof(this.reference([this.path, '.', destinationPathString].join(''))) === 'object') {
@@ -167,13 +167,13 @@ Shell = function(){
     this.pwd = function(returnString) {
         var result;
         if (returnString) {
-            if (this.path === '') {
+            if (!this.path) {
                 result = 'this';
             } else {
                 result = this.path;
             }
         } else {
-            if (this.path === '') {
+            if (!this.path) {
                 result = this;
             } else {
                 result = this.reference(this.path);
