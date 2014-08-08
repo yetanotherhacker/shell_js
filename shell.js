@@ -92,7 +92,7 @@ Shell = function(){
             //after chatting around on freenode, I've been convinced
             //that it's hard to beat jQuery's own implementation
             //edit: not so convinced anymore, need to figure out a clean way to do this
-            if (!shell.reference()['jQuery']) {
+            if (!this.reference()['jQuery']) {
                 return;
             }
             if (!destinationContext[local]) {
@@ -130,37 +130,71 @@ Shell = function(){
         return lsMethod(currentObj).sort();
     };
 
-    this.mkdir = function(newObj, protoObj) {
-        //TODO: move scoping functionality to separate function
+    this.mkdir = function(newObjPath, protoObjPath) {
         //TODO: figure out overwriting options / what to do if existing entry is not an object
-        //mkdir(newObj) makes an empty object
-        //mkdir(newObj, protoObj) makes an object newObj with protoObj as the prototype
-        //so newObj inherits protoObj's properties
-        var globalPathEnvironment = newObj.split('.'),
-            globalPathObject = globalPathEnvironment.pop(),
-            isLocalObj = this.reference('') !== this.reference(this.path) && !/\./.test(newObj),
-            localPathEnvironment = [this.path, newObj].join('.').split('.'),
-            localPathObject = localPathEnvironment.pop(),
+        //mkdir(newObjPath) makes an empty object
+        //mkdir(newObjPath, protoObjPath) makes an object newObj with protoObj as the prototype
+        //so newObj inherits protoObjPath's properties
+        var newObj = newObjPath.split('.').pop(),
+            context = this._newContext(newObjPath),
             objCreated;
 
-        globalPathEnvironment = this.reference(globalPathEnvironment.join('.'));
-        localPathEnvironment = this.reference(localPathEnvironment.join('.'));
+        if (!context) {
+            return;
+        }
 
-        if (typeof protoObj === 'string') {
-            //TODO fix scoping for prototype object
+        if (typeof protoObjPath === 'string' && this.scope(protoObjPath)) {
             //TODO make new .proto property as an option
-            //objCreated = Object.create(this.reference(protoObj));
-            objCreated = Object.create(this.reference(this.path)[protoObj]);
+            objCreated = Object.create(this.scope(protoObjPath));
         } else {
             objCreated = {};
         }
 
-        if (!isLocalObj && typeof(globalPathEnvironment) === 'object' && typeof(this.reference(newObj)) === 'undefined') {
-            //global mkdir behaviour
-            return globalPathEnvironment[globalPathObject] = objCreated;
-        } else if (typeof(localPathEnvironment) === 'object' && typeof(localPathEnvironment[localPathObject]) === 'undefined') {
-            //local mkdir behaviour
-            return localPathEnvironment[localPathObject] = objCreated;
+        context[newObj] = objCreated;
+    };
+
+    this._newContext = function(pathString) {
+        var parentPath = pathString.split('.'),
+            pathEnd = parentPath.pop(),
+            context;
+
+        parentPath = parentPath.join('.');
+        if (parentPath) {
+            context = this.scope(parentPath);
+            return context && !context[pathEnd] && context; //get the actual object reference
+        } else {
+            return this.reference(this.path);
+        }
+    };
+
+    this.scope = function(newObj, val) {
+        if (!newObj) {
+            return this.reference();
+        }
+        var globalPathEnvironment = newObj.split('.'),
+            globalPathObject = globalPathEnvironment.pop(),
+            localPathEnvironment = [this.path, newObj].join('.').split('.'),
+            localPathObject = localPathEnvironment.pop(),
+            isLocalObj;
+
+        globalPathEnvironment = this.reference(globalPathEnvironment.join('.'));
+        localPathEnvironment = this.reference(localPathEnvironment.join('.'));
+        isLocalObj = localPathEnvironment && localPathEnvironment[localPathObject];
+
+        if (!isLocalObj && typeof(globalPathEnvironment) === 'object') {
+            //global scoping behaviour
+            if (val) {
+                globalPathEnvironment[globalPathObject] = val;
+            } else {
+                return globalPathEnvironment[globalPathObject];
+            }
+        } else if (typeof(localPathEnvironment) === 'object') {
+            //local scoping behaviour
+            if (val) {
+                localPathEnvironment[localPathObject] = val;
+            } else {
+                return localPathEnvironment[localPathObject];
+            }
         }
     };
 
