@@ -167,13 +167,13 @@ Shell = function(){
         }
     };
 
-    this.scope = function(newObj, val) {
-        if (!newObj) {
+    this.scope = function(objString, val, deleteFlag) {
+        if (!objString) {
             return this.reference();
         }
-        var globalPathEnvironment = newObj.split('.'),
+        var globalPathEnvironment = objString.split('.'),
             globalPathObject = globalPathEnvironment.pop(),
-            localPathEnvironment = [this.path, newObj].join('.').split('.'),
+            localPathEnvironment = [this.path, objString].join('.').split('.'),
             localPathObject = localPathEnvironment.pop(),
             isLocalObj;
 
@@ -183,14 +183,18 @@ Shell = function(){
 
         if (!isLocalObj && typeof(globalPathEnvironment) === 'object') {
             //global scoping behaviour
-            if (val) {
+            if (deleteFlag) {
+                delete globalPathEnvironment[globalPathObject];
+            } else if (val) {
                 globalPathEnvironment[globalPathObject] = val;
             } else {
                 return globalPathEnvironment[globalPathObject];
             }
         } else if (typeof(localPathEnvironment) === 'object') {
             //local scoping behaviour
-            if (val) {
+            if (deleteFlag) {
+                delete localPathEnvironment[localPathObject];
+            } else if (val) {
                 localPathEnvironment[localPathObject] = val;
             } else {
                 return localPathEnvironment[localPathObject];
@@ -242,17 +246,7 @@ Shell = function(){
     };
 
     this.rm = function(keyString) {
-        //todo check scoping works
-        if (!keyString) {
-            //do nothing if there's nothing to delete
-            return 'rm: missing operand';
-        } else if (typeof(this.reference(this.path)[keyString]) !== 'undefined') {
-            delete this.reference(this.path)[keyString];    //clear local variable
-        } else if (typeof(this.reference(keyString)) !== 'undefined') {
-            delete this.environment[keyString];  //clear out global variable
-        } else {
-            return 'rm: could not find item';
-        }
+        this.scope(keyString, null, true);
     };
 }
 
