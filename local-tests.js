@@ -15,6 +15,7 @@ tests = {
         passTest &= !Object.keys(testHashB).length;
         shell.mkdir('testHashA.c');
         passTest &= Object.keys(testHashA).length == 1;
+
         shell.cd('testHashA');
         shell.mkdir('d');
         passTest &= Object.keys(testHashA).length == 2;
@@ -24,6 +25,7 @@ tests = {
         passTest &= Object.keys(testHashB).length == 1;
         shell.mkdir('testHashB.d.e');
         passTest &= Object.keys(testHashB.d).length == 1;
+
         shell.cd();
         shell.rm('testHashA');
         shell.rm('testHashB');
@@ -52,12 +54,25 @@ tests = {
         shell.cd();
         return [!(shell.ls('', 's').length || shell.ls('--a').length || shell.ls('---').length), 'ls() invalid options']
     },
+    rmScoping: function() {
+        var passTest = true;
+        shell.cd();
+        shell.mkdir('testHashA');
+        shell.mkdir('testHashB');
+        testHashA.a = {b: 3};
+
+        shell.cd('testHashA');
+        shell.rm('a.b');
+        passTest &= !Object.keys(testHashA.a).length;
+        shell.rm('testHashB');
+        passTest &= !shell.reference('testHashB');
+        return [passTest, 'global and local scoping for rm()'];
+    },
     checkRefs: function() {
         //simple does reference() work check
-        //checks initial conditions - keeping this way to make sure all variables are removed cleanly
         shell.cd();
         return [4 == shell.reference('testHash.a[2].b[1][0]'), 'array and object mixed referencing'];
-    },
+    }
 };
 
 for (testName in tests) {
