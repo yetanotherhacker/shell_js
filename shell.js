@@ -3,7 +3,7 @@
 
 /* TODOS
 TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery dependency
-TODO: return a function wrapping the object like all those nice js libraries
+TODO: asterisk pattern matching? I.e. rm("object1.*").
 TODO: make a dev. mode option for console warnings
 */
 Shell = function(){
