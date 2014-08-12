@@ -28,7 +28,7 @@ cd  cp  ls  mkdir   pwd reload  rm
 
 Current quirks:
 
-`cp()` assumes jQuery for its deep copy functionality when copying objects and acts like `cp -r`
+`cp()` acts like `cp -r`
 
 `ls` only supports `-a` for now which is equivalent to `-A`.
 
