@@ -42,65 +42,7 @@ Shell = function(){
     };
 
     this.cp = function(origin, finish) {
-        if (typeof origin !== 'string' || typeof finish !== 'string') {
-            return;
-        }
-        //hard copy from origin to finish
-        var newObj = '',
-            destinationContext = '',
-            local = [],
-            localPath = [this.path, '.', origin].join(''),
-            destinationPathArray = finish.split('.'),
-            destinationPathString = '';
-
-        if (this.reference(localPath) !== undefined) {
-            //check if the string refers to something local
-            newObj = this.reference(localPath);
-        } else if (this.reference(origin) !== undefined) {
-            //check if the string refers to something global
-            newObj = this.reference(origin);
-        } else {
-            return origin + ' doesn\'t exist!';
-        }
-
-        //check to see if the parent of the what we're copying to exists:
-        //(can't copy to a non-existent path!)
-        local = destinationPathArray.pop();
-        if (destinationPathArray !== []) {
-            destinationPathString = destinationPathArray.reduce(function(x, y){ return x.concat('.', y);}, '');
-        }
-
-        if (!destinationPathString) {
-            //a local reference
-            destinationContext = this.reference(this.path);
-        } else if (typeof(this.reference([this.path, '.', destinationPathString].join(''))) === 'object') {
-            //traverse and create a local reference
-            destinationContext = this.reference([this.path, '.', destinationPathString]);
-        } else if (typeof(this.reference(destinationPathString)) === 'object') {
-            //create global reference
-            destinationContext = this.reference(destinationPathString);
-        } else {
-            return destinationPathString + ' is not an object.';
-        }
-
-        if (/(function|number|string)/.test(typeof(newObj))) {
-            //about everything except objects does copy by value
-            //objects do copy by reference
-            destinationContext[local] = newObj;
-        } else if (typeof(newObj) === 'object') {
-            //deep copy's hard due to prototypes and dangling references
-            //after chatting around on freenode, I've been convinced
-            //that it's hard to beat jQuery's own implementation
-            //edit: not so convinced anymore, need to figure out a clean way to do this
-            if (!this.reference()['jQuery']) {
-                return;
-            }
-            if (!destinationContext[local]) {
-                destinationContext[local] = jQuery.extend(true, {}, newObj);
-            } else {
-                destinationContext[local] = jQuery.extend(true, destinationContext[local], newObj);
-            }
-        }
+        return this.scope(finish, this.scope(origin));
     };
 
     this._validateOptions = function(paramString) {
@@ -179,7 +121,7 @@ Shell = function(){
 
         globalPathEnvironment = this.reference(globalPathEnvironment.join('.'));
         localPathEnvironment = this.reference(localPathEnvironment.join('.'));
-        isLocalObj = localPathEnvironment && localPathEnvironment[localPathObject];
+        isLocalObj = localPathEnvironment && (localPathEnvironment[localPathObject] || val);
 
         if (!isLocalObj && typeof(globalPathEnvironment) === 'object') {
             //global scoping behaviour
