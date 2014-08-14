@@ -68,6 +68,19 @@ tests = {
         passTest &= !shell.reference('testHashB');
         return [passTest, 'global and local scoping for rm()'];
     },
+    cpScoping: function() {
+        var passTest = true;
+        shell.cd();
+        shell.cp('testHash.a', 'testHash.x');
+        passTest = passTest && shell.reference('testHash.x');
+
+        shell.cd('testHash');
+        shell.cp('x', 'z');
+        passTest = passTest && shell.reference('testHash.z');
+        shell.rm('x');
+        shell.rm('z');
+        return [passTest, 'global and local scoping for cp()'];
+    },
     checkRefs: function() {
         //simple does reference() work check
         shell.cd();
