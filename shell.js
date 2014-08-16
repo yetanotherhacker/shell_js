@@ -96,6 +96,7 @@ Shell = function(){
     };
 
     this._newContext = function(pathString) {
+        //ensure that the property to be made doesn't exist yet but is valid
         var parentPath = pathString.split('.'),
             pathEnd = parentPath.pop(),
             context;
@@ -164,24 +165,24 @@ Shell = function(){
 
     this.reference = function(path) {
         //takes a path string and returns what it refers to if it exists
-        var pathArray, ref, innerRef, outerRef, currentReference,
+        var pathArray, varRef, innerRef, outerRef, currentReference,
             arrayRegex = /\[([^\]]+)\]/g,
             startRegex = /^(\w+)\[/;
         if (path) {
             pathArray = path.split('.');
-            ref = this.environment;
+            varRef = this.environment;
         //if next token is an object, shift to it and repeat
-            while ((pathArray.length) && (typeof(ref) === 'object')) {
-                currentReference = pathArray.shift(),
+            while ((pathArray.length) && (typeof(varRef) === 'object')) {
+                currentReference = pathArray.shift();
                 innerRef = startRegex.exec(currentReference);
                 innerRef = innerRef && innerRef[1];
                 outerRef = (currentReference.match(arrayRegex) || []).map(function(i){ return i.slice(1, i.length - 1);});
-                ref = ref[innerRef || currentReference];
-                while (innerRef && outerRef.length && ref && ref[outerRef[0]]) {
-                    ref = ref[outerRef.shift()];
+                varRef = varRef[innerRef || currentReference];
+                while (innerRef && outerRef.length && varRef && varRef[outerRef[0]]) {
+                    varRef = varRef[outerRef.shift()];
                 }
             }
-            return ref;
+            return varRef;
         } else {
             return this.environment;
         }
