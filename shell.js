@@ -42,7 +42,7 @@ Shell = function(){
     };
 
     this.cp = function(origin, finish) {
-        return this.scope(finish, this.scope(origin));
+        return this.objScope(finish, this.objScope(origin));
     };
 
     this._validateOptions = function(paramString) {
@@ -85,9 +85,9 @@ Shell = function(){
             return;
         }
 
-        if (typeof protoObjPath === 'string' && this.scope(protoObjPath)) {
+        if (typeof protoObjPath === 'string' && this.objScope(protoObjPath)) {
             //TODO make new .proto property as an option
-            objCreated = Object.create(this.scope(protoObjPath));
+            objCreated = Object.create(this.objScope(protoObjPath));
         } else {
             objCreated = {};
         }
@@ -103,14 +103,15 @@ Shell = function(){
 
         parentPath = parentPath.join('.');
         if (parentPath) {
-            context = this.scope(parentPath);
+            context = this.objScope(parentPath);
             return context && !context[pathEnd] && context; //get the actual object reference
         } else {
             return this.reference(this.path);
         }
     };
 
-    this.scope = function(objString, val, deleteFlag) {
+    this.objScope = function(objString, val, deleteFlag) {
+        //scoping for object and object properties
         if (!objString) {
             return this.reference();
         }
@@ -144,6 +145,23 @@ Shell = function(){
             }
         }
     };
+
+    this.pathFilter = function(filterString) {
+        //checks for *'s and .'s for filtering cli-style
+        var regexArray = [],
+            filterRegex;
+        for(var i = 0; filterString.length > i; ++i) {
+            if (filterString[i] === '*') {
+                regexArray.push('.');
+                regexArray.push('*');
+            } else if (filterString[i] === '.') {
+                regexArray.push('.');
+            } else {
+                regexArray.push(filterString[i]);
+            }
+        }
+        return RegExp(regexArray.join(''));
+    }
 
     this.pwd = function(returnString) {
         var result;
@@ -189,7 +207,7 @@ Shell = function(){
     };
 
     this.rm = function(keyString) {
-        this.scope(keyString, null, true);
+        this.objScope(keyString, null, true);
     };
 }
 
