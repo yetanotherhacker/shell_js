@@ -3,7 +3,7 @@
 
 /* TODOS
 TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery dependency
-TODO: asterisk pattern matching? I.e. rm("object1.*").
+TODO: accept multiple inputs by default
 TODO: make a dev. mode option for console warnings
 */
 Shell = function(){
@@ -69,7 +69,7 @@ Shell = function(){
         var keyPath = this.path + (key ? '.' + key : ''),
             lsMethod = this._handleOption('a','--all').test(paramString) ? Object.getOwnPropertyNames : Object.keys,
             currentObj = this.reference(keyPath) || {};
-        return lsMethod(currentObj).sort();
+        return lsMethod(currentObj).filter(this.pathFilter).sort();
     };
 
     this.mkdir = function(newObjPath, protoObjPath) {
@@ -161,11 +161,11 @@ Shell = function(){
             }
         }
         return RegExp(regexArray.join(''));
-    }
+    };
 
-    this.pwd = function(returnString) {
+    this.pwd = function(isStringResult) {
         var result;
-        if (returnString) {
+        if (isStringResult) {
             if (!this.path) {
                 result = 'this';
             } else {
@@ -175,7 +175,7 @@ Shell = function(){
             if (!this.path) {
                 result = this;
             } else {
-                result = this.reference(this.path);
+                result = this.scope(this.path);
             }
         }
         return result;
