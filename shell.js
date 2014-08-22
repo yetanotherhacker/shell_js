@@ -66,10 +66,15 @@ Shell = function(){
         if (paramString && !this._validateOptions(paramString)) {
             return [];
         }
-        var keyPath = this.path + (key ? '.' + key : ''),
-            lsMethod = this._handleOption('a','--all').test(paramString) ? Object.getOwnPropertyNames : Object.keys,
-            currentObj = this.reference(keyPath) || {};
-        return lsMethod(currentObj).filter(this.pathFilter).sort();
+        var lsMethod = this._handleOption('a','--all').test(paramString) ? Object.getOwnPropertyNames : Object.keys,
+            currentObj = this.objScope(key) || {},
+            keyFilter = this.pathFilter(key);
+
+        if (keyFilter && !this.objScope(key)) {
+            return lsMethod(this.objScope(this.path)).filter(function(i) { return keyFilter.test(i)}).sort();
+        } else {
+            return lsMethod(currentObj);
+        }
     };
 
     this.mkdir = function(newObjPath, protoObjPath) {
@@ -148,6 +153,9 @@ Shell = function(){
 
     this.pathFilter = function(filterString) {
         //checks for *'s and .'s for filtering cli-style
+        if (!filterString) {
+            return;
+        }
         var regexArray = [],
             filterRegex;
         for(var i = 0; filterString.length > i; ++i) {

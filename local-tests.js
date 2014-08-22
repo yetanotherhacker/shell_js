@@ -41,6 +41,10 @@ tests = {
         isDirRemoved = !shell.reference()['emptyTestHash'];
         return [isDirMade && isDirRemoved, 'global make and remove object'];
     },
+    lsFilter: function() {
+        shell.cd();
+        return [shell.ls('*Int*Arr.*').indexOf('Int32Array') > 0, 'cli regex filters'];
+    },
     lsOpts: function() {
         var zeroOpt, singleOpt, doubleOpt;
         shell.cd();
