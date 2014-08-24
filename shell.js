@@ -3,7 +3,7 @@
 
 /* TODOS
 TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery dependency
-TODO: accept multiple inputs by default
+TODO: accept multiple inputs by default like unix already does
 TODO: make a dev. mode option for console warnings
 */
 Shell = function(){
@@ -42,7 +42,7 @@ Shell = function(){
     };
 
     this.cp = function(origin, finish) {
-        return this.objScope(finish, this.objScope(origin));
+        return this._objScope(finish, this._objScope(origin));
     };
 
     this._validateOptions = function(paramString) {
@@ -57,7 +57,7 @@ Shell = function(){
 
     this._handleOption = function(singleParams, doubleParams) {
         //example usage: this._handleOption('[xy]','(--x-option|--y-option)')
-        return RegExp('((^|\\s)-[\\w]?' + singleParams + '[\\w]?)|(' + doubleParams + '(\\s|$))'); 
+        return RegExp(['((^|\\s)-[\\w]?', singleParams, '[\\w]?)|(', doubleParams, '(\\s|$))'].join('')); 
     };
 
     this.ls = function(key, paramString) {
@@ -66,12 +66,12 @@ Shell = function(){
         if (paramString && !this._validateOptions(paramString)) {
             return [];
         }
-        var lsMethod = this._handleOption('a','--all').test(paramString) ? Object.getOwnPropertyNames : Object.keys,
-            currentObj = this.objScope(key) || {},
-            keyFilter = this.pathFilter(key);
+        var lsMethod = this._handleOption('a', '--all').test(paramString) ? Object.getOwnPropertyNames : Object.keys,
+            currentObj = this._objScope(key) || {},
+            keyFilter = this._pathFilter(key);
 
-        if (keyFilter && !this.objScope(key)) {
-            return lsMethod(this.objScope(this.path)).filter(function(i) { return keyFilter.test(i)}).sort();
+        if (keyFilter && !this._objScope(key)) {
+            return lsMethod(this._objScope(this.path)).filter(function(i) { return keyFilter.test(i)}).sort();
         } else {
             return lsMethod(currentObj);
         }
@@ -87,12 +87,12 @@ Shell = function(){
             objCreated;
 
         if (!context) {
-            return;
+            return;     //quit if no valid new object can be made
         }
 
-        if (typeof protoObjPath === 'string' && this.objScope(protoObjPath)) {
+        if (typeof protoObjPath === 'string' && this._objScope(protoObjPath)) {
             //TODO make new .proto property as an option
-            objCreated = Object.create(this.objScope(protoObjPath));
+            objCreated = Object.create(this._objScope(protoObjPath));
         } else {
             objCreated = {};
         }
@@ -108,14 +108,14 @@ Shell = function(){
 
         parentPath = parentPath.join('.');
         if (parentPath) {
-            context = this.objScope(parentPath);
+            context = this._objScope(parentPath);
             return context && !context[pathEnd] && context; //get the actual object reference
         } else {
             return this.reference(this.path);
         }
     };
 
-    this.objScope = function(objString, val, deleteFlag) {
+    this._objScope = function(objString, val, deleteFlag) {
         //scoping for object and object properties
         if (!objString) {
             return this.reference();
@@ -151,7 +151,7 @@ Shell = function(){
         }
     };
 
-    this.pathFilter = function(filterString) {
+    this._pathFilter = function(filterString) {
         //checks for *'s and .'s for filtering cli-style
         if (!filterString) {
             return;
@@ -190,6 +190,7 @@ Shell = function(){
     };
 
     this.reference = function(path) {
+        //TODO: mark as private?
         //takes a path string and returns what it refers to if it exists
         var pathArray, varRef, innerRef, outerRef, currentReference,
             arrayRegex = /\[([^\]]+)\]/g,
@@ -215,7 +216,7 @@ Shell = function(){
     };
 
     this.rm = function(keyString) {
-        this.objScope(keyString, null, true);
+        this._objScope(keyString, null, true);
     };
 }
 
