@@ -28,6 +28,8 @@ cd  cp  ls  mkdir   pwd reload  rm
 
 Current quirks:
 
+Functions only take one input.
+
 `cp()` acts like `cp -r`
 
 `ls` only supports `-a` for now which is equivalent to `-A`.
