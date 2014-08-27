@@ -2,7 +2,7 @@
 //Copyright 2011-2014 by Julius D'souza. Licensed under GPL 3.0.
 
 /* TODOS
-TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery dependency
+TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery use
 TODO: accept multiple inputs by default like unix already does
 TODO: make a dev. mode option for console warnings
 */
@@ -50,7 +50,6 @@ Shell = function(){
         if (/(((^|\s)-[\w]+|--[\w][\w-]+)(\s)?)+$/.test(paramString)) {
             return true;
         } else {
-            //console.warn("invalid option(s)");
             return false;
         }
     };
@@ -160,8 +159,7 @@ Shell = function(){
             filterRegex;
         for(var i = 0; filterString.length > i; ++i) {
             if (filterString[i] === '*') {
-                regexArray.push('.');
-                regexArray.push('*');
+                regexArray.concat(['.', '*']);
             } else if (filterString[i] === '.') {
                 regexArray.push('.');
             } else {
