@@ -5,8 +5,7 @@ testHash = {a: [ 1, [ 2 ], { b: [ 3, [ 4, 5 ] ] } ] };
 allPass = true;
 tests = {
     mkdirScoping: function() {
-        //check global and local scoping work for mkdir()
-        //todo repeat scoping checks for rm() once supported
+        //check global and local scoping via mkdir()
         var passTest = true;
         shell.cd();
         shell.mkdir('testHashA');
