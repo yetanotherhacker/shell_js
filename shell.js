@@ -114,7 +114,7 @@ Shell = function(){
         }
     };
 
-    this._objScope = function(objString, val, deleteFlag) {
+    this._objScope = function(objString, newValue, deleteFlag) {
         //scoping for object and object properties
         if (!objString) {
             return this.reference();
@@ -127,14 +127,14 @@ Shell = function(){
 
         globalPathEnvironment = this.reference(globalPathEnvironment.join('.'));
         localPathEnvironment = this.reference(localPathEnvironment.join('.'));
-        isLocalObj = localPathEnvironment && (localPathEnvironment[localPathObject] || val);
+        isLocalObj = localPathEnvironment && (localPathEnvironment[localPathObject] || newValue);
 
         if (!isLocalObj && typeof(globalPathEnvironment) === 'object') {
             //global scoping behaviour
             if (deleteFlag) {
                 delete globalPathEnvironment[globalPathObject];
-            } else if (val) {
-                globalPathEnvironment[globalPathObject] = val;
+            } else if (newValue) {
+                globalPathEnvironment[globalPathObject] = newValue;
             } else {
                 return globalPathEnvironment[globalPathObject];
             }
@@ -142,8 +142,8 @@ Shell = function(){
             //local scoping behaviour
             if (deleteFlag) {
                 delete localPathEnvironment[localPathObject];
-            } else if (val) {
-                localPathEnvironment[localPathObject] = val;
+            } else if (newValue !== undefined) {
+                localPathEnvironment[localPathObject] = newValue;
             } else {
                 return localPathEnvironment[localPathObject];
             }
