@@ -7,7 +7,7 @@ i.e.
 ```javascript
 	foo = new Shell();
     with (foo) {
-        with(foo.reference(foo.path)) {
+        with(foo._reference(foo.path)) {
             mkdir('x');
             x.y = 4;
             x.z = 6;
@@ -38,4 +38,4 @@ Functions only take one input.
 
 `pwd()` returns a reference to the current path. `pwd(true)` returns the path in `String` form
 
-`reference()` passes the last valid object encountered in the path
+`_reference()` passes the last valid object encountered in the path

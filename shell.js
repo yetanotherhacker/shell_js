@@ -32,9 +32,9 @@ Shell = function(){
             } else {
                 this.path = '';
             }
-        } else if (typeof(this.reference([this.path, '.', objString].join(''))) === 'object') {
+        } else if (typeof(this._reference([this.path, '.', objString].join(''))) === 'object') {
             this.path = [this.path, '.', objString].join(''); //move to local object
-        } else if (typeof(this.reference(objString)) === 'object') {
+        } else if (typeof(this._reference(objString)) === 'object') {
             this.path = objString; //move to global object
         } else {
             return 'No such object exists.';
@@ -110,14 +110,14 @@ Shell = function(){
             context = this._objScope(parentPath);
             return context && !context[pathEnd] && context; //get the actual object reference
         } else {
-            return this.reference(this.path);
+            return this._reference(this.path);
         }
     };
 
     this._objScope = function(objString, newValue, deleteFlag) {
         //scoping for object and object properties
         if (!objString) {
-            return this.reference();
+            return this._reference();
         }
         var globalPathEnvironment = objString.split('.'),
             globalPathObject = globalPathEnvironment.pop(),
@@ -125,8 +125,8 @@ Shell = function(){
             localPathObject = localPathEnvironment.pop(),
             isLocalObj;
 
-        globalPathEnvironment = this.reference(globalPathEnvironment.join('.'));
-        localPathEnvironment = this.reference(localPathEnvironment.join('.'));
+        globalPathEnvironment = this._reference(globalPathEnvironment.join('.'));
+        localPathEnvironment = this._reference(localPathEnvironment.join('.'));
         isLocalObj = localPathEnvironment && (localPathEnvironment[localPathObject] || newValue);
 
         if (!isLocalObj && typeof(globalPathEnvironment) === 'object') {
@@ -159,7 +159,8 @@ Shell = function(){
             filterRegex;
         for(var i = 0; filterString.length > i; ++i) {
             if (filterString[i] === '*') {
-                regexArray.concat(['.', '*']);
+                regexArray.push('.');
+                regexArray.push('*');
             } else if (filterString[i] === '.') {
                 regexArray.push('.');
             } else {
@@ -187,8 +188,7 @@ Shell = function(){
         return result;
     };
 
-    this.reference = function(path) {
-        //TODO: mark as private?
+    this._reference = function(path) {
         //takes a path string and returns what it refers to if it exists
         var pathArray, varRef, innerRef, outerRef, currentReference,
             arrayRegex = /\[([^\]]+)\]/g,
