@@ -35,9 +35,9 @@ tests = {
         var isDirMade, isDirRemoved;
         shell.cd();
         shell.mkdir('emptyTestHash');
-        isDirMade = shell.reference()['emptyTestHash'] && !Object.keys(emptyTestHash).length;
+        isDirMade = shell._reference()['emptyTestHash'] && !Object.keys(emptyTestHash).length;
         shell.rm('emptyTestHash');
-        isDirRemoved = !shell.reference()['emptyTestHash'];
+        isDirRemoved = !shell._reference()['emptyTestHash'];
         return [isDirMade && isDirRemoved, 'global make and remove object'];
     },
     lsFilter: function() {
@@ -68,18 +68,18 @@ tests = {
         shell.rm('a.b');
         passTest &= !Object.keys(testHashA.a).length;
         shell.rm('testHashB');
-        passTest &= !shell.reference('testHashB');
+        passTest &= !shell._reference('testHashB');
         return [passTest, 'global and local scoping for rm()'];
     },
     cpScoping: function() {
         var passTest = true;
         shell.cd();
         shell.cp('testHash.a', 'testHash.x');
-        passTest = passTest && shell.reference('testHash.x');
+        passTest = passTest && shell._reference('testHash.x');
 
         shell.cd('testHash');
         shell.cp('x', 'z');
-        passTest = passTest && shell.reference('testHash.z');
+        passTest = passTest && shell._reference('testHash.z');
         shell.rm('x');
         shell.rm('z');
         return [passTest, 'global and local scoping for cp()'];
@@ -87,7 +87,7 @@ tests = {
     checkRefs: function() {
         //simple does reference() work check
         shell.cd();
-        return [4 == shell.reference('testHash.a[2].b[1][0]'), 'array and object mixed referencing'];
+        return [4 == shell._reference('testHash.a[2].b[1][0]'), 'array and object mixed referencing'];
     }
 };
 
