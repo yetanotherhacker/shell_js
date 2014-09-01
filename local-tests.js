@@ -1,5 +1,4 @@
 // TODO: figure out scoping weirdness with GLOBAL and this in node
-// TODO: copy tests
 shell = new (require('./shell.js'))();
 testHash = {a: [ 1, [ 2 ], { b: [ 3, [ 4, 5 ] ] } ] };
 allPass = true;
@@ -69,7 +68,7 @@ tests = {
         passTest &= !Object.keys(testHashA.a).length;
         shell.rm('testHashB');
         passTest &= !shell._reference('testHashB');
-        return [passTest, 'global and local scoping for rm()'];
+        return [passTest, 'global and local scoping with rm()'];
     },
     cpScoping: function() {
         var passTest = true;
@@ -82,7 +81,7 @@ tests = {
         passTest = passTest && shell._reference('testHash.z');
         shell.rm('x');
         shell.rm('z');
-        return [passTest, 'global and local scoping for cp()'];
+        return [passTest, 'global and local scoping with cp()'];
     },
     checkRefs: function() {
         //simple does reference() work check

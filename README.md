@@ -1,7 +1,7 @@
 ##Shell.js##
 Shell.js: treat Javascript environments like a unix shell. GPL 3.0.
 
-Paradigm: objects act like folders. So given `foo = new Shell()`, `foo.cd(x.y)` will shift to `{current_object}.x.y` and `foo.ls()` will give the contents of the current object. Using the `with()` keyword in appropriate places gives Shell scripting functionality.
+Paradigm: objects act like folders. So given `foo = new Shell()`, `foo.cd(x.y)` will shift to `{current_object}.x.y` and `foo.ls()` will give the contents of the current object. Using the `with()` keyword in appropriate places gives shell scripting functionality.
 
 i.e.
 ```javascript
@@ -23,19 +23,16 @@ i.e.
 
 -- `local-tests.js` has more tests
 
-Functions implemented:
-cd  cp  ls  mkdir   pwd reload  rm
-
 Current quirks:
 
-Functions only take one input.
+No piping.
 
 `cp()` acts like `cp -r`
 
-`ls` only supports `-a` for now which is equivalent to `-A`.
+`ls()` only supports `-a` for now
 
 `mkdir()` supports prototypes as a second parameter
 
-`pwd()` returns a reference to the current path. `pwd(true)` returns the path in `String` form
+`pwd()` returns a reference to the current path by default
 
 `_reference()` passes the last valid object encountered in the path
