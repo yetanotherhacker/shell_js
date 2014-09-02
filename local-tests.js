@@ -29,6 +29,14 @@ tests = {
         shell.rm('testHashB');
         return [passTest, 'global and local scoping for mkdir()'];
     },
+    mkdirProto: function() {
+        var passTest = true;
+        shell.cd();
+        shell.mkdir('protoTest', 'testHash');
+        passTest &= (protoTest.a && protoTest.a[0]) == 1;
+        shell.rm('protoTest');
+        return [passTest, 'mkdir() prototyping'];
+    },
     globalMakeRemove: function() {
         //make and remove in global scope
         var isDirMade, isDirRemoved;
@@ -56,7 +64,7 @@ tests = {
         shell.cd();
         return [!(shell.ls('', 's').length || shell.ls('--a').length || shell.ls('---').length), 'ls() invalid options']
     },
-    rmScoping: function() {
+    rmChecks: function() {
         var passTest = true;
         shell.cd();
         shell.mkdir('testHashA');
@@ -70,7 +78,7 @@ tests = {
         passTest &= !shell._reference('testHashB');
         return [passTest, 'global and local scoping with rm()'];
     },
-    cpScoping: function() {
+    cpChecks: function() {
         var passTest = true;
         shell.cd();
         shell.cp('testHash.a', 'testHash.x');
