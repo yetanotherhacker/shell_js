@@ -12,7 +12,6 @@ Shell = function(){
 
     this.cd = function(objString) {
         var pathObjects = [];
-        //change working object (directory)
         //cd('..') acts like cd ..
         //cd($string) switches to the object
         // -- local scoping followed by global scoping
@@ -61,7 +60,6 @@ Shell = function(){
 
     this.ls = function(key, paramString) {
         //declare contents of current path's object
-        //use Object.getOwnPropertyNames for hidden properties with the 'a' parameter
         if (paramString && !this._validateOptions(paramString)) {
             return [];
         }
@@ -80,7 +78,6 @@ Shell = function(){
         //TODO: figure out overwriting options / what to do if existing entry is not an object
         //mkdir(newObjPath) makes an empty object
         //mkdir(newObjPath, protoObjPath) makes an object newObj with protoObj as the prototype
-        //so newObj inherits protoObjPath's properties
         var newObj = newObjPath.split('.').pop(),
             context = this._newContext(newObjPath),
             objCreated;
@@ -90,7 +87,6 @@ Shell = function(){
         }
 
         if (typeof protoObjPath === 'string' && this._objScope(protoObjPath)) {
-            //TODO make new .proto property as an option
             objCreated = Object.create(this._objScope(protoObjPath));
         } else {
             objCreated = {};
