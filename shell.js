@@ -3,11 +3,11 @@
 
 /* TODOS
 TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery use
-TODO: accept multiple inputs by default like unix already does
-TODO: make a dev. mode option for console warnings
+TODO: accept input array
 */
 Shell = function(){
     this.path = '';
+    this.devMode = false;
     //this.path is of the form 'x.y.z'
 
     this.cd = function(objString) {
@@ -36,7 +36,9 @@ Shell = function(){
         } else if (typeof(this._reference(objString)) === 'object') {
             this.path = objString; //move to global object
         } else {
-            return 'No such object exists.';
+            if (this.devMode) {
+                console.log('No such object exists.');
+            }
         }
     };
 
@@ -104,6 +106,9 @@ Shell = function(){
         parentPath = parentPath.join('.');
         if (parentPath) {
             context = this._objScope(parentPath);
+            if (context[pathEnd] && this.devMode) {
+                console.log("Object already exists!");
+            }
             return context && !context[pathEnd] && context; //get the actual object reference
         } else {
             return this._reference(this.path);
