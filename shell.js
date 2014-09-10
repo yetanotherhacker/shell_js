@@ -3,7 +3,6 @@
 
 /* TODOS
 TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery use
-TODO: accept input array
 */
 Shell = function(){
     this.path = '';
@@ -215,7 +214,12 @@ Shell = function(){
     };
 
     this.rm = function(keyString) {
-        this._objScope(keyString, null, true);
+        var self = this;
+        if (keyString instanceof Array) {
+            keyString.map( function(key) { self._objScope(key, null, true);});
+        } else {
+            this._objScope(keyString, null, true);
+        }
     };
 }
 
