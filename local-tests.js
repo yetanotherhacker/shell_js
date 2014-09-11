@@ -76,8 +76,7 @@ tests = {
         passTest &= !Object.keys(testHashA.a).length;
         shell.cd('..');
         shell.rm(['testHashA', 'testHashB']);
-        passTest &= !shell._reference('testHashB');
-        passTest &= !shell._reference('testHashA');
+        passTest &= shell._reference(['testHashA', 'testHashB']).every(function(i) { return !i;});
         return [passTest, 'global and local scoping with rm()'];
     },
     cpChecks: function() {
