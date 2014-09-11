@@ -190,26 +190,34 @@ Shell = function(){
 
     this._reference = function(path) {
         //takes a path string and returns what it refers to if it exists
-        var pathArray, varRef, innerRef, outerRef, currentReference,
-            arrayRegex = /\[([^\]]+)\]/g,
-            startRegex = /^(\w+)\[/;
-        if (path) {
-            pathArray = path.split('.');
-            varRef = this.environment;
-        //if next token is an object, shift to it and repeat
-            while ((pathArray.length) && (typeof(varRef) === 'object')) {
-                currentReference = pathArray.shift();
-                innerRef = startRegex.exec(currentReference);
-                innerRef = innerRef && innerRef[1];
-                outerRef = (currentReference.match(arrayRegex) || []).map(function(i){ return i.slice(1, i.length - 1);});
-                varRef = varRef[innerRef || currentReference];
-                while (innerRef && outerRef.length && varRef && varRef[outerRef[0]]) {
-                    varRef = varRef[outerRef.shift()];
+        var self = this,
+            mapMethod = function(entry) {
+                var pathArray, varRef, innerRef, outerRef, currentReference,
+                    arrayRegex = /\[([^\]]+)\]/g,
+                    startRegex = /^(\w+)\[/;
+                if (entry) {
+                    pathArray = entry.split('.');
+                    varRef = self.environment;
+                //if next token is an object, shift to it and repeat
+                    while ((pathArray.length) && (typeof(varRef) === 'object')) {
+                        currentReference = pathArray.shift();
+                        innerRef = startRegex.exec(currentReference);
+                        innerRef = innerRef && innerRef[1];
+                        outerRef = (currentReference.match(arrayRegex) || []).map(function(i){ return i.slice(1, i.length - 1);});
+                        varRef = varRef[innerRef || currentReference];
+                        while (innerRef && outerRef.length && varRef && varRef[outerRef[0]]) {
+                            varRef = varRef[outerRef.shift()];
+                        }
+                    }
+                    return varRef;
+                } else {
+                    return self.environment;
                 }
-            }
-            return varRef;
+            };
+        if (path instanceof Array) {
+            return path.map(mapMethod);
         } else {
-            return this.environment;
+            return mapMethod(path);
         }
     };
 
