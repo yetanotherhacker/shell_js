@@ -214,21 +214,22 @@ Shell = function(){
                     return self.environment;
                 }
             };
-        if (path instanceof Array) {
-            return path.map(mapMethod);
-        } else {
-            return mapMethod(path);
-        }
+        return this._vectorMap(path, mapMethod);
     };
 
     this.rm = function(keyString) {
-        var self = this;
-        if (keyString instanceof Array) {
-            keyString.map( function(key) { self._objScope(key, null, true);});
-        } else {
-            this._objScope(keyString, null, true);
-        }
+        var self = this,
+            mapMethod = function(key) { self._objScope(key, null, true);};
+        this._vectorMap(keyString, mapMethod);
     };
+
+    this._vectorMap = function(item, mapMethod) {
+        if (item instanceof Array) {
+            return item.map(mapMethod);
+        } else {
+            return mapMethod(item);
+        }
+    }
 }
 
 //return function if in a browser, export a module with a new object if in node
