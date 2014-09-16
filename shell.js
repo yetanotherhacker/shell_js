@@ -223,6 +223,10 @@ Shell = function(){
         this._vectorMap(keyString, mapMethod);
     };
 
+    this.setDevMode = function() {
+        this.devMode = true;
+    }
+
     this._vectorMap = function(item, mapMethod) {
         if (item instanceof Array) {
             return item.map(mapMethod);
