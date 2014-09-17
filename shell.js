@@ -34,10 +34,8 @@ Shell = function(){
             this.path = [this.path, '.', objString].join(''); //move to local object
         } else if (typeof(this._reference(objString)) === 'object') {
             this.path = objString; //move to global object
-        } else {
-            if (this.devMode) {
+        } else if (this.devMode) {
                 console.log('No such object exists.');
-            }
         }
     };
 
