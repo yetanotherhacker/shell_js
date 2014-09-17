@@ -36,3 +36,5 @@ No piping. Only 'rm()' accepts array input.
 `pwd()` returns a reference to the current path by default
 
 `_reference()` passes the last valid object encountered in the path
+
+Dev. mode is available. Use `setDevMode()`
