@@ -77,21 +77,25 @@ Shell = function(){
         //TODO: figure out overwriting options / what to do if existing entry is not an object
         //mkdir(newObjPath) makes an empty object
         //mkdir(newObjPath, protoObjPath) makes an object newObj with protoObj as the prototype
-        var newObj = newObjPath.split('.').pop(),
-            context = this._newContext(newObjPath),
-            objCreated;
+        var self = this,
+            mapMethod = function(newEntry) {
+                var newObj = newEntry.split('.').pop(),
+                    context = self._newContext(newEntry),
+                    objCreated;
 
-        if (!context) {
-            return;     //quit if no valid new object can be made
-        }
+                if (!context) {
+                    return;     //quit if no valid new object can be made
+                }
 
-        if (typeof protoObjPath === 'string' && this._objScope(protoObjPath)) {
-            objCreated = Object.create(this._objScope(protoObjPath));
-        } else {
-            objCreated = {};
-        }
+                if (typeof protoObjPath === 'string' && self._objScope(protoObjPath)) {
+                    objCreated = Object.create(self._objScope(protoObjPath));
+                } else {
+                    objCreated = {};
+                }
 
-        context[newObj] = objCreated;
+                context[newObj] = objCreated;
+            };
+        this._vectorMap(newObjPath, mapMethod);
     };
 
     this._newContext = function(pathString) {
