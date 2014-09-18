@@ -7,9 +7,8 @@ tests = {
         //check global and local scoping via mkdir()
         var passTest = true;
         shell.cd();
-        shell.mkdir('testHashA');
+        shell.mkdir(['testHashA', 'testHashB']);
         passTest &= !Object.keys(testHashA).length;
-        shell.mkdir('testHashB');
         passTest &= !Object.keys(testHashB).length;
         shell.mkdir('testHashA.c');
         passTest &= Object.keys(testHashA).length == 1;
@@ -25,8 +24,7 @@ tests = {
         passTest &= Object.keys(testHashB.d).length == 1;
 
         shell.cd();
-        shell.rm('testHashA');
-        shell.rm('testHashB');
+        shell.rm(['testHashA', 'testHashB']);
         return [passTest, 'global and local scoping for mkdir()'];
     },
     mkdirProto: function() {
@@ -67,8 +65,7 @@ tests = {
     rmChecks: function() {
         var passTest = true;
         shell.cd();
-        shell.mkdir('testHashA');
-        shell.mkdir('testHashB');
+        shell.mkdir(['testHashA', 'testHashB']);
         testHashA.a = {b: 3};
 
         shell.cd('testHashA');
@@ -88,8 +85,7 @@ tests = {
         shell.cd('testHash');
         shell.cp('x', 'z');
         passTest = passTest && shell._reference('testHash.z');
-        shell.rm('x');
-        shell.rm('z');
+        shell.rm(['x', 'z']);
         return [passTest, 'global and local scoping with cp()'];
     },
     checkRefs: function() {
