@@ -25,7 +25,7 @@ i.e.
 
 Current quirks:
 
-No piping. Only 'rm()' accepts array input.
+No piping. Only 'mkdir()' and 'rm()' accepts array input.
 
 `cp()` acts like `cp -r`
 
