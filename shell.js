@@ -78,16 +78,22 @@ Shell = function(){
         //mkdir(newObjPath) makes an empty object
         //mkdir(newObjPath, protoObjPath) makes an object newObj with protoObj as the prototype
         var self = this,
-            mapMethod = function(newEntry) {
+            mapMethod = function(newEntry, index) {
                 var newObj = newEntry.split('.').pop(),
                     context = self._newContext(newEntry),
+                    isValidProtoArray = protoObjPath instanceof Array && newObjPath instanceof Array && (protoObjPath.length === newObjPath.length),
                     objCreated;
 
                 if (!context) {
                     return;     //quit if no valid new object can be made
                 }
 
-                if (typeof protoObjPath === 'string' && self._objScope(protoObjPath)) {
+                if (protoObjPath instanceof Array) {
+                    if (!isValidProtoArray) {
+                        return; //quit if newObj and protoObj array lengths mismatch
+                    }                   
+                    objCreated = Object.create(self._objScope(protoObjPath[index]));
+                } else if (typeof protoObjPath === 'string' && self._objScope(protoObjPath)) {
                     objCreated = Object.create(self._objScope(protoObjPath));
                 } else {
                     objCreated = {};
