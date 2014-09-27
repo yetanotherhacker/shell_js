@@ -200,24 +200,24 @@ Shell = function(){
         //takes a path string and returns what it refers to if it exists
         var self = this,
             mapMethod = function(entry) {
-                var pathArray, varRef, innerRef, outerRef, currentReference,
+                var pathArray, deepRef, outerArrayRef, multiArrayRef, currentContext,
                     arrayRegex = /\[([^\]]+)\]/g,
                     startRegex = /^(\w+)\[/;
                 if (entry) {
                     pathArray = entry.split('.');
-                    varRef = self.environment;
+                    deepRef = self.environment;
                 //if next token is an object, shift to it and repeat
-                    while ((pathArray.length) && (typeof(varRef) === 'object')) {
-                        currentReference = pathArray.shift();
-                        innerRef = startRegex.exec(currentReference);
-                        innerRef = innerRef && innerRef[1];
-                        outerRef = (currentReference.match(arrayRegex) || []).map(function(i){ return i.slice(1, i.length - 1);});
-                        varRef = varRef[innerRef || currentReference];
-                        while (innerRef && outerRef.length && varRef && varRef[outerRef[0]]) {
-                            varRef = varRef[outerRef.shift()];
+                    while ((pathArray.length) && (typeof(deepRef) === 'object')) {
+                        currentContext = pathArray.shift();
+                        outerArrayRef = startRegex.exec(currentContext);
+                        outerArrayRef = outerArrayRef && outerArrayRef[1];
+                        multiArrayRef = (currentContext.match(arrayRegex) || []).map(function(i){ return i.slice(1, i.length - 1);});
+                        deepRef = deepRef[outerArrayRef || currentContext];
+                        while (outerArrayRef && multiArrayRef.length && deepRef && deepRef[multiArrayRef[0]]) {
+                            deepRef = deepRef[multiArrayRef.shift()];
                         }
                     }
-                    return varRef;
+                    return deepRef;
                 } else {
                     return self.environment;
                 }
