@@ -45,11 +45,11 @@ Shell = function(){
 
     this._validateOptions = function(paramString) {
         //ensure that options are of form -[letters] or --word1-word2
-        if (/(((^|\s)-[\w]+|--[\w][\w-]+)(\s)?)+$/.test(paramString)) {
-            return true;
-        } else {
-            return false;
+        var isValid = /(((^|\s)-[\w]+|--[\w][\w-]+)(\s)?)+$/.test(paramString);
+        if (this.devMode && !isValid) {
+            console.log(paramString, 'is an invalid option.');
         }
+        return isValid;
     };
 
     this._handleOption = function(singleParams, doubleParams) {
@@ -155,6 +155,8 @@ Shell = function(){
             } else {
                 return localPathEnvironment[localPathObject];
             }
+        } else if(this.devMode) {
+            console.log('Scoping failure for', objString);
         }
     };
 
@@ -178,9 +180,9 @@ Shell = function(){
         return RegExp(regexArray.join(''));
     };
 
-    this.pwd = function(isStringResult) {
+    this.pwd = function(resultIsString) {
         var result;
-        if (isStringResult) {
+        if (resultIsString) {
             if (!this.path) {
                 result = 'this';
             } else {
@@ -233,7 +235,7 @@ Shell = function(){
 
     this.setDevMode = function() {
         this.devMode = true;
-    }
+    };
 
     this._vectorMap = function(item, mapMethod) {
         if (item instanceof Array) {
@@ -241,7 +243,7 @@ Shell = function(){
         } else {
             return mapMethod(item);
         }
-    }
+    };
 }
 
 //return function if in a browser, export a module with a new object if in node
