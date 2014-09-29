@@ -3,10 +3,11 @@
 
 /* TODOS
 TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery use
+TODO: make piping work
 */
 Shell = function(){
     this.path = '';
-    this.devMode = false;
+    this._devMode = false;
     //this.path is of the form 'x.y.z'
 
     this.cd = function(objString) {
@@ -34,7 +35,7 @@ Shell = function(){
             this.path = [this.path, '.', objString].join(''); //move to local object
         } else if (typeof(this._reference(objString)) === 'object') {
             this.path = objString; //move to global object
-        } else if (this.devMode) {
+        } else if (this._devMode) {
                 console.log('No such object exists.');
         }
     };
@@ -46,7 +47,7 @@ Shell = function(){
     this._validateOptions = function(paramString) {
         //ensure that options are of form -[letters] or --word1-word2
         var isValid = /(((^|\s)-[\w]+|--[\w][\w-]+)(\s)?)+$/.test(paramString);
-        if (this.devMode && !isValid) {
+        if (this._devMode && !isValid) {
             console.log(paramString, 'is an invalid option.');
         }
         return isValid;
@@ -113,7 +114,7 @@ Shell = function(){
         parentPath = parentPath.join('.');
         if (parentPath) {
             context = this._objScope(parentPath);
-            if (context[pathEnd] && this.devMode) {
+            if (context[pathEnd] && this._devMode) {
                 console.log("Object already exists!");
             }
             return context && !context[pathEnd] && context; //get the actual object reference
@@ -155,7 +156,7 @@ Shell = function(){
             } else {
                 return localPathEnvironment[localPathObject];
             }
-        } else if(this.devMode) {
+        } else if(this._devMode) {
             console.log('Scoping failure for', objString);
         }
     };
@@ -234,7 +235,7 @@ Shell = function(){
     };
 
     this.setDevMode = function() {
-        this.devMode = true;
+        this._devMode = true;
     };
 
     this._vectorMap = function(item, mapMethod) {
