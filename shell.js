@@ -102,7 +102,7 @@ Shell = function(){
 
                 context[newObj] = objCreated;
             };
-        this._vectorMap(newObjPath, mapMethod);
+        return this._vectorMap(newObjPath, mapMethod);
     };
 
     this._newContext = function(pathString) {
@@ -231,7 +231,7 @@ Shell = function(){
     this.rm = function(keyString) {
         var self = this,
             mapMethod = function(key) { self._objScope(key, null, true);};
-        this._vectorMap(keyString, mapMethod);
+        return this._vectorMap(keyString, mapMethod);
     };
 
     this.setDevMode = function() {
