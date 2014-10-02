@@ -184,18 +184,11 @@ Shell = function(){
     this.pwd = function(resultIsString) {
         var result;
         if (resultIsString) {
-            if (!this.path) {
-                result = 'this';
-            } else {
-                result = this.path;
-            }
+            result = !this.path ? 'this' : this.path;
         } else {
-            if (!this.path) {
-                result = this;
-            } else {
-                result = this.scope(this.path);
-            }
+            result = !this.path ? this : this._objScope(this.path);
         }
+
         return result;
     };
 
@@ -213,6 +206,7 @@ Shell = function(){
                     while ((pathArray.length) && (typeof(deepRef) === 'object')) {
                         currentContext = pathArray.shift();
                         outerArrayRef = startRegex.exec(currentContext);
+
                         outerArrayRef = outerArrayRef && outerArrayRef[1];
                         multiArrayRef = (currentContext.match(arrayRegex) || []).map(function(i){ return i.slice(1, i.length - 1);});
                         deepRef = deepRef[outerArrayRef || currentContext];
