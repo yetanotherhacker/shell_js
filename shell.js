@@ -78,10 +78,9 @@ Shell = function(){
         //TODO: figure out overwriting options / what to do if existing entry is not an object
         //mkdir(newObjPath) makes an empty object
         //mkdir(newObjPath, protoObjPath) makes an object newObj with protoObj as the prototype
-        var self = this,
-            mapMethod = function(newEntry, index) {
+        var mapMethod = function(newEntry, index) {
                 var newObj = newEntry.split('.').pop(),
-                    context = self._newContext(newEntry),
+                    context = this._newContext(newEntry),
                     isValidProtoArray = protoObjPath instanceof Array && newObjPath instanceof Array && (protoObjPath.length === newObjPath.length),
                     objCreated;
 
@@ -93,15 +92,15 @@ Shell = function(){
                     if (!isValidProtoArray) {
                         return; //quit if newObj and protoObj array lengths mismatch
                     }                   
-                    objCreated = Object.create(self._objScope(protoObjPath[index]));
-                } else if (typeof protoObjPath === 'string' && self._objScope(protoObjPath)) {
-                    objCreated = Object.create(self._objScope(protoObjPath));
+                    objCreated = Object.create(this._objScope(protoObjPath[index]));
+                } else if (typeof protoObjPath === 'string' && this._objScope(protoObjPath)) {
+                    objCreated = Object.create(this._objScope(protoObjPath));
                 } else {
                     objCreated = {};
                 }
 
                 context[newObj] = objCreated;
-            };
+            }.bind(this);
         return this._vectorMap(newObjPath, mapMethod);
     };
 
@@ -194,14 +193,13 @@ Shell = function(){
 
     this._reference = function(path) {
         //takes a path string and returns what it refers to if it exists
-        var self = this,
-            mapMethod = function(entry) {
+        var mapMethod = function(entry) {
                 var pathArray, deepRef, outerArrayRef, multiArrayRef, currentContext,
                     arrayRegex = /\[([^\]]+)\]/g,
                     startRegex = /^(\w+)\[/;
                 if (entry) {
                     pathArray = entry.split('.');
-                    deepRef = self.environment;
+                    deepRef = this.environment;
                 //if next token is an object, shift to it and repeat
                     while ((pathArray.length) && (typeof(deepRef) === 'object')) {
                         currentContext = pathArray.shift();
@@ -216,15 +214,14 @@ Shell = function(){
                     }
                     return deepRef;
                 } else {
-                    return self.environment;
+                    return this.environment;
                 }
-            };
+            }.bind(this);
         return this._vectorMap(path, mapMethod);
     };
 
     this.rm = function(keyString) {
-        var self = this,
-            mapMethod = function(key) { self._objScope(key, null, true);};
+        var mapMethod = function(key) { this._objScope(key, null, true);}.bind(this);
         return this._vectorMap(keyString, mapMethod);
     };
 
