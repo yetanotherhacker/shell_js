@@ -1,3 +1,4 @@
+// node tests
 // TODO: figure out scoping weirdness with GLOBAL and this in node
 shell = new (require('./shell.js'))();
 testHash = {a: [ 1, [ 2 ], { b: [ 3, [ 4, 5 ] ] } ] };
@@ -11,17 +12,17 @@ tests = {
         passTest &= !Object.keys(testHashA).length;
         passTest &= !Object.keys(testHashB).length;
         shell.mkdir('testHashA.c');
-        passTest &= Object.keys(testHashA).length == 1;
+        passTest &= Object.keys(testHashA).length === 1;
 
         shell.cd('testHashA');
         shell.mkdir('d');
-        passTest &= Object.keys(testHashA).length == 2;
+        passTest &= Object.keys(testHashA).length === 2;
         shell.mkdir('d.e');
-        passTest &= Object.keys(testHashA.d).length == 1;
+        passTest &= Object.keys(testHashA.d).length === 1;
         shell.mkdir('testHashB.d');
-        passTest &= Object.keys(testHashB).length == 1;
+        passTest &= Object.keys(testHashB).length === 1;
         shell.mkdir('testHashB.d.e');
-        passTest &= Object.keys(testHashB.d).length == 1;
+        passTest &= Object.keys(testHashB.d).length === 1;
 
         shell.cd();
         shell.rm(['testHashA', 'testHashB']);
@@ -31,7 +32,7 @@ tests = {
         var passTest = true;
         shell.cd();
         shell.mkdir('protoTest', 'testHash');
-        passTest &= (protoTest.a && protoTest.a[0]) == 1;
+        passTest &= (protoTest.a && protoTest.a[0]) === 1;
         shell.rm('protoTest');
         return [passTest, 'mkdir() prototyping'];
     },
@@ -91,7 +92,7 @@ tests = {
     checkRefs: function() {
         //simple does reference() work check
         shell.cd();
-        return [4 == shell._reference('testHash.a[2].b[1][0]'), 'array and object mixed referencing'];
+        return [4 === shell._reference('testHash.a[2].b[1][0]'), 'array and object mixed referencing'];
     }
 };
 
