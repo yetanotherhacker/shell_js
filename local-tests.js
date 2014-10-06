@@ -1,14 +1,15 @@
 // node tests
-// TODO: figure out scoping weirdness with GLOBAL and this in node
+// TODO: figure out scoping weirdness with 'GLOBAL' and 'this' in node
 shell = new (require('./shell.js'))();
 testHash = {a: [ 1, [ 2 ], { b: [ 3, [ 4, 5 ] ] } ] };
-allPass = true;
+testsPass = true;
 tests = {
     mkdirScoping: function() {
         //check global and local scoping via mkdir()
         var passTest = true;
         shell.cd();
         shell.mkdir(['testHashA', 'testHashB']);
+        //freshly created objects should be empty
         passTest &= !Object.keys(testHashA).length;
         passTest &= !Object.keys(testHashB).length;
         shell.mkdir('testHashA.c');
@@ -100,11 +101,11 @@ for (testName in tests) {
     result = tests[testName]();
     //result is equal to [didTestPass, test description]
     if (!result[0]) {
-        allPass = false;
+        testsPass = false;
         console.log('fail', '-', testName, '-', result[1]);
     }
 }
 
-if (allPass) {
+if (testsPass) {
     console.log('All tests passed!');
 }
