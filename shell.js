@@ -8,6 +8,7 @@ TODO: make piping work
 Shell = function(){
     this.path = '';
     this._devMode = false;
+    this._processes = {};
     //this.path is of the form 'x.y.z'
 
     this.cd = function(objString) {
@@ -227,6 +228,12 @@ Shell = function(){
 
     this.setDevMode = function() {
         this._devMode = true;
+    };
+
+    this.top = function(resultIsString, topOptions) {
+        //need process monitoring first
+        //need htop-style options
+        return;
     };
 
     this._vectorMap = function(item, mapMethod) {
