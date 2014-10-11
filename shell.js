@@ -230,9 +230,23 @@ Shell = function(){
         this._devMode = true;
     };
 
+    this.shell = function(callable, interval, altName) {
+        //TODO finish this function
+        var strForm = String(callable),
+            procName = strForm.substring(9, strForm.indexOf('('));  //String(foo) gives 'function() <--func name here-->{ etc...'
+
+        if (!procName) {
+            return;     //TODO: need new random process ID function
+        } else if (!this._processes[procName]) {
+            this._processes[procName] = [undefined];    //TODO: generate process ID, leaving as undefined till then
+        } else {
+            this._processes[procName].push(undefined);
+        }
+    };
+
     this.top = function(resultIsString, topOptions) {
-        //need process monitoring first
-        //need htop-style options
+        //TODO: process monitoring
+        //TODO: htop-style options
         return;
     };
 
