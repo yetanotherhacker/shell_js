@@ -9,6 +9,7 @@ Shell = function(){
     this.path = '';
     this._devMode = false;
     this._processes = {};
+    this._counter = 0;
     //this.path is of the form 'x.y.z'
 
     this.cd = function(objString) {
@@ -43,15 +44,6 @@ Shell = function(){
 
     this.cp = function(origin, finish) {
         return this._objScope(finish, this._objScope(origin));
-    };
-
-    this._validateOptions = function(paramString) {
-        //ensure that options are of form -[letters] or --word1-word2
-        var isValid = /(((^|\s)-[\w]+|--[\w][\w-]+)(\s)?)+$/.test(paramString);
-        if (this._devMode && !isValid) {
-            console.log(paramString, 'is an invalid option.');
-        }
-        return isValid;
     };
 
     this._handleOption = function(singleParams, doubleParams) {
@@ -236,11 +228,11 @@ Shell = function(){
             procName = strForm.substring(9, strForm.indexOf('('));  //String(foo) gives 'function() <--func name here-->{ etc...'
 
         if (!procName) {
-            return;     //TODO: need new random process ID function
+            this._processes[procName] = [this._counter++];
         } else if (!this._processes[procName]) {
-            this._processes[procName] = [undefined];    //TODO: generate process ID, leaving as undefined till then
+            this._processes[procName] = [this._counter++];
         } else {
-            this._processes[procName].push(undefined);
+            this._processes[procName].push(this._counter++);
         }
     };
 
@@ -249,6 +241,16 @@ Shell = function(){
         //TODO: htop-style options
         return;
     };
+
+    this._validateOptions = function(paramString) {
+        //ensure that options are of form -[letters] or --word1-word2
+        var isValid = /(((^|\s)-[\w]+|--[\w][\w-]+)(\s)?)+$/.test(paramString);
+        if (this._devMode && !isValid) {
+            console.log(paramString, 'is an invalid option.');
+        }
+        return isValid;
+    };
+
 
     this._vectorMap = function(item, mapMethod) {
         if (item instanceof Array) {
