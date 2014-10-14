@@ -222,17 +222,23 @@ Shell = function(){
         this._devMode = true;
     };
 
-    this.shell = function(callable, interval, altName) {
+    this.shell = function(callable, intervalTime, args, altName) {
         //TODO finish this function
         var strForm = String(callable),
+            intervalRef = intervalTime ? undefined : setInterval(callable.call(null, args), intervalTime),
             procName = strForm.substring(9, strForm.indexOf('('));  //String(foo) gives 'function() <--func name here-->{ etc...'
 
-        if (!procName) {
-            this._processes[procName] = [this._counter++];
-        } else if (!this._processes[procName]) {
-            this._processes[procName] = [this._counter++];
+        if (intervalRef) {
+            if (!procName) {
+                this._processes[procName] = [this._counter, intervalRef];
+            } else if (!this._processes[procName]) {
+                this._processes[procName] = [this._counter, intervalRef];
+            } else {
+                this._processes[procName].push([this._counter, intervalRef]);
+            }
+            return this._counter++;
         } else {
-            this._processes[procName].push(this._counter++);
+            return callable.apply(null, args);
         }
     };
 
