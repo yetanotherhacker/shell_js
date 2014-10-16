@@ -225,7 +225,7 @@ Shell = function(){
     this.shell = function(callable, intervalTime, args, altName) {
         //TODO finish this function
         var strForm = String(callable),
-            intervalRef = intervalTime ? undefined : setInterval(callable.bind(this), intervalTime),
+            intervalRef = intervalTime ? undefined : setInterval(function(){ return callable.bind(this, args);}, intervalTime),
             procName = strForm.substring(9, strForm.indexOf('('));  //String(foo) gives 'function() <--func name here-->{ etc...'
 
         if (intervalRef) {
@@ -238,7 +238,7 @@ Shell = function(){
             }
             return this._counter++;
         } else {
-            return callable.bind(this);
+            return callable.call(this, args);
         }
     };
 
