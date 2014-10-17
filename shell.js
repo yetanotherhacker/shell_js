@@ -173,6 +173,15 @@ Shell = function(){
         return RegExp(regexArray.join(''));
     };
 
+    this.prettyPrint = function(styleString, dataMatrix) {
+        var rowLength = dataMatrix.length,
+            columnLength = dataMatrix[0].length;
+
+        if (styleString === 'table') {
+            //TODO: table styling
+        }
+    };
+
     this.pwd = function(resultIsString) {
         var result;
         if (resultIsString) {
