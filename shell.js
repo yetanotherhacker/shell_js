@@ -173,12 +173,17 @@ Shell = function(){
         return RegExp(regexArray.join(''));
     };
 
-    this.prettyPrint = function(styleString, dataMatrix) {
+    this.prettyPrint = function(dataMatrix, styleString) {
         var rowLength = dataMatrix.length,
-            columnLength = dataMatrix[0].length;
+            columnLength = dataMatrix[0].length,
+            maxArray = Array.apply(null, Array(rowLength));
 
-        if (styleString === 'table') {
-            //TODO: table styling
+        if ((styleString === 'table') || !styleString) {
+            //table styling by default or explicitly
+            dataMatrix.every(function(element, index) {
+                //kill if column lengths are inconsistent
+                return element.length !== columnLength;
+            })
         }
     };
 

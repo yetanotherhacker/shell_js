@@ -37,4 +37,6 @@ No piping. Only 'mkdir()' and 'rm()' accepts array input.
 
 `_reference()` passes the last valid object encountered in the path
 
+`top()` is currently being built
+
 Dev. mode is available. Use `setDevMode()`
