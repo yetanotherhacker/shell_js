@@ -173,17 +173,29 @@ Shell = function(){
         return RegExp(regexArray.join(''));
     };
 
-    this.prettyPrint = function(dataMatrix, styleString) {
+    this.prettyPrint = function(dataMatrix, resultIsString) {
         var rowLength = dataMatrix.length,
             columnLength = dataMatrix[0].length,
-            maxArray = Array.apply(null, Array(rowLength));
+            maxArray = Array.apply(null, Array(rowLength)),
+            isConsistent;
 
-        if ((styleString === 'table') || !styleString) {
-            //table styling by default or explicitly
-            dataMatrix.every(function(element, index) {
-                //kill if column lengths are inconsistent
-                return element.length !== columnLength;
-            })
+        
+        isConsistent = dataMatrix.every(function(rowElement, rowIndex) {
+            rowElement.forEach(function(columnElement, columnIndex) {
+                maxArray[columnIndex] = Math.max(maxArray[columnIndex] || 0, String(columnElement).length);
+            });
+            return rowElement.length === columnLength;
+        });
+        if (!isConsistent) {
+            //kill if column lengths are inconsistent
+            if (this._devMode) {
+                console.log('Inconsistent column lengths.');
+            }
+            return;
+        }
+
+        return maxArray;
+        //TODO make stringified result
         }
     };
 
