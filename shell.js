@@ -53,7 +53,7 @@ Shell = function(){
 
     this.ls = function(key, paramString) {
         //declare contents of current path's object
-        if (paramString && !this._validateOptions(paramString)) {
+        if (paramString && !this._validateParameterOptions(paramString)) {
             return [];
         }
         var lsMethod = this._handleOption('a', '--all').test(paramString) ? Object.getOwnPropertyNames : Object.keys,
@@ -249,7 +249,9 @@ Shell = function(){
     };
 
     this.shell = function(callable, intervalTime, args, altName) {
+        //NOTE - NOT PRODUCTION SAFE.
         //TODO finish this function
+        //TODO actual tests
         var strForm = String(callable),
             intervalRef = intervalTime ? undefined : setInterval(function(){ return callable.bind(this, args);}, intervalTime),
             procName = strForm.substring(9, strForm.indexOf('('));  //String(foo) gives 'function() <--func name here-->{ etc...'
@@ -271,10 +273,14 @@ Shell = function(){
     this.top = function(resultIsString, topOptions) {
         //TODO: process monitoring
         //TODO: htop-style options
-        return;
+        if (resultIsString) {
+            return; //TODO: stringify
+        } else {
+            return this._processes;
+        }
     };
 
-    this._validateOptions = function(paramString) {
+    this._validateParameterOptions = function(paramString) {
         //ensure that options are of form -[letters] or --word1-word2
         var isValid = /(((^|\s)-[\w]+|--[\w][\w-]+)(\s)?)+$/.test(paramString);
         if (this._devMode && !isValid) {
