@@ -9,7 +9,7 @@ Shell = function(){
     this.path = '';
     this._devMode = false;
     this._processes = {};
-    this._counter = 0;
+    this._processCounter = 0;
     //this.path is of the form 'x.y.z'
 
     this.cd = function(objString) {
@@ -46,8 +46,8 @@ Shell = function(){
         return this._objScope(finish, this._objScope(origin));
     };
 
-    this._handleOption = function(singleParams, doubleParams) {
-        //example usage: this._handleOption('[xy]','(--x-option|--y-option)')
+    this._handleParameterOptions = function(singleParams, doubleParams) {
+        //example usage: this._handleParameterOptions('[xy]','(--x-option|--y-option)')
         return RegExp(['((^|\\s)-[\\w]?', singleParams, '[\\w]?)|(', doubleParams, '(\\s|$))'].join('')); 
     };
 
@@ -56,7 +56,7 @@ Shell = function(){
         if (paramString && !this._validateParameterOptions(paramString)) {
             return [];
         }
-        var lsMethod = this._handleOption('a', '--all').test(paramString) ? Object.getOwnPropertyNames : Object.keys,
+        var lsMethod = this._handleParameterOptions('a', '--all').test(paramString) ? Object.getOwnPropertyNames : Object.keys,
             currentObj = this._objScope(key) || {},
             keyFilter = this._pathFilter(key);
 
@@ -107,7 +107,7 @@ Shell = function(){
         if (parentPath) {
             context = this._objScope(parentPath);
             if (context[pathEnd] && this._devMode) {
-                console.log("Object already exists!");
+                console.log('Object already exists!');
             }
             return context && !context[pathEnd] && context; //get the actual object reference
         } else {
@@ -258,13 +258,20 @@ Shell = function(){
 
         if (intervalRef) {
             if (!procName) {
-                this._processes[procName] = [this._counter, intervalRef];
+                this._processes[procName] = [this._processCounter, intervalRef];
             } else if (!this._processes[procName]) {
-                this._processes[procName] = [this._counter, intervalRef];
+                this._processes[procName] = [this._processCounter, intervalRef];
             } else {
-                this._processes[procName].push([this._counter, intervalRef]);
+                this._processes[procName].push([this._processCounter, intervalRef]);
             }
-            return this._counter++;
+            this._processes[this._processCounter] = [this._processCounter, intervalRef];    //overwrite by default for process IDs
+            if (altName) {
+                this._processes[altName] = [this._processCounter, intervalRef];
+                if (this._devMode && this._processes[altName]) {
+                    console.log('altName', altName, 'overwritten for process', this._processCounter);
+                }
+            }
+            return this._processCounter++;
         } else {
             return callable.call(this, args);
         }
