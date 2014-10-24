@@ -173,7 +173,7 @@ Shell = function(){
         return RegExp(regexArray.join(''));
     };
 
-    this.prettyPrint = function(dataMatrix, resultIsString) {
+    this.prettyPrint = function(dataMatrix) {
         var rowLength = dataMatrix.length,
             columnLength = dataMatrix[0].length,
             maxArray = Array.apply(null, Array(rowLength)),
@@ -195,7 +195,6 @@ Shell = function(){
         }
 
         return maxArray;
-        //TODO make stringified result
     };
 
     this.pwd = function(resultIsString) {
@@ -295,8 +294,8 @@ Shell = function(){
         return isValid;
     };
 
-
     this._vectorMap = function(item, mapMethod) {
+        //TODO: support only arrays? hashes?
         if (item instanceof Array) {
             return item.map(mapMethod);
         } else {
