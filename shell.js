@@ -200,9 +200,9 @@ Shell = function(){
     this.pwd = function(resultIsString) {
         var result;
         if (resultIsString) {
-            result = !this.path ? 'this' : this.path;
+            result = this.path ? this.path: 'this';
         } else {
-            result = !this.path ? this : this._objScope(this.path);
+            result = this.path ? this._objScope(this.path) : this;
         }
 
         return result;
