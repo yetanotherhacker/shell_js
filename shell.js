@@ -5,12 +5,18 @@
 TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery use
 TODO: make piping work
 */
-Shell = function(){
+
+Shell = function() {
     this.path = '';
     this._devMode = false;
     this._processes = {};
     this._processCounter = 0;
     //this.path is of the form 'x.y.z'
+    if (this['window']) {
+        this._environment = window;
+    } else {
+        this._environment = GLOBAL; //NOTE: this['GLOBAL'] will NOT work in a module
+    }
 
     this.cd = function(objString) {
         var pathObjects = [];
@@ -179,7 +185,6 @@ Shell = function(){
             maxArray = Array.apply(null, Array(rowLength)),
             isConsistent;
 
-        
         isConsistent = dataMatrix.every(function(rowElement, rowIndex) {
             rowElement.forEach(function(columnElement, columnIndex) {
                 maxArray[columnIndex] = Math.max(maxArray[columnIndex] || 0, String(columnElement).length);
@@ -214,9 +219,10 @@ Shell = function(){
                 var pathArray, deepRef, outerArrayRef, multiArrayRef, currentContext,
                     arrayRegex = /\[([^\]]+)\]/g,
                     startRegex = /^(\w+)\[/;
+
                 if (entry) {
                     pathArray = entry.split('.');
-                    deepRef = this.environment;
+                    deepRef = this._environment;
                 //if next token is an object, shift to it and repeat
                     while ((pathArray.length) && (typeof(deepRef) === 'object')) {
                         currentContext = pathArray.shift();
@@ -231,7 +237,7 @@ Shell = function(){
                     }
                     return deepRef;
                 } else {
-                    return this.environment;
+                    return this._environment;
                 }
             }.bind(this);
         return this._vectorMap(path, mapMethod);
@@ -304,10 +310,7 @@ Shell = function(){
     };
 }
 
-//return function if in a browser, export a module with a new object if in node
-if (this['window']) {
-    Shell.prototype.environment = window;
-} else if (GLOBAL) {
-    Shell.prototype.environment = GLOBAL;
+//export a module with the function if in node
+if (!this['window']) {
     module.exports = Shell;
 }
