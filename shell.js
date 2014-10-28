@@ -43,8 +43,8 @@ Shell = function() {
             this.path = [this.path, '.', objString].join(''); //move to local object
         } else if (typeof(this._reference(objString)) === 'object') {
             this.path = objString; //move to global object
-        } else if (this._devMode) {
-                console.log('No such object exists.');
+        } else {
+            this._devLog('cd', 'No such object exists.');
         }
     };
 
@@ -55,6 +55,12 @@ Shell = function() {
     this._handleParameterOptions = function(singleParams, doubleParams) {
         //example usage: this._handleParameterOptions('[xy]','(--x-option|--y-option)')
         return RegExp(['((^|\\s)-[\\w]?', singleParams, '[\\w]?)|(', doubleParams, '(\\s|$))'].join('')); 
+    };
+
+    this._devLog = function(name, message) {
+        if (this._devMode) {
+            console.log([name, '():\t'].join(''), message);
+        }
     };
 
     this.ls = function(key, paramString) {
@@ -74,7 +80,6 @@ Shell = function() {
     };
 
     this.mkdir = function(newObjPath, protoObjPath) {
-        //TODO: figure out overwriting options / what to do if existing entry is not an object
         //mkdir(newObjPath) makes an empty object
         //mkdir(newObjPath, protoObjPath) makes an object newObj with protoObj as the prototype
         var mapMethod = function(newEntry, index) {
@@ -112,8 +117,8 @@ Shell = function() {
         parentPath = parentPath.join('.');
         if (parentPath) {
             context = this._objScope(parentPath);
-            if (context[pathEnd] && this._devMode) {
-                console.log('Object already exists!');
+            if (context[pathEnd]) {
+                this._devLog('_newContext', ['Object already exists in ', pathString, '.'].join(''));
             }
             return context && !context[pathEnd] && context; //get the actual object reference
         } else {
@@ -154,8 +159,8 @@ Shell = function() {
             } else {
                 return localPathEnvironment[localPathObject];
             }
-        } else if(this._devMode) {
-            console.log('Scoping failure for', objString);
+        } else {
+            this._devLog('_objScope', ['Scoping failure for ', objString].join(''));
         }
     };
 
@@ -193,12 +198,11 @@ Shell = function() {
         });
         if (!isConsistent) {
             //kill if column lengths are inconsistent
-            if (this._devMode) {
-                console.log('Inconsistent column lengths.');
-            }
+            this._devLog('prettyPrint', 'Inconsistent column lengths.');
             return;
         }
 
+        //TODO actual pretty printing.
         return maxArray;
     };
 
@@ -254,8 +258,7 @@ Shell = function() {
 
     this.shell = function(callable, intervalTime, args, altName) {
         //NOTE - NOT PRODUCTION SAFE.
-        //TODO finish this function
-        //TODO actual tests
+        //TODO tests
         var strForm = String(callable),
             intervalRef = intervalTime ? undefined : setInterval(function(){ return callable.bind(this, args);}, intervalTime),
             procName = strForm.substring(9, strForm.indexOf('('));  //String(foo) gives 'function() <--func name here-->{ etc...'
@@ -271,8 +274,8 @@ Shell = function() {
             this._processes[this._processCounter] = [this._processCounter, intervalRef];    //overwrite by default for process IDs
             if (altName) {
                 this._processes[altName] = [this._processCounter, intervalRef];
-                if (this._devMode && this._processes[altName]) {
-                    console.log('altName', altName, 'overwritten for process', this._processCounter);
+                if (this._processes[altName]) {
+                    this._devLog('shell', ['altName', altName, 'overwritten for process', this._processCounter].join(''));
                 }
             }
             return this._processCounter++;
@@ -294,8 +297,8 @@ Shell = function() {
     this._validateParameterOptions = function(paramString) {
         //ensure that options are of form -[letters] or --word1-word2
         var isValid = /(((^|\s)-[\w]+|--[\w][\w-]+)(\s)?)+$/.test(paramString);
-        if (this._devMode && !isValid) {
-            console.log(paramString, 'is an invalid option.');
+        if (!isValid) {
+            this._devLog('_validateParameterOptions', [paramString, 'is an invalid option.'].join(''));
         }
         return isValid;
     };
