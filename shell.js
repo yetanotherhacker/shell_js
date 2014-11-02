@@ -109,7 +109,7 @@ Shell = function() {
     };
 
     this._newContext = function(pathString) {
-        //ensure that the property to be made doesn't exist yet but is valid
+        //ensure that the property to be made doesn't exist yet but has a valid path
         var parentPath = pathString.split('.'),
             pathEnd = parentPath.pop(),
             context;
@@ -187,12 +187,12 @@ Shell = function() {
     this.prettyPrint = function(dataMatrix) {
         var rowLength = dataMatrix.length,
             columnLength = dataMatrix[0].length,
-            maxArray = Array.apply(null, Array(rowLength)),
+            tableSizes = Array.apply(null, Array(rowLength)),
             isConsistent;
 
         isConsistent = dataMatrix.every(function(rowElement, rowIndex) {
             rowElement.forEach(function(columnElement, columnIndex) {
-                maxArray[columnIndex] = Math.max(maxArray[columnIndex] || 0, String(columnElement).length);
+                tableSizes[columnIndex] = Math.max(tableSizes[columnIndex] || 0, String(columnElement).length);
             });
             return rowElement.length === columnLength;
         });
@@ -203,7 +203,7 @@ Shell = function() {
         }
 
         //TODO actual pretty printing.
-        return maxArray;
+        return tableSizes;
     };
 
     this.pwd = function(resultIsString) {
@@ -260,7 +260,7 @@ Shell = function() {
         //NOTE - NOT PRODUCTION SAFE.
         //TODO tests
         var strForm = String(callable),
-            intervalRef = intervalTime ? undefined : setInterval(function(){ return callable.bind(this, args);}, intervalTime),
+            intervalRef = intervalTime ? setInterval(function(){ return callable.bind(this, args);}, intervalTime) : undefined,
             procName = strForm.substring(9, strForm.indexOf('('));  //String(foo) gives 'function() <--func name here-->{ etc...'
 
         if (intervalRef) {
