@@ -185,6 +185,7 @@ Shell = function() {
     };
 
     this.prettyPrint = function(dataMatrix) {
+        //NOTE - NOT PRODUCTION SAFE
         var rowLength = dataMatrix.length,
             columnLength = dataMatrix[0].length,
             tableSizes = Array.apply(null, Array(rowLength)),
