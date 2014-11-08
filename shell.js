@@ -63,6 +63,10 @@ Shell = function() {
         }
     };
 
+    this.kill = function(processName) {
+        //TODO fill out
+    }
+
     this.ls = function(key, paramString) {
         //declare contents of current path's object
         if (paramString && !this._validateParameterOptions(paramString)) {
@@ -260,14 +264,20 @@ Shell = function() {
     this.shell = function(callable, intervalTime, args, altName) {
         //NOTE - NOT PRODUCTION SAFE.
         //TODO tests
+
+        //if no function to call and time interval, stop
+        if (!(callable instanceof Function) && (intervalTime instanceof Number) && (intervalTime > 0))
+            return;
         var strForm = String(callable),
             intervalRef = intervalTime ? setInterval(function(){ return callable.bind(this, args);}, intervalTime) : undefined,
             procName = strForm.substring(9, strForm.indexOf('('));  //String(foo) gives 'function() <--func name here-->{ etc...'
 
         if (intervalRef) {
             if (!procName) {
-                this._processes[procName] = [this._processCounter, intervalRef];
-            } else if (!this._processes[procName]) {
+                //anonymous functions still should be recorded if they're being called repeatedly
+                procName = 'anonymous';
+            }
+            if (!this._processes[procName]) {
                 this._processes[procName] = [this._processCounter, intervalRef];
             } else {
                 this._processes[procName].push([this._processCounter, intervalRef]);
