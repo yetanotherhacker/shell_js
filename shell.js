@@ -64,7 +64,15 @@ Shell = function() {
     };
 
     this.kill = function(processName) {
-        //TODO fill out
+        var id, intervalRef;
+        if (!this._processes[processName]) {
+            this._devLog('kill', ['no process with the name or ID of ', processName].join(''));
+        }
+        id = this._processes[processName][0];
+        intervalRef = this._processes[processName][1];
+        clearInterval(intervalRef);
+        delete this._processes[id];
+        delete this._processes[processName];
     }
 
     this.ls = function(key, paramString) {
@@ -267,6 +275,9 @@ Shell = function() {
 
         //if no function to call and time interval, stop
         if (!(callable instanceof Function) && (intervalTime instanceof Number) && (intervalTime > 0))
+            return;
+        //not accepting numbers as shorthand names
+        if (altName && !Number.isNaN(Number(altName)))
             return;
         var strForm = String(callable),
             intervalRef = intervalTime ? setInterval(function(){ return callable.bind(this, args);}, intervalTime) : undefined,
