@@ -64,6 +64,7 @@ Shell = function() {
     };
 
     this.kill = function(processName) {
+        //TODO: kill callbacks for normal exit / options? (-9)
         var id, intervalRef;
         if (!this._processes[processName]) {
             this._devLog('kill', ['no process with the name or ID of ', processName].join(''));
