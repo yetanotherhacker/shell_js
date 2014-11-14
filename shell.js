@@ -65,12 +65,20 @@ Shell = function() {
 
     this.kill = function(processName) {
         //TODO: kill callbacks for normal exit / options? (-9)
-        var id, intervalRef;
+        var localProcess, id, intervalRef, callable;
         if (!this._processes[processName]) {
             this._devLog('kill', ['no process with the name or ID of ', processName].join(''));
         }
-        id = this._processes[processName][0];
-        intervalRef = this._processes[processName][1];
+        localProcess = this._processes[processName];
+
+        id = localProcess[0];
+        intervalRef = localProcess[1];
+        callable = localProcess[2];
+
+        if (callable.onFinish && callable.onFinish instanceof Function) {
+            //Functions are objects too. Check for a onFinish() method and execute if found.
+            callable.onFinish(localProcess);
+        }
         clearInterval(intervalRef);
         delete this._processes[id];
         delete this._processes[processName];
@@ -282,7 +290,8 @@ Shell = function() {
             return;
         var strForm = String(callable),
             intervalRef = intervalTime ? setInterval(function(){ return callable.bind(this, args);}, intervalTime) : undefined,
-            procName = strForm.substring(9, strForm.indexOf('('));  //String(foo) gives 'function() <--func name here-->{ etc...'
+            procName = strForm.substring(9, strForm.indexOf('(')),
+            tuple = [this._processCounter, intervalRef, callable];  //String(foo) gives 'function() <--func name here-->{ etc...'
 
         if (intervalRef) {
             if (!procName) {
@@ -290,13 +299,13 @@ Shell = function() {
                 procName = 'anonymous';
             }
             if (!this._processes[procName]) {
-                this._processes[procName] = [this._processCounter, intervalRef];
+                this._processes[procName] = tuple;
             } else {
-                this._processes[procName].push([this._processCounter, intervalRef]);
+                this._processes[procName].push(tuple);
             }
-            this._processes[this._processCounter] = [this._processCounter, intervalRef];    //overwrite by default for process IDs
+            this._processes[this._processCounter] = tuple;    //overwrite by default for process IDs
             if (altName) {
-                this._processes[altName] = [this._processCounter, intervalRef];
+                this._processes[altName] = tuple;
                 if (this._processes[altName]) {
                     this._devLog('shell', ['altName', altName, 'overwritten for process', this._processCounter].join(''));
                 }
