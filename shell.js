@@ -63,7 +63,7 @@ Shell = function() {
         }
     };
 
-    this.kill = function(processName) {
+    this.kill = function(processName, willFinishNow) {
         //TODO: kill callbacks for normal exit / options? (-9)
         var localProcess, id, intervalRef, callable;
         if (!this._processes[processName]) {
@@ -75,9 +75,13 @@ Shell = function() {
         intervalRef = localProcess[1];
         callable = localProcess[2];
 
-        if (callable.onFinish && callable.onFinish instanceof Function) {
+        if (!willFinishNow && callable.onFinish && callable.onFinish instanceof Function) {
             //Functions are objects too. Check for a onFinish() method and execute if found.
             callable.onFinish(localProcess);
+            return;
+        } else if (callable.onDestroyed && callable.onDestroyed instanceof Function) {
+            //Check for a onDestroyed() method and execute if found.
+            callable.onDestroyed(localProcess);
         }
         clearInterval(intervalRef);
         delete this._processes[id];
