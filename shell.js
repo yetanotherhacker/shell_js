@@ -9,6 +9,7 @@ TODO: make piping work
 Shell = function() {
     this.path = '';
     this._devMode = false;
+    this._logs = {};
     this._processes = {};
     this._processCounter = 0;
     //this.path is of the form 'x.y.z'
@@ -58,8 +59,13 @@ Shell = function() {
     };
 
     this._devLog = function(name, message) {
-        if (this._devMode) {
-            console.log([name, '():\t'].join(''), message);
+        var logTuple = [[name, '():\t'].join(''), message];
+        if (!this._devMode)
+            return;
+
+        console.log(logTuple[0], logTuple[1]);
+        if (this._logs.dev && (this._logs.dev instanceof Array)) {
+            this._logs.dev.push(logTuple);
         }
     };
 
@@ -280,6 +286,7 @@ Shell = function() {
 
     this.setDevMode = function() {
         this._devMode = true;
+        this._logs.dev = [];
     };
 
     this.shell = function(callable, intervalTime, args, altName) {
