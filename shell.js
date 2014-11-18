@@ -7,12 +7,11 @@ TODO: make piping work
 */
 
 Shell = function() {
-    this.path = '';
+    this.path = '';     //this.path is of the form 'x.y.z'
     this._devMode = false;
     this._logs = {};
     this._processes = {};
     this._processCounter = 0;
-    //this.path is of the form 'x.y.z'
     if (this['window']) {
         this._environment = window;
     } else {
@@ -59,9 +58,9 @@ Shell = function() {
     };
 
     this._devLog = function(name, message) {
-        var logTuple = [[name, '():\t'].join(''), message];
         if (!this._devMode)
             return;
+        var logTuple = [[name, '():\t'].join(''), message];
 
         console.log(logTuple[0], logTuple[1]);
         if (this._logs.dev && (this._logs.dev instanceof Array)) {
@@ -70,7 +69,6 @@ Shell = function() {
     };
 
     this.kill = function(processName, willFinishNow) {
-        //TODO: kill callbacks for normal exit / options? (-9)
         var localProcess, id, intervalRef, callable;
         if (!this._processes[processName]) {
             this._devLog('kill', ['no process with the name or ID of ', processName].join(''));
@@ -85,7 +83,7 @@ Shell = function() {
             //Functions are objects too. Check for a onFinish() method and execute if found.
             callable.onFinish(localProcess);
             return;
-        } else if (callable.onDestroyed && callable.onDestroyed instanceof Function) {
+        } else if (willFinishNow && callable.onDestroyed && callable.onDestroyed instanceof Function) {
             //Check for a onDestroyed() method and execute if found.
             callable.onDestroyed(localProcess);
         }
