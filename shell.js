@@ -39,9 +39,9 @@ Shell = function() {
             } else {
                 this.path = '';
             }
-        } else if (typeof(this._reference([this.path, '.', objString].join(''))) === 'object') {
+        } else if (this._reference([this.path, '.', objString].join('')) instanceof Object) {
             this.path = [this.path, '.', objString].join(''); //move to local object
-        } else if (typeof(this._reference(objString)) === 'object') {
+        } else if (this._reference(objString) instanceof Object) {
             this.path = objString; //move to global object
         } else {
             this._devLog('cd', 'No such object exists.');
@@ -170,7 +170,7 @@ Shell = function() {
         localPathEnvironment = this._reference(localPathEnvironment.join('.'));
         isLocalObj = localPathEnvironment && (localPathEnvironment[localPathObject] || newValue);
 
-        if (!isLocalObj && typeof(globalPathEnvironment) === 'object') {
+        if (!isLocalObj && globalPathEnvironment instanceof Object) {
             //global scoping behaviour
             if (deleteFlag) {
                 delete globalPathEnvironment[globalPathObject];
@@ -179,7 +179,7 @@ Shell = function() {
             } else {
                 return globalPathEnvironment[globalPathObject];
             }
-        } else if (typeof(localPathEnvironment) === 'object') {
+        } else if (localPathEnvironment instanceof Object) {
             //local scoping behaviour
             if (deleteFlag) {
                 delete localPathEnvironment[localPathObject];
@@ -258,7 +258,7 @@ Shell = function() {
                     pathArray = entry.split('.');
                     deepRef = this._environment;
                 //if next token is an object, shift to it and repeat
-                    while ((pathArray.length) && (typeof(deepRef) === 'object')) {
+                    while ((pathArray.length) && (deepRef instanceof Object)) {
                         currentContext = pathArray.shift();
                         outerArrayRef = startRegex.exec(currentContext);
 
