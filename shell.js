@@ -69,27 +69,40 @@ Shell = function() {
     };
 
     this.kill = function(processName, willFinishNow) {
-        var localProcess, id, intervalRef, callable;
+        //NOTE - NOT PRODUCTION SAFE
+        //TODO process messages
+        var localProcess, id, intervalRef, callable, finalCall, terminationCall,
+            message = ['no', '', ' process with the name or ID of ', processName];
         if (!this._processes[processName]) {
-            this._devLog('kill', ['no process with the name or ID of ', processName].join(''));
+            this._devLog('kill', message.join(''));
         }
-        localProcess = this._processes[processName];
+        localProcess = this._processes[processName],
+        finalCall = callable.onFinish && callable.onFinish instanceof Function,
+        terminationCall = callable.onDestroyed && callable.onDestroyed instanceof Function;
 
         id = localProcess[0];
         intervalRef = localProcess[1];
         callable = localProcess[2];
 
-        if (!willFinishNow && callable.onFinish && callable.onFinish instanceof Function) {
-            //Functions are objects too. Check for a onFinish() method and execute if found.
-            callable.onFinish(localProcess);
+        if (!willFinishNow) {
+            if (!finalCall) {
+                message[1] = 'onFinish() method for ';
+                this._devLog('kill', message);
+            } else {
+                callable.onFinish(localProcess);
+            }
             return;
-        } else if (willFinishNow && callable.onDestroyed && callable.onDestroyed instanceof Function) {
-            //Check for a onDestroyed() method and execute if found.
-            callable.onDestroyed(localProcess);
+        } else if (willFinishNow && terminationCall) {
+            if (!finalCall) {
+                message[1] = 'onDestroyed() method for ';
+                this._devLog('kill', message);
+            } else {
+                callable.onDestroyed(localProcess);
+            }
         }
         clearInterval(intervalRef);
-        delete this._processes[id];
         delete this._processes[processName];
+        delete this._processes[id];
     }
 
     this.ls = function(key, paramString) {
