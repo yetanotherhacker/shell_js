@@ -310,10 +310,11 @@ Shell = function() {
         //not accepting numbers as shorthand names
         if (altName && !Number.isNaN(Number(altName)))
             return;
+        //TODO hashify tuple for messaging
         var strForm = String(callable),
             intervalRef = intervalTime ? setInterval(function(){ return callable.bind(this, args);}, intervalTime) : undefined,
-            procName = strForm.substring(9, strForm.indexOf('(')),
-            tuple = [this._processCounter, intervalRef, callable];  //String(foo) gives 'function() <--func name here-->{ etc...'
+            procName = strForm.substring(9, strForm.indexOf('(')),  //String(foo) gives 'function() <--func name here-->{ etc...'
+            tuple = [this._processCounter, intervalRef, callable];
 
         if (intervalRef) {
             if (!procName) {
