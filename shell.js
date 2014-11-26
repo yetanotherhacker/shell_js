@@ -12,6 +12,7 @@ Shell = function() {
     this._logs = {};
     this._processes = {};
     this._processCounter = 0;
+    this._signals = {_kill: 1};
     if (this['window']) {
         this._environment = window;
     } else {
@@ -58,6 +59,7 @@ Shell = function() {
     };
 
     this._devLog = function(name, message) {
+        //TODO: infer name from function?
         if (!this._devMode)
             return;
         var logTuple = [[name, '():\t'].join(''), message];
@@ -70,7 +72,6 @@ Shell = function() {
 
     this.kill = function(processName, willFinishNow) {
         //NOTE - NOT PRODUCTION SAFE
-        //TODO process messages
         var localProcess, id, intervalRef, callable, finalCall, terminationCall,
             message = ['no', '', ' process with the name or ID of ', processName];
         if (!this._processes[processName]) {
@@ -90,8 +91,8 @@ Shell = function() {
                 this._devLog('kill', message);
             } else {
                 callable.onFinish(localProcess);
+                this._signals[id] = this._signals.kill;
             }
-            return;
         } else if (willFinishNow && terminationCall) {
             if (!finalCall) {
                 message[1] = 'onDestroyed() method for ';
@@ -99,10 +100,10 @@ Shell = function() {
             } else {
                 callable.onDestroyed(localProcess);
             }
+            clearInterval(intervalRef);
+            delete this._processes[processName];
+            delete this._processes[id];
         }
-        clearInterval(intervalRef);
-        delete this._processes[processName];
-        delete this._processes[id];
     }
 
     this.ls = function(key, paramString) {
@@ -310,7 +311,6 @@ Shell = function() {
         //not accepting numbers as shorthand names
         if (altName && !Number.isNaN(Number(altName)))
             return;
-        //TODO hashify tuple for messaging
         var strForm = String(callable),
             intervalRef = intervalTime ? setInterval(function(){ return callable.bind(this, args);}, intervalTime) : undefined,
             procName = strForm.substring(9, strForm.indexOf('(')),  //String(foo) gives 'function() <--func name here-->{ etc...'
