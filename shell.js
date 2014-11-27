@@ -87,7 +87,7 @@ Shell = function() {
 
         if (!willFinishNow) {
             if (!finalCall) {
-                message[1] = 'onFinish() method for ';
+                message[1] = 'no onFinish() method for ';
                 this._devLog('kill', message);
             } else {
                 callable.onFinish(localProcess);
@@ -95,7 +95,7 @@ Shell = function() {
             }
         } else if (willFinishNow && terminationCall) {
             if (!finalCall) {
-                message[1] = 'onDestroyed() method for ';
+                message[1] = 'no onDestroyed() method for ';
                 this._devLog('kill', message);
             } else {
                 callable.onDestroyed(localProcess);
