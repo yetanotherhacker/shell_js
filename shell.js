@@ -9,6 +9,7 @@ TODO: make piping work
 Shell = function() {
     this.path = '';     //this.path is of the form 'x.y.z'
     this._devMode = false;
+    this._isProduction = true;
     this._logs = {};
     this._processes = {};
     this._processCounter = 0;
@@ -72,6 +73,8 @@ Shell = function() {
 
     this.kill = function(processName, willFinishNow) {
         //NOTE - NOT PRODUCTION SAFE
+        if (this._isProduction)
+            return;
         var localProcess, id, intervalRef, callable, finalCall, terminationCall,
             message = ['no', '', ' process with the name or ID of ', processName];
         if (!this._processes[processName]) {
@@ -229,6 +232,9 @@ Shell = function() {
 
     this.prettyPrint = function(dataMatrix) {
         //NOTE - NOT PRODUCTION SAFE
+        //TODO finish when convenient
+        if (this._isProduction)
+            return;
         var rowLength = dataMatrix.length,
             columnLength = dataMatrix[0].length,
             tableSizes = Array.apply(null, Array(rowLength)),
@@ -246,7 +252,6 @@ Shell = function() {
             return;
         }
 
-        //TODO actual pretty printing.
         return tableSizes;
     };
 
@@ -264,30 +269,30 @@ Shell = function() {
     this._reference = function(path) {
         //takes a path string and returns what it refers to if it exists
         var mapMethod = function(entry) {
-                var pathArray, deepRef, outerArrayRef, multiArrayRef, currentContext,
-                    arrayRegex = /\[([^\]]+)\]/g,
-                    startRegex = /^(\w+)\[/;
+            var pathArray, deepRef, outerArrayRef, multiArrayRef, currentContext,
+                arrayRegex = /\[([^\]]+)\]/g,
+                startRegex = /^(\w+)\[/;
 
-                if (entry) {
-                    pathArray = entry.split('.');
-                    deepRef = this._environment;
-                //if next token is an object, shift to it and repeat
-                    while ((pathArray.length) && (deepRef instanceof Object)) {
-                        currentContext = pathArray.shift();
-                        outerArrayRef = startRegex.exec(currentContext);
+            if (entry) {
+                pathArray = entry.split('.');
+                deepRef = this._environment;
+            //if next token is an object, shift to it and repeat
+                while ((pathArray.length) && (deepRef instanceof Object)) {
+                    currentContext = pathArray.shift();
+                    outerArrayRef = startRegex.exec(currentContext);
 
-                        outerArrayRef = outerArrayRef && outerArrayRef[1];
-                        multiArrayRef = (currentContext.match(arrayRegex) || []).map(function(i){ return i.slice(1, i.length - 1);});
-                        deepRef = deepRef[outerArrayRef || currentContext];
-                        while (outerArrayRef && multiArrayRef.length && deepRef && deepRef[multiArrayRef[0]]) {
-                            deepRef = deepRef[multiArrayRef.shift()];
-                        }
+                    outerArrayRef = outerArrayRef && outerArrayRef[1];
+                    multiArrayRef = (currentContext.match(arrayRegex) || []).map(function(i){ return i.slice(1, i.length - 1);});
+                    deepRef = deepRef[outerArrayRef || currentContext];
+                    while (outerArrayRef && multiArrayRef.length && deepRef && deepRef[multiArrayRef[0]]) {
+                        deepRef = deepRef[multiArrayRef.shift()];
                     }
-                    return deepRef;
-                } else {
-                    return this._environment;
                 }
-            }.bind(this);
+                return deepRef;
+            } else {
+                return this._environment;
+            }
+        }.bind(this);
         return this._vectorMap(path, mapMethod);
     };
 
@@ -301,9 +306,15 @@ Shell = function() {
         this._logs.dev = [];
     };
 
+    this.setNonProduction =function() {
+        this._isProduction = false;
+    };
+
     this.shell = function(callable, intervalTime, args, altName) {
         //NOTE - NOT PRODUCTION SAFE.
         //TODO tests
+        if (this._isProduction)
+            return;
 
         //if no function to call and time interval, stop
         if (!(callable instanceof Function) && (intervalTime instanceof Number) && (intervalTime > 0))
@@ -318,7 +329,7 @@ Shell = function() {
 
         if (intervalRef) {
             if (!procName) {
-                //anonymous functions still should be recorded if they're being called repeatedly
+                //anonymous functions still should be logged correctly if they're being called repeatedly
                 procName = 'anonymous';
             }
             if (!this._processes[procName]) {
