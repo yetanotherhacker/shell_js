@@ -9,7 +9,7 @@ TODO: make piping work
 Shell = function() {
     this.path = '';     //this.path is of the form 'x.y.z'
     this._devMode = false;
-    this._isProduction = true;
+    this._isProduction = true;  //better safe than sorry...
     this._logs = {};
     this._processes = {};
     this._processCounter = 0;
@@ -213,6 +213,11 @@ Shell = function() {
     this._pathFilter = function(filterString) {
         //checks for *'s and .'s for filtering cli-style
         if (!filterString) {
+            this._devLog('_pathFilter', 'No string to filter.')
+            return;
+        }
+        if (typeof filterString !== 'string') {
+            this._devLog('_pathFilter', 'Values passed in not a string.')
             return;
         }
         var regexArray = [],
