@@ -13,7 +13,7 @@ Shell = function() {
     this._logs = {};
     this._processes = {};
     this._processCounter = 0;
-    this._signals = {_kill: 1};
+    this._signals = {_kill: 1, _terminate: 2};
     if (this['window']) {
         this._environment = window;
     } else {
@@ -94,7 +94,7 @@ Shell = function() {
                 this._devLog('kill', message);
             } else {
                 callable.onFinish(localProcess);
-                this._signals[id] = this._signals.kill;
+                this._signals[id] = this._signals._kill;
             }
         } else if (willFinishNow && terminationCall) {
             if (!finalCall) {
@@ -102,6 +102,7 @@ Shell = function() {
                 this._devLog('kill', message);
             } else {
                 callable.onDestroyed(localProcess);
+                this._signals[id] = this._signals._terminate;
             }
             clearInterval(intervalRef);
             delete this._processes[processName];
