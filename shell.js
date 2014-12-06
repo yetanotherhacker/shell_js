@@ -307,20 +307,28 @@ Shell = function() {
         return this._vectorMap(keyString, mapMethod);
     };
 
-    this.setDevMode = function() {
-        this._devMode = true;
-        this._logs.dev = [];
-    };
-
-    this.setNonProduction =function() {
-        this._isProduction = false;
+    this.set = function(option, value) {
+        var optName = '_' + value;
+        if (typeof option !== 'string') {
+            this._devLog('set', 'Option needs to be a string.');
+            return;
+        } else if (!value) {
+            this._devLog('set', 'Need a value. Specify undefined explicitly if undefined.');
+            return;
+        } else if (!this[optName]) {
+            this._devLog('set', 'No such option.');
+            return;
+        }
+        this[optName] = value;
+        return true;
     };
 
     this.shell = function(callable, intervalTime, args, altName) {
         //NOTE - NOT PRODUCTION SAFE.
         //TODO tests
-        if (this._isProduction)
+        if (this._isProduction) {
             return;
+        }
 
         //if no function to call and time interval, stop
         if (!(callable instanceof Function) && (intervalTime instanceof Number) && (intervalTime > 0))
