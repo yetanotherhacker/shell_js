@@ -313,11 +313,13 @@ Shell = function() {
             this._devLog('set', 'Option needs to be a string.');
             return;
         } else if (!value) {
-            this._devLog('set', 'Need a value. Specify undefined explicitly if undefined.');
+            this._devLog('set', 'Need a value. Specify undefined or null explicitly.');
             return;
         } else if (!this[optName]) {
             this._devLog('set', 'No such option.');
             return;
+        } else if (this[optName]._isValid && !this[optName]._isValid(value)) {
+            this._devLog('set', ['Invalid value for ', option].join(''));
         }
         this[optName] = value;
         return true;
