@@ -290,8 +290,11 @@ Shell = function() {
                     outerArrayRef = outerArrayRef && outerArrayRef[1];
                     multiArrayRef = (currentContext.match(arrayRegex) || []).map(function(i){ return i.slice(1, i.length - 1);});
                     deepRef = deepRef[outerArrayRef || currentContext];
-                    while (outerArrayRef && multiArrayRef.length && deepRef && deepRef[multiArrayRef[0]]) {
-                        deepRef = deepRef[multiArrayRef.shift()];
+
+                    if (outerArrayRef) {
+                        while (multiArrayRef.length && deepRef && deepRef[multiArrayRef[0]]) {
+                            deepRef = deepRef[multiArrayRef.shift()];
+                        }
                     }
                 }
                 return deepRef;
