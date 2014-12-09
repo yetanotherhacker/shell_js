@@ -282,7 +282,7 @@ Shell = function() {
             if (entry) {
                 pathArray = entry.split('.');
                 deepRef = this._environment;
-            //if next token is an object, shift to it and repeat
+                //if next token is an object, shift to it and repeat
                 while ((pathArray.length) && (deepRef instanceof Object)) {
                     currentContext = pathArray.shift();
                     outerArrayRef = startRegex.exec(currentContext);
@@ -311,11 +311,14 @@ Shell = function() {
     };
 
     this.set = function(option, value) {
-        var optName = '_' + value;
+        var optName;
         if (typeof option !== 'string') {
             this._devLog('set', 'Option needs to be a string.');
             return;
-        } else if (!value) {
+        }
+
+        optName = '_' + value;
+        if (!value) {
             this._devLog('set', 'Need a value. Specify undefined or null explicitly.');
             return;
         } else if (!this[optName]) {
