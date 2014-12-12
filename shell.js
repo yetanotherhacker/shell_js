@@ -396,7 +396,7 @@ Shell = function() {
         if (item instanceof Array) {
             return item.map(mapMethod);
         } else if (item instanceof Object) {
-            Object.keys(item).map(function(key){
+            return Object.keys(item).map(function(key){
                 mapObj[key] = mapMethod(item[key]);
             });
         } else {
