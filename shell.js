@@ -341,8 +341,8 @@ Shell = function() {
         //if no function to call and time interval, stop
         if (!(callable instanceof Function) && (intervalTime instanceof Number) && (intervalTime > 0))
             return;
-        //not accepting numbers as shorthand names
-        if (altName && !Number.isNaN(Number(altName)))
+        //kick out non-string altnames & do not accept numbers as shorthand names
+        if (altName && ((typeof altName !== 'string') || !Number.isNaN(Number(altName))))
             return;
         var strForm = String(callable),
             intervalRef = intervalTime ? setInterval(function(){ return callable.bind(this, args);}, intervalTime) : undefined,
