@@ -236,31 +236,6 @@ Shell = function() {
         return RegExp(regexArray.join(''));
     };
 
-    this.prettyPrint = function(dataMatrix) {
-        //NOTE - NOT PRODUCTION SAFE
-        //TODO finish when convenient
-        if (this._isProduction)
-            return;
-        var rowLength = dataMatrix.length,
-            columnLength = dataMatrix[0].length,
-            tableSizes = Array.apply(null, Array(rowLength)),
-            isConsistent;
-
-        isConsistent = dataMatrix.every(function(rowElement, rowIndex) {
-            rowElement.forEach(function(columnElement, columnIndex) {
-                tableSizes[columnIndex] = Math.max(tableSizes[columnIndex] || 0, String(columnElement).length);
-            });
-            return rowElement.length === columnLength;
-        });
-        if (!isConsistent) {
-            //kill if column lengths are inconsistent
-            this._devLog('prettyPrint', 'Inconsistent column lengths.');
-            return;
-        }
-
-        return tableSizes;
-    };
-
     this.pwd = function(resultIsString) {
         var result;
         if (resultIsString) {
