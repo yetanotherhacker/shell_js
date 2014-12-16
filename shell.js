@@ -236,6 +236,12 @@ Shell = function() {
         return RegExp(regexArray.join(''));
     };
 
+    this._pipe = function(input) {
+        //return function yielding a generator ending with null?
+        if (this._isProduction)
+            return;
+    }
+
     this.pwd = function(resultIsString) {
         var result;
         if (resultIsString) {
