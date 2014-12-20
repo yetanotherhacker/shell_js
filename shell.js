@@ -3,7 +3,6 @@
 
 /* TODOS
 TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery use
-TODO: make piping work
 */
 
 Shell = function() {
@@ -237,6 +236,7 @@ Shell = function() {
     };
 
     this._pipe = function(input) {
+        //TODO develop function
         //return function yielding a generator ending with null?
         if (this._isProduction)
             return;
@@ -292,6 +292,7 @@ Shell = function() {
     };
 
     this.set = function(option, value) {
+        //TODO: freeze() and seal()? Chmod emulation?
         var optName;
         if (typeof option !== 'string') {
             this._devLog('set', 'Option needs to be a string.');
