@@ -253,7 +253,7 @@ Shell = function() {
         return result;
     };
 
-    this._reference = function(path) {
+    this._reference = function(pathString) {
         //takes a path string and returns what it refers to if it exists
         var mapMethod = function(entry) {
             var pathArray, deepRef, outerArrayRef, multiArrayRef, currentContext,
@@ -283,7 +283,7 @@ Shell = function() {
                 return this._environment;
             }
         }.bind(this);
-        return this._vectorMap(path, mapMethod);
+        return this._vectorMap(pathString, mapMethod);
     };
 
     this.rm = function(keyString) {
@@ -308,6 +308,9 @@ Shell = function() {
             return;
         } else if (this[optName]._isValid && !this[optName]._isValid(value)) {
             this._devLog('set', ['Invalid value for ', option].join(''));
+        } else if (this[optName] instanceof Object) {
+            this._devLog('set', ['Object overwrite is not permitted.', option].join(''));
+            return;
         }
         this[optName] = value;
         return true;
