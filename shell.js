@@ -357,16 +357,6 @@ Shell = function() {
         }
     };
 
-    this.top = function(resultIsString, topOptions) {
-        //TODO: process monitoring
-        //TODO: htop-style options
-        if (resultIsString) {
-            return; //TODO: stringify
-        } else {
-            return this._processes;
-        }
-    };
-
     this._validateParameterOptions = function(paramString) {
         //ensure that options are of form -[letters] or --word1-word2
         var isValid = /(((^|\s)-[\w]+|--[\w][\w-]+)(\s)?)+$/.test(paramString);
