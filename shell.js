@@ -240,12 +240,12 @@ Shell = function() {
         //return function yielding a generator ending with null?
         if (this._isProduction)
             return;
-    }
+    };
 
     this.pwd = function(resultIsString) {
         var result;
         if (resultIsString) {
-            result = this.path ? this.path: 'this';
+            result = this.path ? this.path : 'this';
         } else {
             result = this.path ? this._objScope(this.path) : this;
         }
