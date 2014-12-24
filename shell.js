@@ -45,7 +45,7 @@ Shell = function() {
         } else if (this._reference(objString) instanceof Object) {
             this.path = objString; //move to global object
         } else {
-            this._devLog('cd', 'No such object exists.');
+            this._log('dev','cd', 'No such object exists.');
         }
     };
 
@@ -58,7 +58,7 @@ Shell = function() {
         return RegExp(['((^|\\s)-[\\w]?', singleParams, '[\\w]?)|(', doubleParams, '(\\s|$))'].join('')); 
     };
 
-    this._devLog = function(name, message) {
+    this._log = function(logType, name, message) {
         //TODO: infer name from function?
         if (!this._devMode)
             return;
@@ -77,7 +77,7 @@ Shell = function() {
         var localProcess, id, intervalRef, callable, finalCall, terminationCall,
             message = ['no', '', ' process with the name or ID of ', processName];
         if (!this._processes[processName]) {
-            this._devLog('kill', message.join(''));
+            this._log('dev','kill', message.join(''));
         }
         localProcess = this._processes[processName],
         finalCall = callable.onFinish && callable.onFinish instanceof Function,
@@ -90,7 +90,7 @@ Shell = function() {
         if (!willFinishNow) {
             if (!finalCall) {
                 message[1] = 'no onFinish() method for ';
-                this._devLog('kill', message);
+                this._log('dev','kill', message);
             } else {
                 callable.onFinish(localProcess);
                 this._signals[id] = this._signals._kill;
@@ -98,7 +98,7 @@ Shell = function() {
         } else if (willFinishNow && terminationCall) {
             if (!finalCall) {
                 message[1] = 'no onDestroyed() method for ';
-                this._devLog('kill', message);
+                this._log('dev','kill', message);
             } else {
                 callable.onDestroyed(localProcess);
                 this._signals[id] = this._signals._terminate;
@@ -164,7 +164,7 @@ Shell = function() {
         if (parentPath) {
             context = this._objScope(parentPath);
             if (context[pathEnd]) {
-                this._devLog('_newContext', ['Object already exists in ', pathString, '.'].join(''));
+                this._log('dev','_newContext', ['Object already exists in ', pathString, '.'].join(''));
             }
             return context && !context[pathEnd] && context; //get the actual object reference
         } else {
@@ -206,18 +206,18 @@ Shell = function() {
                 return localPathEnvironment[localPathObject];
             }
         } else {
-            this._devLog('_objScope', ['Scoping failure for ', objString].join(''));
+            this._log('dev','_objScope', ['Scoping failure for ', objString].join(''));
         }
     };
 
     this._pathFilter = function(filterString) {
         //checks for *'s and .'s for filtering cli-style
         if (!filterString) {
-            this._devLog('_pathFilter', 'No string to filter.')
+            this._log('dev','_pathFilter', 'No string to filter.')
             return;
         }
         if (typeof filterString !== 'string') {
-            this._devLog('_pathFilter', 'Values passed in not a string.')
+            this._log('dev','_pathFilter', 'Values passed in not a string.')
             return;
         }
         var regexArray = [],
@@ -295,21 +295,21 @@ Shell = function() {
         //TODO: freeze() and seal()? Chmod emulation?
         var optName;
         if (typeof option !== 'string') {
-            this._devLog('set', 'Option needs to be a string.');
+            this._log('dev','set', 'Option needs to be a string.');
             return;
         }
 
         optName = '_' + value;
         if (!value) {
-            this._devLog('set', 'Need a value. Specify undefined or null explicitly.');
+            this._log('dev','set', 'Need a value. Specify undefined or null explicitly.');
             return;
         } else if (!this[optName]) {
-            this._devLog('set', 'No such option.');
+            this._log('dev','set', 'No such option.');
             return;
         } else if (this[optName]._isValid && !this[optName]._isValid(value)) {
-            this._devLog('set', ['Invalid value for ', option].join(''));
+            this._log('dev','set', ['Invalid value for ', option].join(''));
         } else if (this[optName] instanceof Object) {
-            this._devLog('set', ['Object overwrite is not permitted.', option].join(''));
+            this._log('dev','set', ['Object overwrite is not permitted.', option].join(''));
             return;
         }
         this[optName] = value;
@@ -348,7 +348,7 @@ Shell = function() {
             if (altName) {
                 this._processes[altName] = tuple;
                 if (this._processes[altName]) {
-                    this._devLog('shell', ['altName', altName, 'overwritten for process', this._processCounter].join(''));
+                    this._log('dev','shell', ['altName', altName, 'overwritten for process', this._processCounter].join(''));
                 }
             }
             return this._processCounter++;
@@ -361,7 +361,7 @@ Shell = function() {
         //ensure that options are of form -[letters] or --word1-word2
         var isValid = /(((^|\s)-[\w]+|--[\w][\w-]+)(\s)?)+$/.test(paramString);
         if (!isValid) {
-            this._devLog('_validateParameterOptions', [paramString, 'is an invalid option.'].join(''));
+            this._log('dev','_validateParameterOptions', [paramString, 'is an invalid option.'].join(''));
         }
         return isValid;
     };
