@@ -60,7 +60,7 @@ Shell = function() {
 
     this._log = function(logType, name, message) {
         //TODO: infer name from function?
-        if (!this._devMode)
+        if (!this._devMode && logType === 'dev')
             return;
         var logTuple = [[name, '():\t'].join(''), message];
 
