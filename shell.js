@@ -7,7 +7,7 @@ TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery u
 
 Shell = function() {
     this.path = '';     //this.path is of the form 'x.y.z'
-    this._devMode = false;
+    this._modes = { dev: false};
     this._isProduction = true;  //better safe than sorry...
     this._logs = {};
     this._processes = {};
@@ -60,7 +60,7 @@ Shell = function() {
 
     this._log = function(logType, name, message) {
         //TODO: infer name from function?
-        if (!this._devMode && logType === 'dev')
+        if (!this._modes.dev && logType === 'dev')
             return;
         var logTuple = [[name, '():\t'].join(''), message];
 
@@ -291,28 +291,30 @@ Shell = function() {
         return this._vectorMap(keyString, mapMethod);
     };
 
-    this.set = function(option, value) {
+    this.setMode = function(option, value) {
         //TODO: freeze() and seal()? Chmod emulation?
         var optName;
         if (typeof option !== 'string') {
-            this._log('dev','set', 'Option needs to be a string.');
+            this._log('dev','setMode', 'Option needs to be a string.');
             return;
         }
 
-        optName = '_' + value;
-        if (!value) {
-            this._log('dev','set', 'Need a value. Specify undefined or null explicitly.');
+        if (!value && (value !== false)) {
+            this._log('dev','setMode', 'Need a value. Specify undefined or null explicitly.');
             return;
-        } else if (!this[optName]) {
-            this._log('dev','set', 'No such option.');
+        } else if (this._modes[option] !== Boolean(this._modes[option])) {
+            this._log('dev','setMode', 'No such option.');
             return;
-        } else if (this[optName]._isValid && !this[optName]._isValid(value)) {
-            this._log('dev','set', ['Invalid value for ', option].join(''));
-        } else if (this[optName] instanceof Object) {
-            this._log('dev','set', ['Object overwrite is not permitted.', option].join(''));
+        } else if (this._modes[option]._isValid && !this[option]._isValid(value)) {
+            this._log('dev','setMode', ['Invalid value for ', option].join(''));
+        } else if (this._modes[option] instanceof Object) {
+            this._log('dev','setMode', ['Object overwrite is not permitted.', option].join(''));
             return;
         }
-        this[optName] = value;
+        this._modes[option] = value;
+        if (!(this._logs[option] instanceof Array)) {
+            this._logs[option] = [];
+        }
         return true;
     };
 
