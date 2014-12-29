@@ -74,8 +74,8 @@ Shell = function() {
         //NOTE - NOT PRODUCTION SAFE
         if (this._isProduction)
             return;
-        var localProcess, id, intervalRef, callable, finalCall, terminationCall,
-            message = ['no', '', ' process with the name or ID of ', processName];
+        var localProcess, processID, intervalRef, callable, finalCall, terminationCall,
+            message = ['no', 'onPlaceholderMethod() for', ' process with the name or processID of ', processName];
         if (!this._processes[processName]) {
             this._log('dev','kill', message.join(''));
         }
@@ -83,29 +83,29 @@ Shell = function() {
         finalCall = callable.onFinish && callable.onFinish instanceof Function,
         terminationCall = callable.onDestroyed && callable.onDestroyed instanceof Function;
 
-        id = localProcess[0];
+        processID = localProcess[0];
         intervalRef = localProcess[1];
         callable = localProcess[2];
 
         if (!willFinishNow) {
             if (!finalCall) {
-                message[1] = 'no onFinish() method for ';
+                message[1] = 'onFinish() method for ';
                 this._log('dev','kill', message);
             } else {
                 callable.onFinish(localProcess);
-                this._signals[id] = this._signals._kill;
+                this._signals[processID] = this._signals._kill;
             }
         } else if (willFinishNow && terminationCall) {
             if (!finalCall) {
-                message[1] = 'no onDestroyed() method for ';
+                message[1] = 'onDestroyed() method for ';
                 this._log('dev','kill', message);
             } else {
                 callable.onDestroyed(localProcess);
-                this._signals[id] = this._signals._terminate;
+                this._signals[processID] = this._signals._terminate;
             }
             clearInterval(intervalRef);
             delete this._processes[processName];
-            delete this._processes[id];
+            delete this._processes[processID];
         }
     }
 
@@ -291,28 +291,24 @@ Shell = function() {
         return this._vectorMap(keyString, mapMethod);
     };
 
-    this.setMode = function(option, value) {
-        //TODO: freeze() and seal()? Chmod emulation?
+    this.setMode = function(mode, value) {
         var optName;
-        if (typeof option !== 'string') {
-            this._log('dev','setMode', 'Option needs to be a string.');
+        if (typeof mode !== 'string') {
+            this._log('dev','setMode', 'Mode name needs to be a string.');
             return;
         }
 
         if (!value && (value !== false)) {
             this._log('dev','setMode', 'Need a value. Specify undefined or null explicitly.');
             return;
-        } else if (this._modes[option] !== Boolean(this._modes[option])) {
-            this._log('dev','setMode', 'No such option.');
+        } else if (this._modes[mode] !== Boolean(this._modes[mode])) {
+            this._log('dev','setMode', 'No such mode.');
             return;
-        } else if (this._modes[option]._isValid && !this[option]._isValid(value)) {
-            this._log('dev','setMode', ['Invalid value for ', option].join(''));
-        } else if (this._modes[option] instanceof Object) {
-            this._log('dev','setMode', ['Object overwrite is not permitted.', option].join(''));
-            return;
+        } else if (this._modes[mode]._isValid && !this[mode]._isValid(value)) {
+            this._log('dev','setMode', ['Invalid value for ', mode].join(''));
         }
         this._modes[option] = value;
-        if (!(this._logs[option] instanceof Array)) {
+        if (!(this._logs[option] instanceof Array) && value) {
             this._logs[option] = [];
         }
         return true;
@@ -350,7 +346,7 @@ Shell = function() {
             if (altName) {
                 this._processes[altName] = tuple;
                 if (this._processes[altName]) {
-                    this._log('dev','shell', ['altName', altName, 'overwritten for process', this._processCounter].join(''));
+                    this._log('dev','shell', ['altName ', altName, ' overwritten for process', this._processCounter].join(''));
                 }
             }
             return this._processCounter++;
