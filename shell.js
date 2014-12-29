@@ -107,7 +107,7 @@ Shell = function() {
             delete this._processes[processName];
             delete this._processes[processID];
         }
-    }
+    };
 
     this.ls = function(key, paramString) {
         //declare contents of current path's object
