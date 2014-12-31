@@ -53,8 +53,8 @@ Shell = function() {
         return this._objScope(finish, this._objScope(origin));
     };
 
-    this._handleParameterOptions = function(singleParams, doubleParams) {
-        //example usage: this._handleParameterOptions('[xy]','(--x-option|--y-option)')
+    this._createParameterOptionRegex = function(singleParams, doubleParams) {
+        //example usage: this._createParameterOptionRegex('[xy]','(--x-option|--y-option)')
         return RegExp(['((^|\\s)-[\\w]?', singleParams, '[\\w]?)|(', doubleParams, '(\\s|$))'].join('')); 
     };
 
@@ -114,7 +114,7 @@ Shell = function() {
         if (paramString && !this._validateParameterOptions(paramString)) {
             return [];
         }
-        var lsMethod = this._handleParameterOptions('a', '--all').test(paramString) ? Object.getOwnPropertyNames : Object.keys,
+        var lsMethod = this._createParameterOptionRegex('a', '--all').test(paramString) ? Object.getOwnPropertyNames : Object.keys,
             currentObj = this._objScope(key) || {},
             keyFilter = this._pathFilter(key);
 
@@ -298,14 +298,12 @@ Shell = function() {
             return;
         }
 
-        if (!value && (value !== false)) {
-            this._log('dev','setMode', 'Need a value. Specify undefined or null explicitly.');
+        if (value !== Boolean(value)) {
+            this._log('dev','setMode', 'Value must be either true or false.');
             return;
         } else if (this._modes[mode] !== Boolean(this._modes[mode])) {
             this._log('dev','setMode', 'No such mode.');
             return;
-        } else if (this._modes[mode]._isValid && !this[mode]._isValid(value)) {
-            this._log('dev','setMode', ['Invalid value for ', mode].join(''));
         }
         this._modes[option] = value;
         if (!(this._logs[option] instanceof Array) && value) {
