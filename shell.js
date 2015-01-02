@@ -17,6 +17,7 @@ Shell = function() {
         this._environment = window;
     } else {
         this._environment = GLOBAL; //NOTE: this['GLOBAL'] will NOT work in a module
+        this._modes.nodejs = true;  //assuming a nodejs environment
     }
 
     this.cd = function(objString) {
@@ -236,10 +237,21 @@ Shell = function() {
     };
 
     this._pipe = function(input) {
-        //TODO develop function
-        //return function yielding a generator ending with null?
-        if (this._isProduction)
+        //TODO finish _pipe
+        var nodeVersion;
+        if (this._modes.nodejs && this._environment['process']) {
+            nodeVersion =  process.version
+                            .substr(1)
+                            .split('.')
+                            .map(function(element) { return Number(element);});
+            if (!(nodeVersion[0] >= 0 && nodeVersion[1] >= 11 && nodeVersion[2] > 2)) {
+                this._log('dev', '_pipe', ['Need v8 generators which are unsupported in node ', process.version, '. Exiting.'].join(''));
+                return;
+            }
+        }
+        if (this._isProduction) {
             return;
+        }
     };
 
     this.pwd = function(resultIsString) {
@@ -305,9 +317,9 @@ Shell = function() {
             this._log('dev','setMode', 'No such mode.');
             return;
         }
-        this._modes[option] = value;
-        if (!(this._logs[option] instanceof Array) && value) {
-            this._logs[option] = [];
+        this._modes[mode] = value;
+        if (!(this._logs[mode] instanceof Array) && value) {
+            this._logs[mode] = [];
         }
         return true;
     };
