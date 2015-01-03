@@ -59,16 +59,18 @@ Shell = function() {
         return RegExp(['((^|\\s)-[\\w]?', singleParams, '[\\w]?)|(', doubleParams, '(\\s|$))'].join('')); 
     };
 
-    this._log = function(logType, name, message) {
-        //TODO: infer name from function?
-        if (!this._modes.dev && logType === 'dev')
+    this._inferName = function(method) {
+        var name, strForm;
+        if (!method instanceof Function) {
+            this._log('dev', '_inferName', 'Need a function.');
             return;
-        var logTuple = [[name, '():\t'].join(''), message];
-
-        console.log(logTuple[0], logTuple[1]);
-        if (this._logs.dev && (this._logs.dev instanceof Array)) {
-            this._logs.dev.push(logTuple);
         }
+        strForm = String(method);
+        name = strForm.substring(9, strForm.indexOf('('));  //String(foo) gives 'function() <--func name here-->{ etc...'
+        if (!name) {
+            name = 'anonymous';
+        }
+        return name;
     };
 
     this.kill = function(processName, willFinishNow) {
@@ -107,6 +109,18 @@ Shell = function() {
             clearInterval(intervalRef);
             delete this._processes[processName];
             delete this._processes[processID];
+        }
+    };
+
+    this._log = function(logType, name, message) {
+        //TODO: infer name from function?
+        if (!this._modes.dev && logType === 'dev')
+            return;
+        var logTuple = [[name, '():\t'].join(''), message];
+
+        console.log(logTuple[0], logTuple[1]);
+        if (this._logs.dev && (this._logs.dev instanceof Array)) {
+            this._logs.dev.push(logTuple);
         }
     };
 
@@ -337,16 +351,11 @@ Shell = function() {
         //kick out non-string altnames & do not accept numbers as shorthand names
         if (altName && ((typeof altName !== 'string') || !Number.isNaN(Number(altName))))
             return;
-        var strForm = String(callable),
+        var procName = this._inferName(callable),
             intervalRef = intervalTime ? setInterval(function(){ return callable.bind(this, args);}, intervalTime) : undefined,
-            procName = strForm.substring(9, strForm.indexOf('(')),  //String(foo) gives 'function() <--func name here-->{ etc...'
             tuple = [this._processCounter, intervalRef, callable];
 
         if (intervalRef) {
-            if (!procName) {
-                //anonymous functions still should be logged correctly if they're being called repeatedly
-                procName = 'anonymous';
-            }
             if (!this._processes[procName]) {
                 this._processes[procName] = tuple;
             } else {
