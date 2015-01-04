@@ -8,10 +8,10 @@ i.e.
 	foo = new Shell();
     with (foo) {
         with(foo._reference(foo.path)) {
-            mkdir('x');
-            x.y = 4;
-            x.z = 6;
-            cd('x');
+            mkdir('obj');
+            obj.y = 4;
+            obj.z = 6;
+            cd('obj');
             ls();
         }
     }
@@ -19,7 +19,7 @@ i.e.
 
 -- `ls()` returns x and y
 
--- the entire 'script' runs in local scope
+-- the entire script runs in local scope
 
 -- `local-tests.js` has more tests
 
@@ -37,6 +37,4 @@ No piping. Only 'mkdir()' and 'rm()' accepts array input.
 
 `_reference()` passes the last valid object encountered in the path
 
-`top()` is currently being built
-
-Dev. mode is available. Use `setDevMode()`
+Dev. mode is available. Use `setMode('dev')`
