@@ -1,5 +1,5 @@
-//shell.js - a library to treat a JavaScript environment like a unix shell.
-//Copyright 2011-2014 by Julius D'souza. Licensed under GPL 3.0.
+//shell.js - a shell-like library for JavaScript environments.
+//Copyright 2011-2015 by Julius D'souza. Licensed under GPL 3.0.
 
 /* TODOS
 TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery use
@@ -59,10 +59,10 @@ Shell = function() {
         return RegExp(['((^|\\s)-[\\w]?', singleParams, '[\\w]?)|(', doubleParams, '(\\s|$))'].join('')); 
     };
 
-    this._inferName = function(method) {
+    this._inferMethodName = function(method) {
         var name, strForm;
         if (!method instanceof Function) {
-            this._log('dev', '_inferName', 'Need a function.');
+            this._log('dev', '_inferMethodName', 'Need a function.');
             return;
         }
         strForm = String(method);
@@ -113,7 +113,6 @@ Shell = function() {
     };
 
     this._log = function(logType, name, message) {
-        //TODO: infer name from function?
         if (!this._modes.dev && logType === 'dev')
             return;
         var logTuple = [[name, '():\t'].join(''), message];
@@ -125,7 +124,7 @@ Shell = function() {
     };
 
     this.ls = function(key, paramString) {
-        //declare contents of current path's object
+        //return array with keys of the current path object
         if (paramString && !this._validateParameterOptions(paramString)) {
             return [];
         }
@@ -230,8 +229,7 @@ Shell = function() {
         if (!filterString) {
             this._log('dev','_pathFilter', 'No string to filter.')
             return;
-        }
-        if (typeof filterString !== 'string') {
+        } else if (typeof filterString !== 'string') {
             this._log('dev','_pathFilter', 'Values passed in not a string.')
             return;
         }
@@ -251,7 +249,7 @@ Shell = function() {
     };
 
     this._pipe = function(input) {
-        //TODO finish _pipe
+        //TODO finish _pipe, check yield support carefully
         var nodeVersion;
         if (this._modes.nodejs && this._environment['process']) {
             nodeVersion =  process.version
@@ -259,6 +257,7 @@ Shell = function() {
                             .split('.')
                             .map(function(element) { return Number(element);});
             if (!(nodeVersion[0] >= 0 && nodeVersion[1] >= 11 && nodeVersion[2] > 2)) {
+                //need at least 0.11.2 for v8 generators
                 this._log('dev', '_pipe', ['Need v8 generators which are unsupported in node ', process.version, '. Exiting.'].join(''));
                 return;
             }
@@ -351,7 +350,7 @@ Shell = function() {
         //kick out non-string altnames & do not accept numbers as shorthand names
         if (altName && ((typeof altName !== 'string') || !Number.isNaN(Number(altName))))
             return;
-        var procName = this._inferName(callable),
+        var procName = this._inferMethodName(callable),
             intervalRef = intervalTime ? setInterval(function(){ return callable.bind(this, args);}, intervalTime) : undefined,
             tuple = [this._processCounter, intervalRef, callable];
 
