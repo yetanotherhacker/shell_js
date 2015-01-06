@@ -113,7 +113,7 @@ Shell = function() {
     };
 
     this._log = function(logType, name, message) {
-        if (!this._modes.dev && logType === 'dev')
+        if (!logType || !this._modes[logType])
             return;
         var logTuple = [[name, '():\t'].join(''), message];
 
