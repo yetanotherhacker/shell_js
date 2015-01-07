@@ -46,7 +46,7 @@ Shell = function() {
         } else if (this._reference(objString) instanceof Object) {
             this.path = objString; //move to global object
         } else {
-            this._log('dev','cd', 'No such object exists.');
+            this.log('dev','cd', 'No such object exists.');
         }
     };
 
@@ -62,7 +62,7 @@ Shell = function() {
     this._inferMethodName = function(method) {
         var name, strForm;
         if (!method instanceof Function) {
-            this._log('dev', '_inferMethodName', 'Need a function.');
+            this.log('dev', '_inferMethodName', 'Need a function.');
             return;
         }
         strForm = String(method);
@@ -78,9 +78,9 @@ Shell = function() {
         if (this._isProduction)
             return;
         var localProcess, processID, intervalRef, callable, finalCall, terminationCall,
-            message = ['no', 'onPlaceholderMethod() for', ' process with the name or processID of ', processName];
+            message = ['no', 'onPlaceholderMethod() for', 'process with the name or processID of', processName];
         if (!this._processes[processName]) {
-            this._log('dev','kill', message.join(''));
+            this.log('dev','kill', message.join(' '));
         }
         localProcess = this._processes[processName],
         finalCall = callable.onFinish && callable.onFinish instanceof Function,
@@ -93,7 +93,7 @@ Shell = function() {
         if (!willFinishNow) {
             if (!finalCall) {
                 message[1] = 'onFinish() method for ';
-                this._log('dev','kill', message);
+                this.log('dev','kill', message);
             } else {
                 callable.onFinish(localProcess);
                 this._signals[processID] = this._signals._kill;
@@ -101,7 +101,7 @@ Shell = function() {
         } else if (willFinishNow && terminationCall) {
             if (!finalCall) {
                 message[1] = 'onDestroyed() method for ';
-                this._log('dev','kill', message);
+                this.log('dev','kill', message);
             } else {
                 callable.onDestroyed(localProcess);
                 this._signals[processID] = this._signals._terminate;
@@ -112,7 +112,7 @@ Shell = function() {
         }
     };
 
-    this._log = function(logType, name, message) {
+    this.log = function(logType, name, message) {
         if (!logType || !this._modes[logType])
             return;
         var logTuple = [[name, '():\t'].join(''), message];
@@ -178,7 +178,7 @@ Shell = function() {
         if (parentPath) {
             context = this._objScope(parentPath);
             if (context[pathEnd]) {
-                this._log('dev','_newContext', ['Object already exists in ', pathString, '.'].join(''));
+                this.log('dev','_newContext', ['Object already exists in ', pathString, '.'].join(''));
             }
             return context && !context[pathEnd] && context; //get the actual object reference
         } else {
@@ -220,17 +220,17 @@ Shell = function() {
                 return localPathEnvironment[localPathObject];
             }
         } else {
-            this._log('dev','_objScope', ['Scoping failure for ', objString].join(''));
+            this.log('dev','_objScope', ['Scoping failure for ', objString].join(''));
         }
     };
 
     this._pathFilter = function(filterString) {
         //checks for *'s and .'s for filtering cli-style
         if (!filterString) {
-            this._log('dev','_pathFilter', 'No string to filter.')
+            this.log('dev','_pathFilter', 'No string to filter.')
             return;
         } else if (typeof filterString !== 'string') {
-            this._log('dev','_pathFilter', 'Values passed in not a string.')
+            this.log('dev','_pathFilter', 'Values passed in not a string.')
             return;
         }
         var regexArray = [],
@@ -258,7 +258,7 @@ Shell = function() {
                             .map(function(element) { return Number(element);});
             if (!(nodeVersion[0] >= 0 && nodeVersion[1] >= 11 && nodeVersion[2] > 2)) {
                 //need at least 0.11.2 for v8 generators
-                this._log('dev', '_pipe', ['Need v8 generators which are unsupported in node ', process.version, '. Exiting.'].join(''));
+                this.log('dev', '_pipe', ['Need v8 generators which are unsupported in node ', process.version, '. Exiting.'].join(''));
                 return;
             }
         }
@@ -319,15 +319,15 @@ Shell = function() {
     this.setMode = function(mode, value) {
         var optName;
         if (typeof mode !== 'string') {
-            this._log('dev','setMode', 'Mode name needs to be a string.');
+            this.log('dev','setMode', 'Mode name needs to be a string.');
             return;
         }
 
         if (value !== Boolean(value)) {
-            this._log('dev','setMode', 'Value must be either true or false.');
+            this.log('dev','setMode', 'Value must be either true or false.');
             return;
         } else if (this._modes[mode] !== Boolean(this._modes[mode])) {
-            this._log('dev','setMode', 'No such mode.');
+            this.log('dev','setMode', 'No such mode.');
             return;
         }
         this._modes[mode] = value;
@@ -364,7 +364,7 @@ Shell = function() {
             if (altName) {
                 this._processes[altName] = tuple;
                 if (this._processes[altName]) {
-                    this._log('dev','shell', ['altName ', altName, ' overwritten for process', this._processCounter].join(''));
+                    this.log('dev','shell', ['altName', altName, 'overwritten for process', this._processCounter].join(' '));
                 }
             }
             return this._processCounter++;
@@ -377,7 +377,7 @@ Shell = function() {
         //ensure that options are of form -[letters] or --word1-word2
         var isValid = /(((^|\s)-[\w]+|--[\w][\w-]+)(\s)?)+$/.test(paramString);
         if (!isValid) {
-            this._log('dev','_validateParameterOptions', [paramString, 'is an invalid option.'].join(''));
+            this.log('dev','_validateParameterOptions', [paramString, 'is an invalid option.'].join(' '));
         }
         return isValid;
     };
