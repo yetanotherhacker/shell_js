@@ -348,7 +348,7 @@ Shell = function() {
         if (!(callable instanceof Function) && (intervalTime instanceof Number) && (intervalTime > 0))
             return;
         //kick out non-string altnames & do not accept numbers as shorthand names
-        if (altName && ((typeof altName !== 'string') || !Number.isNaN(Number(altName))))
+        if ((typeof altName !== 'string') || !Number.isNaN(Number(altName)))
             return;
         var procName = this._inferMethodName(callable),
             intervalRef = intervalTime ? setInterval(function(){ return callable.bind(this, args);}, intervalTime) : undefined,
