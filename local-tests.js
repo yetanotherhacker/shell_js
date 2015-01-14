@@ -7,7 +7,7 @@ testsPass = true;
 tests = {
     devLogs: function() {
         shell.log('dev', 'test/devLogs', 'Testing logging.');
-        return [shell._logs.dev.length, 'Testing devLogs().']
+        return [shell._logs.dev.length, 'Testing devLogs().'];
     },
     mkdirScoping: function() {
         //check global and local scoping via mkdir()

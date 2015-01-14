@@ -8,7 +8,7 @@ TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery u
 Shell = function() {
     this.path = '';     //this.path is of the form 'x.y.z'
     this._modes = { dev: false};
-    this._isProduction = true;  //better safe than sorry...
+    this._isProduction = false;  //better safe than sorry...
     this._logs = {};
     this._processes = {};
     this._processCounter = 0;
@@ -230,7 +230,7 @@ Shell = function() {
             this.log('dev','_pathFilter', 'No string to filter.')
             return;
         } else if (typeof filterString !== 'string') {
-            this.log('dev','_pathFilter', 'Values passed in not a string.')
+            this.log('dev','_pathFilter', 'Given value is not a string.')
             return;
         }
         var regexArray = [],
