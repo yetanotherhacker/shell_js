@@ -115,7 +115,7 @@ Shell = function() {
     this.log = function(logType, name, message) {
         if (!logType || !this._modes[logType])
             return;
-        var logTuple = [[name, '():\t'].join(''), message];
+        var logTuple = [[name, '():\t'].join(''), message, new Date()];
 
         console.log(logTuple[0], logTuple[1]);
         if (this._logs.dev && (this._logs.dev instanceof Array)) {
