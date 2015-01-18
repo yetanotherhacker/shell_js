@@ -74,21 +74,27 @@ Shell = function() {
     };
 
     this.kill = function(processName, willFinishNow) {
-        //NOTE - NOT PRODUCTION SAFE
-        if (this._isProduction)
+        //NOTE - still needs work, obviously not production safe
+        if (this._isProduction) {
             return;
+        }
         var localProcess, processID, intervalRef, callable, finalCall, terminationCall,
             message = ['no', 'onPlaceholderMethod() for', 'process with the name or processID of', processName];
         if (!this._processes[processName]) {
             this.log('dev','kill', message.join(' '));
         }
-        localProcess = this._processes[processName],
-        finalCall = callable.onFinish && callable.onFinish instanceof Function,
-        terminationCall = callable.onDestroyed && callable.onDestroyed instanceof Function;
+        localProcess = this._processes[processName];
 
+        if (!(localProcess instanceof Array)) {
+            this.log('dev', 'kill', ['localProcess for ', processName, 'is invalid.']);
+            return;
+        }
         processID = localProcess[0];
         intervalRef = localProcess[1];
         callable = localProcess[2];
+
+        finalCall = callable.onFinish && callable.onFinish instanceof Function;
+        terminationCall = callable.onDestroyed && callable.onDestroyed instanceof Function;
 
         if (!willFinishNow) {
             if (!finalCall) {
