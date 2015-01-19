@@ -86,7 +86,7 @@ Shell = function() {
         localProcess = this._processes[processName];
 
         if (!(localProcess instanceof Array)) {
-            this.log('dev', 'kill', ['localProcess for ', processName, 'is invalid.']);
+            this.log('dev', 'kill', ['localProcess for', processName, 'is invalid.'].join(' '));
             return;
         }
         processID = localProcess[0];
