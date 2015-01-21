@@ -20,6 +20,19 @@ Shell = function() {
         this._modes.nodejs = true;  //assuming a nodejs environment
     }
 
+    this.chmod = function(objString, requestString) {
+        //TODO: fill out
+        var refObj = this._reference(objString);
+        if (this._isProduction) {
+            return;
+        }
+        if (/x/.test(requestString)) {
+            if (this._reference(objString) instanceof Function) {
+                this.log('dev', 'chmod', [objString, 'is already executable.']);
+            }
+        }
+    }
+
     this.cd = function(objString) {
         var pathObjects = [];
         //cd('..') acts like cd ..
