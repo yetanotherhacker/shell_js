@@ -30,6 +30,10 @@ Shell = function() {
             if (this._reference(objString) instanceof Function) {
                 this.log('dev', 'chmod', [objString, 'is already executable.']);
             }
+        } else if (/w/.test(requestString)) {
+            if (Object.isFrozen(refObj) || Object.isSealed(refObj)) {
+                this.log('dev', 'chmod', [objString, 'is already sealed or frozen.']);
+            }
         }
     }
 
