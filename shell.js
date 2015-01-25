@@ -22,13 +22,18 @@ Shell = function() {
 
     this.chmod = function(objString, requestString) {
         //TODO: fill out
+        //TODO: figure out rights management / if chmod still makes sense
         var refObj = this._reference(objString);
         if (this._isProduction) {
             return;
         }
-        if (/x/.test(requestString)) {
+        if (/\+.*x/.test(requestString)) {
             if (this._reference(objString) instanceof Function) {
                 this.log('dev', 'chmod', [objString, 'is already executable.']);
+            }
+        } else if (/\+.*w/.test(requestString)) {
+            if (Object.isFrozen(refObj) || Object.isSealed(refObj)) {
+                this.log('dev', 'chmod', [objString, 'is already sealed or frozen.']);
             }
         }
     }
