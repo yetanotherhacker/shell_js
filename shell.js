@@ -254,7 +254,7 @@ Shell = function() {
         return RegExp(regexArray.join(''));
     };
 
-    this._pipe = function(input) {
+    this._pipe = function(input, mapFunction) {
         //TODO finish _pipe, check yield support carefully
         var nodeVersion;
         if (this._modes.nodejs && this._environment['process']) {
