@@ -3,9 +3,12 @@
 
 /* TODOS
 TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery use
+TODO: AMD loading / 
 */
 
-Shell = function() {
+//var root = this;
+
+var Shell = function() {
     this.path = '';     //this.path is of the form 'x.y.z'
     this._modes = { dev: false};
     this._isProduction = false;  //better safe than sorry...
@@ -13,11 +16,15 @@ Shell = function() {
     this._processes = {};
     this._processCounter = 0;
     this._signals = {_kill: 1, _terminate: 2};
-    if (this['window']) {
-        this._environment = window;
-    } else {
-        this._environment = GLOBAL; //NOTE: this['GLOBAL'] will NOT work in a module
+    if (typeof module !== 'undefined') {
+        if (module.exports) {
+            module.exports = this;
+        }
+
+        this._environment = root;
         this._modes.nodejs = true;  //assuming a nodejs environment
+    } else if (root.window) {
+        this._environment = window;
     }
 
     this.cd = function(objString) {
