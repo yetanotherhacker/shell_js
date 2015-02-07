@@ -3,7 +3,6 @@
 
 /* TODOS
 TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery use
-TODO: AMD loading / 
 */
 
 //var root = this;
@@ -412,4 +411,10 @@ var Shell = function() {
 //export a module with the function if in node
 if (!this['window']) {
     module.exports = Shell;
+}
+
+if (typeof define == 'function' && define.amd) {
+    define('shelljs', [], function() {
+        return Shell;
+    });
 }
