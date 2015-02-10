@@ -15,6 +15,7 @@ var Shell = function() {
     this._processes = {};
     this._processCounter = 0;
     this._signals = {_kill: 1, _terminate: 2};
+    this.version = 0.8;
     if (typeof module !== 'undefined') {
         if (module.exports) {
             module.exports = this;
@@ -22,7 +23,7 @@ var Shell = function() {
 
         this._environment = root;
         this._modes.nodejs = true;  //assuming a nodejs environment
-    } else if (root.window) {
+    } else if (typeof window !== 'undefined') {
         this._environment = window;
     }
 
