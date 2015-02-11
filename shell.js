@@ -5,8 +5,6 @@
 TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery use
 */
 
-//var root = this;
-
 var Shell = function() {
     this.path = '';     //this.path is of the form 'x.y.z'
     this._modes = { dev: false};
@@ -17,10 +15,6 @@ var Shell = function() {
     this._signals = {_kill: 1, _terminate: 2};
     this.version = 0.8;
     if (typeof module !== 'undefined') {
-        if (module.exports) {
-            module.exports = this;
-        }
-
         this._environment = root;
         this._modes.nodejs = true;  //assuming a nodejs environment
     } else if (typeof window !== 'undefined') {
@@ -410,7 +404,7 @@ var Shell = function() {
 }
 
 //export a module with the function if in node
-if (!this['window']) {
+if (typeof module !== 'undefined' && module.exports) {
     module.exports = Shell;
 }
 
