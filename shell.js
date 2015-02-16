@@ -16,7 +16,11 @@ var Shell = function() {
     this.version = 0.8;
     if (typeof module !== 'undefined') {
         this._environment = root;
-        this._modes.nodejs = true;  //assuming a nodejs environment
+        this._modes.nodejs = {};  //assuming a nodejs environment
+        this._modes.nodejs.version =  process.version
+                                    .substr(1)
+                                    .split('.')
+                                    .map(function(element) { return Number(element);});
     } else if (typeof window !== 'undefined') {
         this._environment = window;
     }
@@ -257,17 +261,11 @@ var Shell = function() {
 
     this._pipe = function(input, mapFunction) {
         //TODO finish _pipe, check yield support carefully
-        var nodeVersion;
-        if (this._modes.nodejs && this._environment['process']) {
-            nodeVersion =  process.version
-                            .substr(1)
-                            .split('.')
-                            .map(function(element) { return Number(element);});
-            if (!(nodeVersion[0] >= 0 && nodeVersion[1] >= 11 && nodeVersion[2] > 2)) {
-                //need at least 0.11.2 for v8 generators
-                this.log('dev', '_pipe', ['Need v8 generators which are unsupported in node ', process.version, '. Exiting.'].join(''));
-                return;
-            }
+        var version = this.modes.nodejs.version;
+        if (!(version[0] >= 0 && version[1] >= 11 && version[2] > 2)) {
+            //need at least 0.11.2 for v8 generators
+            this.log('dev', '_pipe', ['Need v8 generators which are unsupported in node ', process.version, '. Exiting.'].join(''));
+            return;
         }
         if (this._isProduction) {
             return;
