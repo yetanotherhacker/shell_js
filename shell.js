@@ -55,6 +55,23 @@ var Shell = function() {
         }
     };
 
+    this.chmod = function(rightsObj, chmodString) {
+        //TODO: finish
+        if (this._isProduction) {
+            return;
+        }
+        if ((typeof chmodString !== 'string') || !(rightsObj instanceof Object)) {
+            this.log('Invalid type for parameters.');
+            return;
+        }
+        var isModifier = /^[+-][rwx]+$/.test(chmodString),
+            isNumeric = /^[0-7]{3}$/.test(chmodString);
+
+        if (!isNumeric || !isModifier) {
+            this.log('Invalid permmissions string.');
+        }
+    };
+
     this.cp = function(origin, finish) {
         return this._objScope(finish, this._objScope(origin));
     };
@@ -392,7 +409,7 @@ var Shell = function() {
         if (item instanceof Array) {
             return item.map(mapMethod);
         } else if (item instanceof Object) {
-            return Object.keys(item).map(function(key){
+            return Object.keys(item).forEach(function(key){
                 mapObj[key] = mapMethod(item[key]);
             });
         } else {
