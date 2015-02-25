@@ -65,10 +65,22 @@ var Shell = function() {
             return;
         }
         var isModifier = /^[+-][rwx]+$/.test(chmodString),
-            isNumeric = /^[0-7]{3}$/.test(chmodString);
+            isNumeric = /^[0-7]{3}$/.test(chmodString),
+            defaultRights = {r: true, w: true, x: true};
 
         if (!isNumeric || !isModifier) {
             this.log('Invalid permmissions string.');
+            return;
+        }
+
+        if (!rightsObj._chmod) {
+            rightsObj._chmod = {};
+            ['o', 'g', 'u'].forEach(function(userClass) {
+                rightsObj._chmod[userClass] = {};
+                Object.keys(defaultRights).forEach(function(rightsKey) {
+                    rightsObj._chmod[rightsKey] = true;
+                });
+            });
         }
     };
 
