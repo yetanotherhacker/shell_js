@@ -64,9 +64,11 @@ var Shell = function() {
             this.log('Invalid type for parameters.');
             return;
         }
-        var isModifier = /^[+-][rwx]+$/.test(chmodString),
-            isNumeric = /^[0-7]{3}$/.test(chmodString),
-            defaultRights = {r: true, w: true, x: true};
+        var modifierArray = chmodString.match(/^([+-])([rwx]+)$/),
+            numericArray = chmodString.match(/^([0-7]{3})$/),
+            defaultRights = {r: true, w: true, x: true},
+            matchArray = [],
+            isPlus;
 
         if (!isNumeric || !isModifier) {
             this.log('Invalid permmissions string.');
@@ -74,12 +76,22 @@ var Shell = function() {
         }
 
         if (!rightsObj._chmod) {
+            //prefill chmod rights
             rightsObj._chmod = {};
+            // TODO: design question: long-form names for unix-style properties e.g. 'user' instead of 'u'?
             ['o', 'g', 'u'].forEach(function(userClass) {
                 rightsObj._chmod[userClass] = {};
                 Object.keys(defaultRights).forEach(function(rightsKey) {
-                    rightsObj._chmod[rightsKey] = true;
+                    rightsObj._chmod[userClass][rightsKey] = true;
                 });
+            });
+        }
+
+        if (isModifier) {
+            matchArray = chmodString[2];
+            isPlus = chmodString[1] === '+';
+            matchArray.forEach(function(rightsKey) {
+                rightsObj._chmod.u[rightsKey] = isPlus;
             });
         }
     };
