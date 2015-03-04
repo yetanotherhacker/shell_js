@@ -56,7 +56,7 @@ var Shell = function() {
     };
 
     this.chmod = function(rightsObj, chmodString) {
-        //TODO: finish
+        //TODO: partial impelementation: needs testing / finishing
         if (this._isProduction) {
             return;
         }
@@ -65,6 +65,7 @@ var Shell = function() {
             return;
         }
         var modifierArray = chmodString.match(/^([+-])([rwx]+)$/),
+            ownersArray = ['o', 'g', 'u'],
             numericArray = chmodString.match(/^([0-7]{3})$/),
             defaultRights = {r: true, w: true, x: true},
             matchArray = [],
@@ -79,7 +80,7 @@ var Shell = function() {
             //prefill chmod rights
             rightsObj._chmod = {};
             // TODO: design question: long-form names for unix-style properties e.g. 'user' instead of 'u'?
-            ['o', 'g', 'u'].forEach(function(userClass) {
+            ownersArray.forEach(function(userClass) {
                 rightsObj._chmod[userClass] = {};
                 Object.keys(defaultRights).forEach(function(rightsKey) {
                     rightsObj._chmod[userClass][rightsKey] = true;
@@ -93,6 +94,19 @@ var Shell = function() {
             matchArray.forEach(function(rightsKey) {
                 rightsObj._chmod.u[rightsKey] = isPlus;
             });
+        } else if (isNumeric) {
+            matchArray = chmodString[0].split('');
+            ownersArray.forEach(function(owner, index) {
+                var octal = Number(matchArray[index]),
+                    isExecute = octal % 2,
+                    isWrite = Math.ceil(octal / 2) % 2,
+                    isRead = Math.ceil(octal / 2) % 4,
+                    ownerRights = rightsObj._chmod[owner];
+
+                ownerRights['x'] = isExecute;
+                ownerRights['w'] = isWrite;
+                ownerRights['r'] = isRead;
+            })
         }
     };
 
@@ -301,14 +315,14 @@ var Shell = function() {
     };
 
     this._pipe = function(input, mapFunction) {
+        if (this._isProduction) {
+            return;
+        }
         //TODO finish _pipe, check yield support carefully
         var version = this.modes.nodejs.version;
         if (!(version[0] >= 0 && version[1] >= 11 && version[2] > 2)) {
             //need at least 0.11.2 for v8 generators
             this.log('dev', '_pipe', ['Need v8 generators which are unsupported in node ', process.version, '. Exiting.'].join(''));
-            return;
-        }
-        if (this._isProduction) {
             return;
         }
     };
