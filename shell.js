@@ -56,7 +56,7 @@ var Shell = function() {
     };
 
     this.chmod = function(rightsObj, chmodString) {
-        //TODO: partial impelementation: needs testing / finishing
+        //TODO: testing
         if (this._isProduction) {
             return;
         }
@@ -65,14 +65,14 @@ var Shell = function() {
             return;
         }
         var modifierArray = chmodString.match(/^([+-])([rwx]+)$/),
-            ownersArray = ['o', 'g', 'u'],
+            ownersArray = ['g', 'o', 'u'],
             numericArray = chmodString.match(/^([0-7]{3})$/),
             defaultRights = {r: true, w: true, x: true},
             matchArray = [],
             isPlus;
 
         if (!isNumeric || !isModifier) {
-            this.log('Invalid permmissions string.');
+            this.log('Invalid permissions string.');
             return;
         }
 
@@ -103,10 +103,21 @@ var Shell = function() {
                     isRead = Math.ceil(octal / 2) % 4,
                     ownerRights = rightsObj._chmod[owner];
 
-                ownerRights['x'] = isExecute;
-                ownerRights['w'] = isWrite;
                 ownerRights['r'] = isRead;
+                ownerRights['w'] = isWrite;
+                ownerRights['x'] = isExecute;
             })
+        }
+    };
+
+    this._chmodCheck = function(rightsObj, userClass, permission) {
+        //TOOD: finish permission checks
+        if (!rightsObj || !(rightsObj instanceof Object)) {
+            this.log('Not a valid object.');
+        } else if (userClass && (!(typeof userClass === 'string') || /^[rwx]$/.test(userClass))) {
+            this.log('Invalid user class.');
+        } else if (!permission || !((typeof permission === 'string') || /^[gou]$/.test(permission))) {
+            this.log('Invalid permission type.');
         }
     };
 
