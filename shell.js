@@ -8,7 +8,7 @@ TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery u
 var Shell = function() {
     this.path = '';     //this.path is of the form 'x.y.z'
     this._modes = { dev: false};
-    this._isProduction = false;  //better safe than sorry...
+    this._isProduction = true;  //better safe than sorry...
     this._logs = {};
     this._processes = {};
     this._processCounter = 0;
@@ -111,7 +111,10 @@ var Shell = function() {
     };
 
     this._chmodCheck = function(rightsObj, userClass, permission) {
-        //TOOD: finish permission checks
+        //TODO: finish permission checks
+        if (this._isProduction) {
+            return;
+        }
         if (!rightsObj || !(rightsObj instanceof Object)) {
             this.log('Not a valid object.');
         } else if (userClass && (!(typeof userClass === 'string') || /^[rwx]$/.test(userClass))) {
