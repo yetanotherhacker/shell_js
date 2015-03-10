@@ -2,6 +2,7 @@
 // TODO: figure out scoping weirdness with 'GLOBAL' and 'this' in node
 shell = new (require('./shell.js'))();
 shell.setMode('dev', true);
+shell._isProduction = false;
 testHash = {
     a: [1, [2], {
             b: [3, [4,5]]
