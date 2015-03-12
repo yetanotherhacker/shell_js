@@ -110,18 +110,31 @@ var Shell = function() {
         }
     };
 
-    this._chmodCheck = function(rightsObj, userClass, permission) {
-        //TODO: finish permission checks
+    this._chmodCheck = function(rightsObj, permission, userClass) {
         if (this._isProduction) {
             return;
         }
+
+        if (!userClass) {
+            userClass = 'u';
+        }
+
         if (!rightsObj || !(rightsObj instanceof Object)) {
             this.log('Not a valid object.');
+            return;
         } else if (userClass && (!(typeof userClass === 'string') || /^[rwx]$/.test(userClass))) {
             this.log('Invalid user class.');
+            return;
         } else if (!permission || !((typeof permission === 'string') || /^[gou]$/.test(permission))) {
             this.log('Invalid permission type.');
+            return;
         }
+
+        if (rightsObj && rightsObj._chmod && rightsObj._chmod[userClass] && rightsObj._chmod[userClass][permission]) {
+            return true;
+        }
+
+        return false;
     };
 
     this.cp = function(origin, finish) {
