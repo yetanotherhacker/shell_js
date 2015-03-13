@@ -128,9 +128,10 @@ var Shell = function() {
         } else if (!permission || !((typeof permission === 'string') || /^[gou]$/.test(permission))) {
             this.log('Invalid permission type.');
             return;
-        }
-
-        if (rightsObj && rightsObj._chmod && rightsObj._chmod[userClass] && rightsObj._chmod[userClass][permission]) {
+        } else if (!rightsObj._chmod) {
+            this.log('Object does not currently support virtual chmod. Please define its rights.');
+            return;
+        } else if (rightsObj && rightsObj._chmod && rightsObj._chmod[userClass] && rightsObj._chmod[userClass][permission]) {
             return true;
         }
 
