@@ -7,9 +7,11 @@ TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery u
 
 var Shell = function() {
     this.path = '';     //this.path is of the form 'x.y.z'
-    this._modes = { dev: false};
-    this._isProduction = true;  //better safe than sorry...
+    this._modes = { dev: false, production: true};
     this._logs = {};
+    this._messages = {
+        production: 'In a production environment. Exiting.'
+    };
     this._processes = {};
     this._processCounter = 0;
     this._signals = {_kill: 1, _terminate: 2};
@@ -56,12 +58,14 @@ var Shell = function() {
     };
 
     this.chmod = function(rightsObj, chmodString) {
-        //TODO: testing
-        if (this._isProduction) {
+        //TODO: get working correctly
+        this.log('dev', 'chmod', 'Hi!');
+        if (this._modes.production) {
+            this.log('dev', 'chmod', this._messages.production);
             return;
         }
         if ((typeof chmodString !== 'string') || !(rightsObj instanceof Object)) {
-            this.log('Invalid type for parameters.');
+            this.log('dev', 'chmod', 'Invalid type for parameters.');
             return;
         }
         var modifierArray = chmodString.match(/^([+-])([rwx]+)$/),
@@ -71,8 +75,8 @@ var Shell = function() {
             matchArray = [],
             isPlus;
 
-        if (!isNumeric || !isModifier) {
-            this.log('Invalid permissions string.');
+        if (!numericArray && !modifierArray) {
+            this.log('dev', 'chmod', 'Invalid permissions string.');
             return;
         }
 
@@ -88,13 +92,13 @@ var Shell = function() {
             });
         }
 
-        if (isModifier) {
+        if (modifierArray) {
             matchArray = chmodString[2];
             isPlus = chmodString[1] === '+';
             matchArray.forEach(function(rightsKey) {
                 rightsObj._chmod.u[rightsKey] = isPlus;
             });
-        } else if (isNumeric) {
+        } else if (numericArray) {
             matchArray = chmodString[0].split('');
             ownersArray.forEach(function(owner, index) {
                 var octal = Number(matchArray[index]),
@@ -111,7 +115,8 @@ var Shell = function() {
     };
 
     this._chmodCheck = function(rightsObj, permission, userClass) {
-        if (this._isProduction) {
+        if (this._modes.production) {
+            this.log('dev', 'chmod', this._messages.production);
             return;
         }
 
@@ -120,16 +125,16 @@ var Shell = function() {
         }
 
         if (!rightsObj || !(rightsObj instanceof Object)) {
-            this.log('Not a valid object.');
+            this.log('dev', 'chmod', 'Not a valid object.');
             return;
         } else if (userClass && (!(typeof userClass === 'string') || /^[rwx]$/.test(userClass))) {
-            this.log('Invalid user class.');
+            this.log('dev', 'chmod', 'Invalid user class.');
             return;
         } else if (!permission || !((typeof permission === 'string') || /^[gou]$/.test(permission))) {
-            this.log('Invalid permission type.');
+            this.log('dev', 'chmod', 'Invalid permission type.');
             return;
         } else if (!rightsObj._chmod) {
-            this.log('Object does not currently support virtual chmod. Please define its rights.');
+            this.log('dev', 'chmod', 'Object does not currently support virtual chmod. Please define its rights.');
             return;
         } else if (rightsObj && rightsObj._chmod && rightsObj._chmod[userClass] && rightsObj._chmod[userClass][permission]) {
             return true;
@@ -163,7 +168,7 @@ var Shell = function() {
 
     this.kill = function(processName, willFinishNow) {
         //NOTE - still needs work, obviously not production safe
-        if (this._isProduction) {
+        if (this._modes.production) {
             return;
         }
         var localProcess, processID, intervalRef, callable, finalCall, terminationCall,
@@ -207,8 +212,10 @@ var Shell = function() {
     };
 
     this.log = function(logType, name, message) {
-        if (!logType || !this._modes[logType])
+        if (!logType || !this._modes[logType]) {
+            console.log('Need a proper log type.');
             return;
+        }
         var logTuple = [[name, '():\t'].join(''), message, new Date()];
 
         console.log(logTuple[0], logTuple[1]);
@@ -343,7 +350,7 @@ var Shell = function() {
     };
 
     this._pipe = function(input, mapFunction) {
-        if (this._isProduction) {
+        if (this._modes.production) {
             return;
         }
         //TODO finish _pipe, check yield support carefully
@@ -428,7 +435,7 @@ var Shell = function() {
     this.shell = function(callable, intervalTime, args, altName) {
         //NOTE - NOT PRODUCTION SAFE.
         //TODO tests
-        if (this._isProduction) {
+        if (this._modes.production) {
             return;
         }
 
