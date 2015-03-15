@@ -59,7 +59,6 @@ var Shell = function() {
 
     this.chmod = function(rightsObj, chmodString) {
         //TODO: get working correctly
-        this.log('dev', 'chmod', 'Hi!');
         if (this._modes.production) {
             this.log('dev', 'chmod', this._messages.production);
             return;
@@ -99,12 +98,12 @@ var Shell = function() {
                 rightsObj._chmod.u[rightsKey] = isPlus;
             });
         } else if (numericArray) {
-            matchArray = chmodString[0].split('');
+            matchArray = chmodString.split('');
             ownersArray.forEach(function(owner, index) {
                 var octal = Number(matchArray[index]),
                     isExecute = octal % 2,
-                    isWrite = Math.ceil(octal / 2) % 2,
-                    isRead = Math.ceil(octal / 2) % 4,
+                    isWrite = Math.floor(octal / 2) % 2,
+                    isRead = Math.floor(octal / 4) % 2,
                     ownerRights = rightsObj._chmod[owner];
 
                 ownerRights['r'] = isRead;
