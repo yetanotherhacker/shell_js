@@ -28,7 +28,7 @@ var Shell = function() {
     }
 
     this.cd = function(objString) {
-        var pathObjects = [];
+        var pathArray = [];
         //cd('..') acts like cd ..
         //cd($string) switches to the object
         // -- local scoping followed by global scoping
@@ -39,10 +39,10 @@ var Shell = function() {
             //move up the object chain: x.y.z -> x.y
             //tokenizes the path by '.' into an array,
             //pops the array and recreates the path string
-            pathObjects = this.path.split('.');
-            pathObjects.pop();
-            if (pathObjects.length) {
-                this.path = pathObjects.reduce(function(pathChain, pathLink) {
+            pathArray = this.path.split('.');
+            pathArray.pop();
+            if (pathArray.length) {
+                this.path = pathArray.reduce(function(pathChain, pathLink) {
                     return pathChain.concat('.', pathLink);
                 });
             } else {
