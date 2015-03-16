@@ -27,15 +27,15 @@ var Shell = function() {
         this._environment = window;
     }
 
-    this.cd = function(objString) {
+    this.cd = function(objName) {
         var pathArray = [];
         //cd('..') acts like cd ..
         //cd($string) switches to the object
         // -- local scoping followed by global scoping
 
-        if (!objString) {
+        if (!objName) {
             this.path = ''; //move to the top
-        } else if (objString === '..') {
+        } else if (objName === '..') {
             //move up the object chain: x.y.z -> x.y
             //tokenizes the path by '.' into an array,
             //pops the array and recreates the path string
@@ -48,10 +48,10 @@ var Shell = function() {
             } else {
                 this.path = '';
             }
-        } else if (this._reference([this.path, '.', objString].join('')) instanceof Object) {
-            this.path = [this.path, '.', objString].join(''); //move to local object
-        } else if (this._reference(objString) instanceof Object) {
-            this.path = objString; //move to global object
+        } else if (this._reference([this.path, '.', objName].join('')) instanceof Object) {
+            this.path = [this.path, '.', objName].join(''); //move to local object
+        } else if (this._reference(objName) instanceof Object) {
+            this.path = objName; //move to global object
         } else {
             this.log('dev','cd', 'No such object exists.');
         }
@@ -287,14 +287,14 @@ var Shell = function() {
         }
     };
 
-    this._objScope = function(objString, newValue, deleteFlag) {
+    this._objScope = function(objName, newValue, deleteFlag) {
         //scoping for object and object properties
-        if (!objString) {
+        if (!objName) {
             return this._reference();
         }
-        var globalPathEnvironment = objString.split('.'),
+        var globalPathEnvironment = objName.split('.'),
             globalPathObject = globalPathEnvironment.pop(),
-            localPathEnvironment = [this.path, objString].join('.').split('.'),
+            localPathEnvironment = [this.path, objName].join('.').split('.'),
             localPathObject = localPathEnvironment.pop(),
             isLocalObj;
 
@@ -321,7 +321,7 @@ var Shell = function() {
                 return localPathEnvironment[localPathObject];
             }
         } else {
-            this.log('dev','_objScope', ['Scoping failure for ', objString].join(''));
+            this.log('dev','_objScope', ['Scoping failure for ', objName].join(''));
         }
     };
 
