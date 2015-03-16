@@ -59,6 +59,7 @@ var Shell = function() {
 
     this.chmod = function(rightsObj, chmodString) {
         //TODO: get working correctly
+        // TODO: design question: long-form names for unix-style properties e.g. 'user' instead of 'u'?
         if (this._modes.production) {
             this.log('dev', 'chmod', this._messages.production);
             return;
@@ -82,7 +83,6 @@ var Shell = function() {
         if (!rightsObj._chmod) {
             //prefill chmod rights
             rightsObj._chmod = {};
-            // TODO: design question: long-form names for unix-style properties e.g. 'user' instead of 'u'?
             ownersArray.forEach(function(userClass) {
                 rightsObj._chmod[userClass] = {};
                 Object.keys(defaultRights).forEach(function(rightsKey) {
@@ -92,6 +92,7 @@ var Shell = function() {
         }
 
         if (modifierArray) {
+            //check verses chmod docs for proper behaviour, may be esoteric
             matchArray = chmodString[2];
             isPlus = chmodString[1] === '+';
             matchArray.forEach(function(rightsKey) {
