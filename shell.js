@@ -14,7 +14,7 @@ var Shell = function() {
     };
     this._processes = {};
     this._processCounter = 0;
-    this._signals = {_kill: 1, _terminate: 2};
+    this._signals = {kill: 1, terminate: 2};
     this.version = 0.8;
     if (typeof module !== 'undefined') {
         this._environment = root;
@@ -195,7 +195,7 @@ var Shell = function() {
                 this.log('dev','kill', message);
             } else {
                 callable.onFinish(localProcess);
-                this._signals[processID] = this._signals._kill;
+                this._signals[processID] = this._signals.kill;
             }
         } else if (willFinishNow && terminationCall) {
             if (!finalCall) {
@@ -203,7 +203,7 @@ var Shell = function() {
                 this.log('dev','kill', message);
             } else {
                 callable.onDestroyed(localProcess);
-                this._signals[processID] = this._signals._terminate;
+                this._signals[processID] = this._signals.terminate;
             }
             clearInterval(intervalRef);
             delete this._processes[processName];
