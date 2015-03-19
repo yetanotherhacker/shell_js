@@ -12,8 +12,10 @@ var Shell = function() {
     this._messages = {
         production: 'In a production environment. Exiting.'
     };
-    this._processes = {};
-    this._processCounter = 0;
+    this._process = {
+        collection = {},
+        counter = 0
+    };
     this._signals = {kill: 1, terminate: 2};
     this.version = 0.8;
     if (typeof module !== 'undefined') {
@@ -173,10 +175,10 @@ var Shell = function() {
         }
         var localProcess, processID, intervalRef, callable, finalCall, terminationCall,
             message = ['no', 'onPlaceholderMethod() for', 'process with the name or processID of', processName];
-        if (!this._processes[processName]) {
+        if (!this._process.collection[processName]) {
             this.log('dev','kill', message.join(' '));
         }
-        localProcess = this._processes[processName];
+        localProcess = this._process.collection[processName];
 
         if (!(localProcess instanceof Array)) {
             this.log('dev', 'kill', ['localProcess for', processName, 'is invalid.'].join(' '));
@@ -206,8 +208,8 @@ var Shell = function() {
                 this._signals[processID] = this._signals.terminate;
             }
             clearInterval(intervalRef);
-            delete this._processes[processName];
-            delete this._processes[processID];
+            delete this._process.collection[processName];
+            delete this._process.collection[processID];
         }
     };
 
@@ -447,22 +449,22 @@ var Shell = function() {
             return;
         var procName = this._inferMethodName(callable),
             intervalRef = intervalTime ? setInterval(function(){ return callable.bind(this, args);}, intervalTime) : undefined,
-            tuple = [this._processCounter, intervalRef, callable];
+            tuple = [this._process.counter, intervalRef, callable];
 
         if (intervalRef) {
-            if (!this._processes[procName]) {
-                this._processes[procName] = tuple;
+            if (!this._process.collection[procName]) {
+                this._process.collection[procName] = tuple;
             } else {
-                this._processes[procName].push(tuple);
+                this._process.collection[procName].push(tuple);
             }
-            this._processes[this._processCounter] = tuple;    //overwrite by default for process IDs
+            this._process.collection[this._process.counter] = tuple;    //overwrite by default for process IDs
             if (altName) {
-                this._processes[altName] = tuple;
-                if (this._processes[altName]) {
-                    this.log('dev','shell', ['altName', altName, 'overwritten for process', this._processCounter].join(' '));
+                this._process.collection[altName] = tuple;
+                if (this._process.collection[altName]) {
+                    this.log('dev','shell', ['altName', altName, 'overwritten for process', this._process.counter].join(' '));
                 }
             }
-            return this._processCounter++;
+            return this._process.counter++;
         } else {
             return callable.call(this, args);
         }
