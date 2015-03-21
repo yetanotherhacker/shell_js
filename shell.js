@@ -13,8 +13,8 @@ var Shell = function() {
         production: 'In a production environment. Exiting.'
     };
     this._process = {
-        collection = {},
-        counter = 0
+        collection: {},
+        counter: 0
     };
     this._signals = {kill: 1, terminate: 2};
     this.version = 0.8;
