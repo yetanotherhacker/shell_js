@@ -31,9 +31,6 @@ var Shell = function() {
 
     this.cd = function(objName) {
         var pathArray = [];
-        //cd('..') acts like cd ..
-        //cd($string) switches to the object
-        // -- local scoping followed by global scoping
 
         if (!objName) {
             this.path = ''; //move to the top
@@ -117,6 +114,7 @@ var Shell = function() {
     };
 
     this._chmodCheck = function(rightsObj, permission, userClass) {
+        //virtual chmod property checks
         if (this._modes.production) {
             this.log('dev', 'chmod', this._messages.production);
             return;
