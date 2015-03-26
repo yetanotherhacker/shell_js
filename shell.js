@@ -161,7 +161,7 @@ var Shell = function() {
         strForm = String(method);
         name = strForm.substring(9, strForm.indexOf('('));  //String(foo) gives 'function() <--func name here-->{ etc...'
         if (!name) {
-            name = 'anonymous';
+            name = '0_anonymous';   //syntax hack; a valid function name can't start with a digit
         }
         return name;
     };
