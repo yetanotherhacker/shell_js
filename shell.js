@@ -6,8 +6,8 @@ TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery u
 */
 
 var Shell = function() {
-    this.path = '';     //this.path is of the form 'x.y.z'
-    this._modes = { dev: false, production: true};
+    this.path = '';     //dot-delimited string: i.e. of form 'x.y.z'
+    this._state = { dev: false, production: true};
     this._logs = {};
     this._messages = {
         production: 'In a production environment. Exiting.'
@@ -18,10 +18,10 @@ var Shell = function() {
     };
     this._signals = {kill: 1, terminate: 2};
     this.version = 0.8;
-    if (typeof module !== 'undefined') {
+    if (typeof module !== 'undefined' && typeof process !== 'undefined') {
         this._environment = root;
-        this._modes.nodejs = {};  //assuming a nodejs environment
-        this._modes.nodejs.version =  process.version
+        this._state.nodejs = {};  //assuming a nodejs environment
+        this._state.nodejs.version =  process.version
                                     .substr(1)
                                     .split('.')
                                     .map(function(element) { return Number(element);});
@@ -59,8 +59,8 @@ var Shell = function() {
     this.chmod = function(rightsObj, chmodString) {
         //TODO: check versus chmod specs, get working correctly
         // TODO: design question: long-form names for unix-style properties e.g. 'user' instead of 'u'?
-        if (this._modes.production) {
-            this.log('dev', 'chmod', this._messages.production);
+        if (this._state.unstables) {
+            this.log('dev', 'chmod', this._messages.unstables);
             return;
         }
         if ((typeof chmodString !== 'string') || !(rightsObj instanceof Object)) {
@@ -115,8 +115,8 @@ var Shell = function() {
 
     this._chmodCheck = function(rightsObj, permission, userClass) {
         //virtual chmod property checks
-        if (this._modes.production) {
-            this.log('dev', 'chmod', this._messages.production);
+        if (this._state.unstables) {
+            this.log('dev', 'chmod', this._messages.unstables);
             return;
         }
 
@@ -168,7 +168,7 @@ var Shell = function() {
 
     this.kill = function(processName, willFinishNow) {
         //NOTE - still needs work, obviously not production safe
-        if (this._modes.production) {
+        if (this._state.unstables) {
             return;
         }
         var localProcess, processID, intervalRef, callable, finalCall, terminationCall,
@@ -212,7 +212,7 @@ var Shell = function() {
     };
 
     this.log = function(logType, name, message) {
-        if (!logType || !this._modes[logType]) {
+        if (!logType || !this._state[logType]) {
             console.log('Need a proper log type.');
             return;
         }
@@ -350,11 +350,11 @@ var Shell = function() {
     };
 
     this._pipe = function(input, mapFunction) {
-        if (this._modes.production) {
+        if (this._state.unstables) {
             return;
         }
         //TODO finish _pipe, check yield support carefully
-        var version = this.modes.nodejs.version;
+        var version = this.state.nodejs.version;
         if (!(version[0] >= 0 && version[1] >= 11 && version[2] > 2)) {
             //need at least 0.11.2 for v8 generators
             this.log('dev', '_pipe', ['Need v8 generators which are unsupported in node ', process.version, '. Exiting.'].join(''));
@@ -421,11 +421,11 @@ var Shell = function() {
         if (value !== Boolean(value)) {
             this.log('dev','setMode', 'Value must be either true or false.');
             return;
-        } else if (this._modes[mode] !== Boolean(this._modes[mode])) {
+        } else if (this._state[mode] !== Boolean(this._state[mode])) {
             this.log('dev','setMode', 'No such mode.');
             return;
         }
-        this._modes[mode] = value;
+        this._state[mode] = value;
         if (!(this._logs[mode] instanceof Array) && value) {
             this._logs[mode] = [];
         }
@@ -435,7 +435,7 @@ var Shell = function() {
     this.shell = function(callable, intervalTime, args, altName) {
         //NOTE - NOT PRODUCTION SAFE.
         //TODO tests
-        if (this._modes.production) {
+        if (this._state.unstables) {
             return;
         }
 
@@ -491,11 +491,12 @@ var Shell = function() {
     };
 }
 
-//export a module with the function if in node
+//export a module with the function if in a node-like environment
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = Shell;
 }
 
+//amd registration
 if (typeof define == 'function' && define.amd) {
     define('shelljs', [], function() {
         return Shell;
