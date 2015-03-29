@@ -18,7 +18,7 @@ var Shell = function() {
     };
     this._signals = {kill: 1, terminate: 2};
     this.version = 0.8;
-    if (typeof module !== 'undefined' && typeof process !== 'undefined') {
+    if (typeof module === 'object' && typeof process === 'object') {
         this._environment = root;
         this._state.nodejs = {};  //assuming a nodejs environment
         this._state.nodejs.version =  process.version
