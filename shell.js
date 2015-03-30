@@ -18,7 +18,7 @@ var Shell = function() {
     };
     this._signals = {kill: 1, terminate: 2};
     this.version = 0.8;
-    if (typeof module === 'object' && typeof process === 'object') {
+    if (typeof root === 'object' && typeof process === 'object') {
         this._environment = root;
         this._state.nodejs = {};  //assuming a nodejs environment
         this._state.nodejs.version =  process.version
@@ -58,7 +58,7 @@ var Shell = function() {
 
     this.chmod = function(rightsObj, chmodString) {
         //TODO: check versus chmod specs, get working correctly
-        // TODO: design question: long-form names for unix-style properties e.g. 'user' instead of 'u'?
+        // TODO: design question: long-form alts for unix-style properties e.g. 'user' for 'u'?
         if (this._state.unstables) {
             this.log('dev', 'chmod', this._messages.unstables);
             return;
@@ -115,13 +115,10 @@ var Shell = function() {
 
     this._chmodCheck = function(rightsObj, permission, userClass) {
         //virtual chmod property checks
+        userClass = userClass || 'u';
         if (this._state.unstables) {
             this.log('dev', 'chmod', this._messages.unstables);
             return;
-        }
-
-        if (!userClass) {
-            userClass = 'u';
         }
 
         if (!rightsObj || !(rightsObj instanceof Object)) {
