@@ -119,9 +119,7 @@ var Shell = function() {
         if (this._state.unstables) {
             this.log('dev', 'chmod', this._messages.unstables);
             return;
-        }
-
-        if (!rightsObj || !(rightsObj instanceof Object)) {
+        } else if (!rightsObj || !(rightsObj instanceof Object)) {
             this.log('dev', 'chmod', 'Not a valid object.');
             return;
         } else if (userClass && (!(typeof userClass === 'string') || /^[rwx]$/.test(userClass))) {
@@ -133,7 +131,7 @@ var Shell = function() {
         } else if (!rightsObj._chmod) {
             this.log('dev', 'chmod', 'Object does not currently support virtual chmod. Please define its rights.');
             return;
-        } else if (rightsObj && rightsObj._chmod && rightsObj._chmod[userClass] && rightsObj._chmod[userClass][permission]) {
+        } else if (rightsObj._chmod[userClass] && rightsObj._chmod[userClass][permission]) {
             return true;
         }
 
