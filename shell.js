@@ -59,8 +59,8 @@ var Shell = function() {
     this.chmod = function(rightsObj, chmodString) {
         //TODO: check versus chmod specs, get working correctly
         // TODO: design question: long-form alts for unix-style properties e.g. 'user' for 'u'?
-        if (this._state.unstables) {
-            this.log('dev', 'chmod', this._messages.unstables);
+        if (this._state.unstable) {
+            this.log('dev', 'chmod', this._messages.unstable);
             return;
         }
         if ((typeof chmodString !== 'string') || !(rightsObj instanceof Object)) {
@@ -116,8 +116,8 @@ var Shell = function() {
     this._chmodCheck = function(rightsObj, permission, userClass) {
         //virtual chmod property checks
         userClass = userClass || 'u';
-        if (this._state.unstables) {
-            this.log('dev', 'chmod', this._messages.unstables);
+        if (this._state.unstable) {
+            this.log('dev', 'chmod', this._messages.unstable);
             return;
         } else if (!rightsObj || !(rightsObj instanceof Object)) {
             this.log('dev', 'chmod', 'Not a valid object.');
@@ -153,6 +153,7 @@ var Shell = function() {
             this.log('dev', '_inferMethodName', 'Need a function.');
             return;
         }
+
         strForm = String(method);
         name = strForm.substring(9, strForm.indexOf('('));  //String(foo) gives 'function() <--func name here-->{ etc...'
         if (!name) {
@@ -163,7 +164,7 @@ var Shell = function() {
 
     this.kill = function(processName, willFinishNow) {
         //NOTE - still needs work, obviously not production safe
-        if (this._state.unstables) {
+        if (this._state.unstable) {
             return;
         }
         var localProcess, processID, intervalRef, callable, finalCall, terminationCall,
@@ -345,7 +346,7 @@ var Shell = function() {
     };
 
     this._pipe = function(input, mapFunction) {
-        if (this._state.unstables) {
+        if (this._state.unstable) {
             return;
         }
         //TODO finish _pipe, check yield support carefully
@@ -430,7 +431,7 @@ var Shell = function() {
     this.shell = function(callable, intervalTime, args, altName) {
         //NOTE - NOT PRODUCTION SAFE.
         //TODO tests
-        if (this._state.unstables) {
+        if (this._state.unstable) {
             return;
         }
 
