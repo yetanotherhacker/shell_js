@@ -1,12 +1,8 @@
 //shell.js - a shell-like library for JavaScript environments.
 //Copyright 2011-2015 by Julius D'souza. Licensed under GPL 3.0.
 
-/* TODOS
-TODO: figure out how to do deep copy cleanly in node / get rid of silly jQuery use
-*/
-
 var Shell = function() {
-    this.path = '';     //dot-delimited string: i.e. of form 'x.y.z'
+    this._path = '';     //dot-delimited string: i.e. of form 'x.y.z'
     this._state = { dev: false, production: true};
     this._logs = {};
     this._messages = {
@@ -33,24 +29,24 @@ var Shell = function() {
         var pathArray = [];
 
         if (!objName) {
-            this.path = ''; //move to the top
+            this._path = ''; //move to the top
         } else if (objName === '..') {
             //move up the object chain: x.y.z -> x.y
             //tokenizes the path by '.' into an array,
             //pops the array and recreates the path string
-            pathArray = this.path.split('.');
+            pathArray = this._path.split('.');
             pathArray.pop();
             if (pathArray.length) {
-                this.path = pathArray.reduce(function(pathChain, pathLink) {
+                this._path = pathArray.reduce(function(pathChain, pathLink) {
                     return pathChain.concat('.', pathLink);
                 });
             } else {
-                this.path = '';
+                this._path = '';
             }
-        } else if (this._reference([this.path, '.', objName].join('')) instanceof Object) {
-            this.path = [this.path, '.', objName].join(''); //move to local object
+        } else if (this._reference([this._path, '.', objName].join('')) instanceof Object) {
+            this._path = [this._path, '.', objName].join(''); //move to local object
         } else if (this._reference(objName) instanceof Object) {
-            this.path = objName; //move to global object
+            this._path = objName; //move to global object
         } else {
             this.log('dev','cd', 'No such object exists.');
         }
@@ -230,7 +226,7 @@ var Shell = function() {
             keyFilter = this._pathFilter(key);
 
         if (keyFilter && !this._objScope(key)) {
-            return lsMethod(this._objScope(this.path)).filter(function(i) { return keyFilter.test(i)}).sort();
+            return lsMethod(this._objScope(this._path)).filter(function(i) { return keyFilter.test(i)}).sort();
         } else {
             return lsMethod(currentObj);
         }
@@ -279,7 +275,7 @@ var Shell = function() {
             }
             return context && !context[pathEnd] && context; //get the actual object reference
         } else {
-            return this._reference(this.path);
+            return this._reference(this._path);
         }
     };
 
@@ -290,7 +286,7 @@ var Shell = function() {
         }
         var globalPathEnvironment = objName.split('.'),
             globalPathObject = globalPathEnvironment.pop(),
-            localPathEnvironment = [this.path, objName].join('.').split('.'),
+            localPathEnvironment = [this._path, objName].join('.').split('.'),
             localPathObject = localPathEnvironment.pop(),
             isLocalObj;
 
@@ -361,9 +357,9 @@ var Shell = function() {
     this.pwd = function(resultIsString) {
         var result;
         if (resultIsString) {
-            result = this.path ? this.path : 'this';
+            result = this._path ? this._path : 'this';
         } else {
-            result = this.path ? this._objScope(this.path) : this;
+            result = this._path ? this._objScope(this._path) : this;
         }
 
         return result;
