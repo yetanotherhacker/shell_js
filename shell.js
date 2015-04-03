@@ -21,7 +21,7 @@ var Shell = function() {
                                     .substr(1)
                                     .split('.')
                                     .map(function(element) { return Number(element);});
-    } else if (typeof window !== 'undefined') {
+    } else if (typeof window === 'object') {
         this._environment = window;
     }
 
@@ -205,7 +205,7 @@ var Shell = function() {
 
     this.log = function(logType, name, message) {
         if (!logType || !this._state[logType]) {
-            console.log('Need a proper log type.');
+            console.log('log(): Need a proper log type.');
             return;
         }
         var logTuple = [[name, '():\t'].join(''), message, new Date()];
@@ -484,7 +484,7 @@ var Shell = function() {
 }
 
 //export a module with the function if in a node-like environment
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module === 'object' && module.exports) {
     module.exports = Shell;
 }
 
