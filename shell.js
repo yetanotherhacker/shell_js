@@ -55,8 +55,8 @@ var Shell = function() {
     this.chmod = function(rightsObj, chmodString) {
         //TODO: check versus chmod specs, get working correctly
         // TODO: design question: long-form alts for unix-style properties e.g. 'user' for 'u'?
-        if (this._state.unstable) {
-            this.log('dev', 'chmod', this._messages.unstable);
+        if (this._state.production) {
+            this.log('dev', 'chmod', this._messages.production);
             return;
         }
         if ((typeof chmodString !== 'string') || !(rightsObj instanceof Object)) {
@@ -112,8 +112,8 @@ var Shell = function() {
     this._chmodCheck = function(rightsObj, permission, userClass) {
         //virtual chmod property checks
         userClass = userClass || 'u';
-        if (this._state.unstable) {
-            this.log('dev', 'chmod', this._messages.unstable);
+        if (this._state.production) {
+            this.log('dev', 'chmod', this._messages.production);
             return;
         } else if (!rightsObj || !(rightsObj instanceof Object)) {
             this.log('dev', 'chmod', 'Not a valid object.');
@@ -160,7 +160,8 @@ var Shell = function() {
 
     this.kill = function(processName, willFinishNow) {
         //NOTE - still needs work, obviously not production safe
-        if (this._state.unstable) {
+        if (this._state.production) {
+            this.log('dev', 'chmod', this._messages.production);
             return;
         }
         var localProcess, processID, intervalRef, callable, finalCall, terminationCall,
@@ -342,7 +343,8 @@ var Shell = function() {
     };
 
     this._pipe = function(input, mapFunction) {
-        if (this._state.unstable) {
+        if (this._state.production) {
+            this.log('dev', 'chmod', this._messages.production);
             return;
         }
         //TODO finish _pipe, check yield support carefully
@@ -427,7 +429,8 @@ var Shell = function() {
     this.shell = function(callable, intervalTime, args, altName) {
         //NOTE - NOT PRODUCTION SAFE.
         //TODO tests
-        if (this._state.unstable) {
+        if (this._state.production) {
+            this.log('dev', 'chmod', this._messages.production);
             return;
         }
 
