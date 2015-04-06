@@ -99,12 +99,13 @@ var Shell = function() {
                 var octal = Number(matchArray[index]),
                     isExecute = octal % 2,
                     isWrite = Math.floor(octal / 2) % 2,
-                    isRead = Math.floor(octal / 4) % 2,
-                    ownerRights = rightsObj._chmod[owner];
+                    isRead = Math.floor(octal / 4) % 2;
 
-                ownerRights['r'] = isRead;
-                ownerRights['w'] = isWrite;
-                ownerRights['x'] = isExecute;
+                    rightsObj._chmod[owner] = {
+                        r: isRead,
+                        w: isWrite,
+                        x: isExecute
+                    };
             })
         }
     };
@@ -209,11 +210,16 @@ var Shell = function() {
             console.log('log(): Need a proper log type.');
             return;
         }
+
+        if (!name || !message) {
+            return this._logs[logType];
+        }
+
         var logTuple = [[name, '():\t'].join(''), message, new Date()];
 
         console.log(logTuple[0], logTuple[1]);
-        if (this._logs.dev && (this._logs.dev instanceof Array)) {
-            this._logs.dev.push(logTuple);
+        if (this._logs[logType] && (this._logs[logType] instanceof Array)) {
+            this._logs[logType].push(logTuple);
         }
     };
 
