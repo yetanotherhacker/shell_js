@@ -1,4 +1,4 @@
-##Shell.js v0.8##
+##Shell.js v0.81##
 Shell.js: treat Javascript environments like a unix shell. Requires Javascript 1.6. GPL 3.0.
 
 Paradigm: objects act like folders. So given `foo = new Shell()`, `foo.cd(x.y)` will shift to `{current_object}.x.y` and `foo.ls()` will give the contents of the current object. Using the `with()` keyword in appropriate places gives shell scripting functionality.
@@ -25,7 +25,7 @@ i.e.
 
 Current quirks:
 
-No piping. Only 'mkdir()' and 'rm()' accepts array input.
+Piping is in the works.
 
 `cp()` acts like `cp -r`
 
@@ -37,4 +37,4 @@ No piping. Only 'mkdir()' and 'rm()' accepts array input.
 
 `_reference()` passes the last valid object encountered in the path
 
-Dev. mode is available. Use `setMode('dev')`
+Dev. mode is available. Use `setMode('dev', true)`
