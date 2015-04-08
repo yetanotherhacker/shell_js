@@ -89,6 +89,16 @@ tests = {
         passTest &= shell._reference(['testHashA', 'testHashB']).every(function(i) { return !i;});
         return [passTest, 'global and local scoping with rm()'];
     },
+    chmodCheck: function() {
+        var passTest = true,
+            isRead;
+        shell.cd();
+        shell.mkdir('testHashC');
+        shell.chmod(testHashC, '+r');
+        isRead = testHashC._chmod['u']['r'];
+        shell.rm('testHashC');
+        return [isRead, 'chmod() modifier setting'];
+    },
     cpChecks: function() {
         var passTest = true;
         shell.cd();
