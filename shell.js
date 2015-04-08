@@ -3,7 +3,7 @@
 
 var Shell = function() {
     this._path = '';     //dot-delimited string: i.e. of form 'x.y.z'
-    this._state = { dev: false, production: true};
+    this._state = { dev: false, production: false};
     this._logs = {};
     this._messages = {
         production: 'In a production environment. Exiting.'
@@ -81,16 +81,16 @@ var Shell = function() {
             ownersArray.forEach(function(userClass) {
                 rightsObj._chmod[userClass] = {};
                 Object.keys(defaultRights).forEach(function(rightsKey) {
-                    rightsObj._chmod[userClass][rightsKey] = true;
+                    rightsObj._chmod[userClass][rightsKey] = false;
                 });
             });
         }
 
         if (modifierArray) {
             //may be esoteric, check verses specs
-            matchArray = chmodString[2];
-            isPlus = chmodString[1] === '+';
-            matchArray.forEach(function(rightsKey) {
+            matchArray = modifierArray[2];
+            isPlus = modifierArray[1] === '+';
+            matchArray.split('').forEach(function(rightsKey) {
                 rightsObj._chmod.u[rightsKey] = isPlus;
             });
         } else if (numericArray) {
