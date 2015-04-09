@@ -1,5 +1,5 @@
 //shell.js - a shell-like library for JavaScript environments.
-//Copyright 2011-2015 by Julius D'souza. Licensed under GPL 3.0.
+//Copyright 2015 by Julius D'souza. Licensed under GPL 3.0.
 
 var Shell = function() {
     this._path = '';     //dot-delimited string: i.e. of form 'x.y.z'
@@ -13,7 +13,7 @@ var Shell = function() {
         counter: 0
     };
     this._signals = {kill: 1, terminate: 2};
-    this.version = 0.8;
+    this.version = 0.81;
     if (typeof root === 'object' && typeof process === 'object') {
         this._environment = root;
         this._state.nodejs = {};  //assuming a nodejs environment
@@ -112,6 +112,7 @@ var Shell = function() {
 
     this._chmodCheck = function(rightsObj, permission, userClass) {
         //virtual chmod property checks
+        //NOTE: the range of {true, false, undefined} is intentional
         userClass = userClass || 'u';
         if (this._state.production) {
             this.log('dev', 'chmod', this._messages.production);
@@ -243,28 +244,30 @@ var Shell = function() {
         //mkdir(newObjPath) makes an empty object
         //mkdir(newObjPath, protoObjPath) makes an object newObj with protoObj as the prototype
         var mapMethod = function(newEntry, index) {
-                var newObj = newEntry.split('.').pop(),
-                    context = this._newContext(newEntry),
-                    isValidProtoArray = protoObjPath instanceof Array && newObjPath instanceof Array && (protoObjPath.length === newObjPath.length),
-                    objCreated;
+            var newObj = newEntry.split('.').pop(),
+                context = this._newContext(newEntry),
+                isValidProtoArray = protoObjPath instanceof Array &&
+                                    newObjPath instanceof Array &&
+                                    (protoObjPath.length === newObjPath.length),
+                objCreated;
 
-                if (!context) {
-                    return;     //quit if no valid new object can be made
-                }
+            if (!context) {
+                return;     //quit if no valid new object can be made
+            }
 
-                if (protoObjPath instanceof Array) {
-                    if (!isValidProtoArray) {
-                        return; //quit if newObj and protoObj array lengths mismatch
-                    }                   
-                    objCreated = Object.create(this._objScope(protoObjPath[index]));
-                } else if (typeof protoObjPath === 'string' && this._objScope(protoObjPath)) {
-                    objCreated = Object.create(this._objScope(protoObjPath));
-                } else {
-                    objCreated = {};
-                }
+            if (protoObjPath instanceof Array) {
+                if (!isValidProtoArray) {
+                    return; //quit if newObj and protoObj array lengths mismatch
+                }                   
+                objCreated = Object.create(this._objScope(protoObjPath[index]));
+            } else if (typeof protoObjPath === 'string' && this._objScope(protoObjPath)) {
+                objCreated = Object.create(this._objScope(protoObjPath));
+            } else {
+                objCreated = {};
+            }
 
-                context[newObj] = objCreated;
-            }.bind(this);
+            context[newObj] = objCreated;
+        }.bind(this);
         return this._vectorMap(newObjPath, mapMethod);
     };
 
