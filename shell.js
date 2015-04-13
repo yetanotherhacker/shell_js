@@ -136,8 +136,8 @@ var Shell = function() {
         return false;
     };
 
-    this.cp = function(origin, finish) {
-        return this._objScope(finish, this._objScope(origin));
+    this.cp = function(origin, destination) {
+        return this._objScope(destination, this._objScope(origin));
     };
 
     this._createParameterOptionRegex = function(singleParams, doubleParams) {
@@ -160,7 +160,7 @@ var Shell = function() {
         return name;
     };
 
-    this.kill = function(processName, willFinishNow) {
+    this.kill = function(processName, canFinish) {
         //NOTE - still needs work, obviously not production safe
         if (this._state.production) {
             this.log('dev', 'chmod', this._messages.production);
@@ -184,7 +184,7 @@ var Shell = function() {
         finalCall = callable.onFinish && callable.onFinish instanceof Function;
         terminationCall = callable.onDestroyed && callable.onDestroyed instanceof Function;
 
-        if (!willFinishNow) {
+        if (!canFinish) {
             if (!finalCall) {
                 message[1] = 'onFinish() method for ';
                 this.log('dev','kill', message);
@@ -192,7 +192,7 @@ var Shell = function() {
                 callable.onFinish(localProcess);
                 this._signals[processID] = this._signals.kill;
             }
-        } else if (willFinishNow && terminationCall) {
+        } else if (canFinish && terminationCall) {
             if (!finalCall) {
                 message[1] = 'onDestroyed() method for ';
                 this.log('dev','kill', message);
@@ -356,6 +356,7 @@ var Shell = function() {
             this.log('dev', 'chmod', this._messages.production);
             return;
         }
+
         //TODO finish _pipe, check yield support carefully
         var version = this.state.nodejs.version;
         if (!(version[0] >= 0 && version[1] >= 11 && version[2] > 2)) {
