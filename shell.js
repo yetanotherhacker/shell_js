@@ -416,7 +416,6 @@ var Shell = function() {
     };
 
     this.setMode = function(mode, value) {
-        var optName;
         if (typeof mode !== 'string') {
             this.log('dev','setMode', 'Mode name needs to be a string.');
             return;
