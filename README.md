@@ -1,4 +1,4 @@
-##Shell.js v0.81##
+##Shell.js v0.82##
 Shell.js: treat Javascript environments like a unix shell. Requires Javascript 1.6. GPL 3.0.
 
 Paradigm: objects act like folders. So given `foo = new Shell()`, `foo.cd(x.y)` will shift to `{current_object}.x.y` and `foo.ls()` will give the contents of the current object. Using the `with()` keyword in appropriate places gives shell scripting functionality.

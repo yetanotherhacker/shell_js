@@ -3,7 +3,7 @@
 
 var Shell = function() {
     this._path = '';     //dot-delimited string: i.e. of form 'x.y.z'
-    this._state = { dev: false, production: false};
+    this._state = { dev: true, production: false};
     this._logs = {};
     this._messages = {
         production: 'In a production environment. Exiting.'
@@ -13,15 +13,17 @@ var Shell = function() {
         counter: 0
     };
     this._signals = {kill: 1, terminate: 2};
-    this.version = 0.81;
+    this.version = 0.82;
     if (typeof root === 'object' && typeof process === 'object') {
+        //assuming a nodejs environment
         this._environment = root;
-        this._state.nodejs = {};  //assuming a nodejs environment
+        this._state.nodejs = {};
         this._state.nodejs.version =  process.version
                                     .substr(1)
                                     .split('.')
                                     .map(function(element) { return Number(element);});
     } else if (typeof window === 'object') {
+        //assuming a browser environment
         this._environment = window;
     }
 
@@ -106,7 +108,7 @@ var Shell = function() {
                         w: isWrite,
                         x: isExecute
                     };
-            })
+            });
         }
     };
 
@@ -146,18 +148,18 @@ var Shell = function() {
     };
 
     this._inferMethodName = function(method) {
-        var name, strForm;
+        var methodName, strForm;
         if (!method instanceof Function) {
             this.log('dev', '_inferMethodName', 'Need a function.');
             return;
         }
 
         strForm = String(method);
-        name = strForm.substring(9, strForm.indexOf('('));  //String(foo) gives 'function() <--func name here-->{ etc...'
-        if (!name) {
-            name = '0_anonymous';   //syntax hack; a valid function name can't start with a digit
+        methodName = strForm.substring(9, strForm.indexOf('('));  //grab name from string form of function
+        if (!methodName) {
+            methodName = '0_anonymous';   //syntax hack; a valid function name can't start with a digit
         }
-        return name;
+        return methodName;
     };
 
     this.kill = function(processName, canFinish) {
@@ -329,11 +331,8 @@ var Shell = function() {
 
     this._pathFilter = function(filterString) {
         //checks for *'s and .'s for filtering cli-style
-        if (!filterString) {
-            this.log('dev','_pathFilter', 'No string to filter.')
-            return;
-        } else if (typeof filterString !== 'string') {
-            this.log('dev','_pathFilter', 'Given value is not a string.')
+        if (typeof filterString !== 'string') {
+            this.log('dev','_pathFilter', ['Given value is not a string: ', filterString].join(''));
             return;
         }
         var regexArray = [],
