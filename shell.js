@@ -284,8 +284,9 @@ var Shell = function() {
             context = this._objScope(parentPath);
             if (context[pathEnd]) {
                 this.log('dev','_newContext', ['Object already exists in ', pathString, '.'].join(''));
+                return;
             }
-            return context && !context[pathEnd] && context; //get the actual object reference
+            return context; //get the actual object reference
         } else {
             return this._reference(this._path);
         }
@@ -298,7 +299,7 @@ var Shell = function() {
         }
         var globalPathEnvironment = objName.split('.'),
             globalPathObject = globalPathEnvironment.pop(),
-            localPathEnvironment = [this._path, objName].join('.').split('.'),
+            localPathEnvironment = [this._path, objName].join('.').split('.'),  //lazy string concatenate
             localPathObject = localPathEnvironment.pop(),
             isLocalObj;
 
