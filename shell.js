@@ -238,7 +238,7 @@ var Shell = function() {
         if (keyFilter && !this._objScope(key)) {
             return lsMethod(this._objScope(this._path)).filter(function(i) { return keyFilter.test(i)}).sort();
         } else {
-            return lsMethod(currentObj);
+            return lsMethod(currentObj).sort();
         }
     };
 
