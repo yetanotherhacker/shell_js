@@ -275,13 +275,13 @@ var Shell = function() {
 
     this._newContext = function(pathString) {
         //ensure that the property to be made doesn't exist yet but has a valid path
-        var parentPath = pathString.split('.'),
-            pathEnd = parentPath.pop(),
+        var pathArray = pathString.split('.'),
+            pathEnd = pathArray.pop(),
             context;
 
-        parentPath = parentPath.join('.');
-        if (parentPath) {
-            context = this._objScope(parentPath);
+        pathArray = pathArray.join('.');
+        if (pathArray) {
+            context = this._objScope(pathArray);
             if (context[pathEnd]) {
                 this.log('dev','_newContext', ['Object already exists in ', pathString, '.'].join(''));
                 return;
@@ -501,7 +501,7 @@ if (typeof module === 'object' && module.exports) {
 }
 
 //amd registration
-if (typeof define == 'function' && define.amd) {
+if (typeof define === 'function' && define.amd) {
     define('shelljs', [], function() {
         return Shell;
     });
