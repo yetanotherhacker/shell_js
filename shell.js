@@ -56,12 +56,11 @@ var Shell = function() {
 
     this.chmod = function(rightsObj, chmodString) {
         //TODO: check versus chmod specs, get working correctly
-        // TODO: design question: long-form alts for unix-style properties e.g. 'user' for 'u'?
+        //TODO: design question: long-form alts for unix-style properties e.g. 'user' for 'u'?
         if (this._state.production) {
             this.log('dev', 'chmod', this._messages.production);
             return;
-        }
-        if ((typeof chmodString !== 'string') || !(rightsObj instanceof Object)) {
+        } else if ((typeof chmodString !== 'string') || !(rightsObj instanceof Object)) {
             this.log('dev', 'chmod', 'Invalid type for parameters.');
             return;
         }
@@ -163,7 +162,7 @@ var Shell = function() {
     };
 
     this.kill = function(processName, canFinish) {
-        //NOTE - still needs work, obviously not production safe
+        //NOTE - currently in stasis, obviously not production safe
         if (this._state.production) {
             this.log('dev', 'chmod', this._messages.production);
             return;
@@ -436,7 +435,7 @@ var Shell = function() {
     };
 
     this.shell = function(callable, intervalTime, args, altName) {
-        //NOTE - NOT PRODUCTION SAFE.
+        //NOTE - currently in stasis, not production safe
         //TODO tests
         if (this._state.production) {
             this.log('dev', 'chmod', this._messages.production);
