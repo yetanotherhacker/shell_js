@@ -49,7 +49,6 @@ tests = {
         return [passTest, 'mkdir() prototyping'];
     },
     globalMakeRemove: function() {
-        //make and remove in global scope
         var isDirMade, isDirRemoved;
         shell.cd();
         shell.mkdir('emptyTestHash');
@@ -95,9 +94,11 @@ tests = {
         shell.cd();
         shell.mkdir('testHashC');
         shell.chmod(testHashC, '+r');
-        isRead = testHashC._chmod['u']['r'];
+        passTest = testHashC._chmod['u']['r'];
+        shell.chmod(testHashC, '-r');
+        passTest &= !testHashC._chmod['u']['r'];
         shell.rm('testHashC');
-        return [isRead, 'chmod() modifier setting'];
+        return [passTest, 'chmod() +/- relative modifiers'];
     },
     cpChecks: function() {
         var passTest = true;
