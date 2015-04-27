@@ -211,9 +211,7 @@ var Shell = function() {
         if (!logType || !this._state[logType]) {
             console.log('log(): Need a proper log type.');
             return;
-        }
-
-        if (!name || !message) {
+        } else if (!name || !message) {
             return this._logs[logType];
         }
 
@@ -254,9 +252,7 @@ var Shell = function() {
 
             if (!context) {
                 return;     //quit if no valid new object can be made
-            }
-
-            if (protoObjPath instanceof Array) {
+            } else if (protoObjPath instanceof Array) {
                 if (!isValidProtoArray) {
                     return; //quit if newObj and protoObj array lengths mismatch
                 }                   
@@ -418,9 +414,7 @@ var Shell = function() {
         if (typeof mode !== 'string') {
             this.log('dev','setMode', 'Mode name needs to be a string.');
             return;
-        }
-
-        if (value !== Boolean(value)) {
+        } else if (value !== Boolean(value)) {
             this.log('dev','setMode', 'Value must be either true or false.');
             return;
         } else if (this._state[mode] !== Boolean(this._state[mode])) {
