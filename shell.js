@@ -281,7 +281,7 @@ var Shell = function() {
                 this.log('dev','_newContext', ['Object already exists in ', pathString, '.'].join(''));
                 return;
             }
-            return context; //get the actual object reference
+            return context;
         } else {
             return this._reference(this._path);
         }
@@ -428,7 +428,7 @@ var Shell = function() {
         return true;
     };
 
-    this.shell = function(callable, intervalTime, args, altName) {
+    this.shell = function(callable, intervalTime, callParameters, altName) {
         //NOTE - currently in stasis, not production safe
         //TODO tests
         if (this._state.production) {
@@ -436,22 +436,22 @@ var Shell = function() {
             return;
         }
 
-        //if no function to call and time interval, stop
-        if (!(callable instanceof Function) && (intervalTime instanceof Number) && (intervalTime > 0))
+        if (!(callable instanceof Function) && (intervalTime instanceof Number) && (intervalTime > 0)) {
+            //exit if no function to call or valid time interval
             return;
-        //kick out non-string altnames & do not accept numbers as shorthand names
-        if ((typeof altName !== 'string') || !Number.isNaN(Number(altName)))
+        } else if ((typeof altName !== 'string') || !Number.isNaN(Number(altName)))
+            //kick out non-string altnames
+            //do not accept numbers as shorthand names since they override counter-generated identifiers
             return;
         var procName = this._inferMethodName(callable),
-            intervalRef = intervalTime ? setInterval(function(){ return callable.bind(this, args);}, intervalTime) : undefined,
+            intervalRef = intervalTime ? setInterval(function(){ return callable.bind(this, callParameters);}, intervalTime) : undefined,
             tuple = [this._process.counter, intervalRef, callable];
 
         if (intervalRef) {
             if (!this._process.collection[procName]) {
-                this._process.collection[procName] = tuple;
-            } else {
-                this._process.collection[procName].push(tuple);
+                this._process.collection[procName] = [];
             }
+            this._process.collection[procName].push(tuple);
             this._process.collection[this._process.counter] = tuple;    //overwrite by default for process IDs
             if (altName) {
                 this._process.collection[altName] = tuple;
