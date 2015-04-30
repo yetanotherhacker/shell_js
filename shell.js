@@ -146,7 +146,7 @@ var Shell = function() {
         return RegExp(['((^|\\s)-[\\w]?', singleParams, '[\\w]?)|(', doubleParams, '(\\s|$))'].join('')); 
     };
 
-    this._inferMethodName = function(method) {
+    this._inferMethodName = function(method, willGenerate) {
         var methodName, strForm;
         if (!method instanceof Function) {
             this.log('dev', '_inferMethodName', 'Need a function.');
@@ -155,8 +155,8 @@ var Shell = function() {
 
         strForm = String(method);
         methodName = strForm.substring(9, strForm.indexOf('('));  //grab name from string form of function
-        if (!methodName) {
-            methodName = '0_anonymous';   //syntax hack; a valid function name can't start with a digit
+        if (!methodName && willGenerate) {
+            methodName = '0_anonymous';   //syntax hack for record generation; a valid function name can't start with a digit
         }
         return methodName;
     };
@@ -443,7 +443,7 @@ var Shell = function() {
             //kick out non-string altnames
             //do not accept numbers as shorthand names since they override counter-generated identifiers
             return;
-        var procName = this._inferMethodName(callable),
+        var procName = this._inferMethodName(callable, true),
             intervalRef = intervalTime ? setInterval(function(){ return callable.bind(this, callParameters);}, intervalTime) : undefined,
             tuple = [this._process.counter, intervalRef, callable];
 
