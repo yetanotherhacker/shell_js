@@ -34,8 +34,6 @@ var Shell = function() {
             this._path = ''; //move to the top
         } else if (objName === '..') {
             //move up the object chain: x.y.z -> x.y
-            //tokenizes the path by '.' into an array,
-            //pops the array and recreates the path string
             pathArray = this._path.split('.');
             pathArray.pop();
             if (pathArray.length) {
@@ -102,18 +100,18 @@ var Shell = function() {
                     isWrite = Math.floor(octal / 2) % 2,
                     isRead = Math.floor(octal / 4) % 2;
 
-                    rightsObj._chmod[owner] = {
-                        r: isRead,
-                        w: isWrite,
-                        x: isExecute
-                    };
+                rightsObj._chmod[owner] = {
+                    r: isRead,
+                    w: isWrite,
+                    x: isExecute
+                };
             });
         }
     };
 
     this._chmodCheck = function(rightsObj, permission, userClass) {
         //virtual chmod property checks
-        //NOTE: the range of {true, false, undefined} is intentional
+        //NOTE: the return range of {true, false, undefined} is intentional
         userClass = userClass || 'u';
         if (this._state.production) {
             this.log('dev', 'chmod', this._messages.production);
@@ -211,7 +209,7 @@ var Shell = function() {
         if (!logType || !this._state[logType]) {
             console.log('log(): Need a proper log type.');
             return;
-        } else if (!name || !message) {
+        } else if (!(name && message)) {
             return this._logs[logType];
         }
 
@@ -288,6 +286,7 @@ var Shell = function() {
     };
 
     this._objScope = function(objName, newValue, deleteFlag) {
+        //TODO: replacing tight coupling in code with binds and helpers
         //scoping for object and object properties
         if (!objName) {
             return this._reference();
