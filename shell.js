@@ -374,9 +374,9 @@ var Shell = function() {
     this._reference = function(pathString) {
         //takes a path string and returns what it refers to if it exists
         var mapMethod = function(entry) {
-            var pathArray, deepRef, outerArrayRef, multiArrayRef, currentContext,
-                arrayRegex = /\[([^\]]+)\]/g,
-                startRegex = /^(\w+)\[/;
+            var arrayRegex = /\[([^\]]+)\]/g,
+                startRegex = /^(\w+)\[/,
+                currentContext, deepRef, headNode, multiArrayRef, outerArrayRef, pathArray;
 
             if (entry) {
                 pathArray = entry.split('.');
@@ -386,14 +386,15 @@ var Shell = function() {
                     currentContext = pathArray.shift();
                     outerArrayRef = startRegex.exec(currentContext);
 
-                    outerArrayRef = outerArrayRef && outerArrayRef[1];
+                    outerArrayRef = outerArrayRef && outerArrayRef[1];  //regex group capture
                     multiArrayRef = (currentContext.match(arrayRegex) || []).map(function(i){ return i.slice(1, i.length - 1);});
                     deepRef = deepRef[outerArrayRef || currentContext];
 
-                    if (outerArrayRef) {
-                        while (multiArrayRef.length && deepRef && deepRef[multiArrayRef[0]]) {
-                            deepRef = deepRef[multiArrayRef.shift()];
-                        }
+                    if (!outerArrayRef) {
+                        continue;
+                    }
+                    while (multiArrayRef.length && deepRef && deepRef[multiArrayRef[0]]) {
+                        deepRef = deepRef[multiArrayRef.shift()];
                     }
                 }
                 return deepRef;
@@ -438,30 +439,28 @@ var Shell = function() {
         if (!(callable instanceof Function) && (intervalTime instanceof Number) && (intervalTime > 0)) {
             //exit if no function to call or valid time interval
             return;
-        } else if ((typeof altName !== 'string') || !Number.isNaN(Number(altName)))
+        } else if ((typeof altName !== 'string') || !Number.isNaN(Number(altName))) {
             //kick out non-string altnames
             //do not accept numbers as shorthand names since they override counter-generated identifiers
             return;
+        }
         var procName = this._inferMethodName(callable, true),
             intervalRef = intervalTime ? setInterval(function(){ return callable.bind(this, callParameters);}, intervalTime) : undefined,
             tuple = [this._process.counter, intervalRef, callable];
 
-        if (intervalRef) {
-            if (!this._process.collection[procName]) {
-                this._process.collection[procName] = [];
-            }
-            this._process.collection[procName].push(tuple);
-            this._process.collection[this._process.counter] = tuple;    //overwrite by default for process IDs
-            if (altName) {
-                this._process.collection[altName] = tuple;
-                if (this._process.collection[altName]) {
-                    this.log('dev','shell', ['altName', altName, 'overwritten for process', this._process.counter].join(' '));
-                }
-            }
-            return this._process.counter++;
-        } else {
+        if (!intervalRef) {
             return callable.call(this, args);
         }
+        this._process.collection[procName] = this._process.collection[procName] || [];
+        this._process.collection[procName].push(tuple);
+        this._process.collection[this._process.counter] = tuple;    //overwrite by default for process IDs
+        if (altName) {
+            this._process.collection[altName] = tuple;
+            if (this._process.collection[altName]) {
+                this.log('dev','shell', ['altName', altName, 'overwritten for process', this._process.counter].join(' '));
+            }
+        }
+        return this._process.counter++;
     };
 
     this._validateParameterOptions = function(paramString) {
