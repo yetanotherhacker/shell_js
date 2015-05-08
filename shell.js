@@ -166,7 +166,7 @@ var Shell = function() {
             return;
         }
         var localProcess, processID, intervalRef, callable, finalCall, terminationCall,
-            message = ['no', 'onPlaceholderMethod() for', 'process with the name or processID of', processName];
+            message = ['no', 'onPlaceholder()', ' method for', 'process with the name or processID of', processName];
         if (!this._process.collection[processName]) {
             this.log('dev','kill', message.join(' '));
         }
@@ -185,7 +185,7 @@ var Shell = function() {
 
         if (!canFinish) {
             if (!finalCall) {
-                message[1] = 'onFinish() method for ';
+                message[1] = 'onFinish()';
                 this.log('dev','kill', message);
             } else {
                 callable.onFinish(localProcess);
@@ -193,7 +193,7 @@ var Shell = function() {
             }
         } else if (canFinish && terminationCall) {
             if (!finalCall) {
-                message[1] = 'onDestroyed() method for ';
+                message[1] = 'onDestroyed()';
                 this.log('dev','kill', message);
             } else {
                 callable.onDestroyed(localProcess);
@@ -207,7 +207,7 @@ var Shell = function() {
 
     this.log = function(logType, name, message) {
         if (!logType || !this._state[logType]) {
-            console.log('log(): Need a proper log type.');
+            console.log('log(): Need a proper type.');
             return;
         } else if (!(name && message)) {
             return this._logs[logType];
