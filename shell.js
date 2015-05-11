@@ -425,7 +425,7 @@ var Shell = function() {
         if (!(this._logs[mode] instanceof Array) && value) {
             this._logs[mode] = [];
         }
-        return true;
+        return value;
     };
 
     this.shell = function(callable, intervalTime, callParameters, altName) {
