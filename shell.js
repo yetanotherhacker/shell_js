@@ -238,8 +238,8 @@ var Shell = function() {
     };
 
     this.mkdir = function(newObjPath, protoObjPath) {
-        //mkdir(newObjPath) makes an empty object
-        //mkdir(newObjPath, protoObjPath) makes an object newObj with protoObj as the prototype
+        //mkdir(newObjPath) creates an empty object
+        //mkdir(newObjPath, protoObjPath) creates an object newObj with protoObj as the prototype
         var mapMethod = function(newEntry, index) {
             var newObj = newEntry.split('.').pop(),
                 context = this._newContext(newEntry),
@@ -249,9 +249,11 @@ var Shell = function() {
                 objCreated;
 
             if (!context) {
+                this.log('dev', 'mkdir', 'Cannot make a valid object with given path.');
                 return;     //quit if no valid new object can be made
             } else if (protoObjPath instanceof Array) {
                 if (!isValidProtoArray) {
+                    this.log('dev', 'mkdir', 'Given array lengths need to match.');
                     return; //quit if newObj and protoObj array lengths mismatch
                 }                   
                 objCreated = Object.create(this._objScope(protoObjPath[index]));
@@ -386,7 +388,7 @@ var Shell = function() {
                     currentContext = pathArray.shift();
                     outerArrayRef = startRegex.exec(currentContext);
 
-                    outerArrayRef = outerArrayRef && outerArrayRef[1];  //regex group capture
+                    outerArrayRef = outerArrayRef && outerArrayRef[1];  //regex group capture of inner array
                     multiArrayRef = (currentContext.match(arrayRegex) || []).map(function(i){ return i.slice(1, i.length - 1);});
                     deepRef = deepRef[outerArrayRef || currentContext];
 
