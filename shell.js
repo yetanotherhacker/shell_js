@@ -144,7 +144,7 @@ var Shell = function() {
         return RegExp(['((^|\\s)-[\\w]?', singleParams, '[\\w]?)|(', doubleParams, '(\\s|$))'].join('')); 
     };
 
-    this._inferMethodName = function(method, willGenerate) {
+    this._inferMethodName = function(method, generateFlag) {
         var methodName, strForm;
         if (!method instanceof Function) {
             this.log('dev', '_inferMethodName', 'Need a function.');
@@ -153,13 +153,13 @@ var Shell = function() {
 
         strForm = String(method);
         methodName = strForm.substring(9, strForm.indexOf('('));  //grab name from string form of function
-        if (!methodName && willGenerate) {
+        if (!methodName && generateFlag) {
             methodName = '0_anonymous';   //syntax hack for record generation; a valid function name can't start with a digit
         }
         return methodName;
     };
 
-    this.kill = function(processName, canFinish) {
+    this.kill = function(processName, finishFlag) {
         //NOTE - currently in stasis, obviously not production safe
         if (this._state.production) {
             this.log('dev', 'chmod', this._messages.production);
@@ -183,7 +183,7 @@ var Shell = function() {
         finalCall = callable.onFinish && callable.onFinish instanceof Function;
         terminationCall = callable.onDestroyed && callable.onDestroyed instanceof Function;
 
-        if (!canFinish) {
+        if (!finishFlag) {
             if (!finalCall) {
                 message[1] = 'onFinish()';
                 this.log('dev','kill', message);
@@ -191,7 +191,7 @@ var Shell = function() {
                 callable.onFinish(localProcess);
                 this._signals[processID] = this._signals.kill;
             }
-        } else if (canFinish && terminationCall) {
+        } else if (finishFlag && terminationCall) {
             if (!finalCall) {
                 message[1] = 'onDestroyed()';
                 this.log('dev','kill', message);
@@ -362,9 +362,9 @@ var Shell = function() {
         }
     };
 
-    this.pwd = function(resultIsString) {
+    this.pwd = function(returnStringFlag) {
         var result;
-        if (resultIsString) {
+        if (returnStringFlag) {
             result = this._path ? this._path : 'this';
         } else {
             result = this._path ? this._objScope(this._path) : this;
