@@ -348,13 +348,13 @@ var Shell = function() {
     };
 
     this._pipe = function(input, mapFunction) {
+        //TODO finish _pipe, check yield support carefully
+        var version = this.state.nodejs.version;
         if (this._state.production) {
             this.log('dev', 'chmod', this._messages.production);
             return;
         }
 
-        //TODO finish _pipe, check yield support carefully
-        var version = this.state.nodejs.version;
         if (!(version[0] >= 0 && version[1] >= 11 && version[2] > 2)) {
             //need at least 0.11.2 for v8 generators
             this.log('dev', '_pipe', ['Need v8 generators which are unsupported in node ', process.version, '. Exiting.'].join(''));
