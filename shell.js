@@ -241,7 +241,7 @@ var Shell = function() {
         //mkdir(newObjPath) creates an empty object
         //mkdir(newObjPath, protoObjPath) creates an object newObj with protoObj as the prototype
         var mapMethod = function(newEntry, index) {
-            var newObj = newEntry.split('.').pop(),
+            var newObjKey = newEntry.split('.').pop(),
                 context = this._newContext(newEntry),
                 isValidProtoArray = protoObjPath instanceof Array &&
                                     newObjPath instanceof Array &&
@@ -263,7 +263,7 @@ var Shell = function() {
                 objCreated = {};
             }
 
-            context[newObj] = objCreated;
+            context[newObjKey] = objCreated;
         }.bind(this);
         return this._vectorMap(newObjPath, mapMethod);
     };
@@ -374,7 +374,7 @@ var Shell = function() {
     };
 
     this._reference = function(pathString) {
-        //takes a path string and returns what it refers to if it exists
+        //find and return property of named path object if possible
         var mapMethod = function(entry) {
             var arrayRegex = /\[([^\]]+)\]/g,
                 startRegex = /^(\w+)\[/,
