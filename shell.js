@@ -2,17 +2,24 @@
 //Copyright 2015 by Julius D'souza. Licensed under GPL 3.0.
 
 var Shell = function() {
-    this._path = '';     //dot-delimited string: i.e. of form 'x.y.z'
-    this._state = { dev: true, production: false};
     this._logs = {};
     this._messages = {
+        notCollection: 'Need an array or object.',
         production: 'In a production environment. Exiting.'
     };
+    this._path = '';     //dot-delimited string: i.e. of form 'x.y.z'
     this._process = {
         collection: {},
         counter: 0
     };
     this._signals = {kill: 1, terminate: 2};
+    this._state = { dev: true, production: false};
+    this._validTypes = {
+        isCollection: function(element) {
+            //TODO: generalize to iterables
+            return (element instanceof Array) || (element instanceof Object);
+        }
+    }
     this.version = 0.82;
     if (typeof root === 'object' && typeof process === 'object') {
         //assuming a nodejs environment
@@ -347,18 +354,18 @@ var Shell = function() {
         return RegExp(regexArray.join(''));
     };
 
-    this._pipe = function(input, mapFunction) {
+    this._pipe = function(collection, mapFunction) {
         //TODO finish _pipe, check yield support carefully
         var version = this.state.nodejs.version;
         if (this._state.production) {
             this.log('dev', 'chmod', this._messages.production);
             return;
-        }
-
-        if (!(version[0] >= 0 && version[1] >= 11 && version[2] > 2)) {
+        } else if (!(version[0] >= 0 && version[1] >= 11 && version[2] > 2)) {
             //need at least 0.11.2 for v8 generators
             this.log('dev', '_pipe', ['Need v8 generators which are unsupported in node ', process.version, '. Exiting.'].join(''));
             return;
+        } else if (!this._validTypes.isCollection(collection)) {
+            this.log('dev', 'chmod', this._messages.notCollection);
         }
     };
 
