@@ -295,7 +295,6 @@ var Shell = function() {
     };
 
     this._objScope = function(objName, newValue, deleteFlag) {
-        //TODO: replacing tight coupling in code with binds and helpers
         //scoping for object and object properties
         if (!objName) {
             return this._reference();
