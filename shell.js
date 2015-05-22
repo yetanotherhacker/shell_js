@@ -7,7 +7,7 @@ var Shell = function() {
         notCollection: 'Need an array or object.',
         production: 'In a production environment. Exiting.'
     };
-    this._path = '';     //dot-delimited string: i.e. of form 'x.y.z'
+    this._path = '';
     this._process = {
         collection: {},
         counter: 0
