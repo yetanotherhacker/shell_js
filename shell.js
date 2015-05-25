@@ -15,9 +15,9 @@ var Shell = function() {
     this._signals = {kill: 1, terminate: 2};
     this._state = { dev: true, production: false};
     this._validTypes = {
-        isCollection: function(element) {
-            //TODO: generalize to iterables
-            return (element instanceof Array) || (element instanceof Object);
+        isIterable: function(element) {
+            //TODO: generalize safely to iterable functions
+            return (element instanceof Object);
         }
     }
     this.version = 0.82;
@@ -353,7 +353,7 @@ var Shell = function() {
         return RegExp(regexArray.join(''));
     };
 
-    this._pipe = function(collection, mapFunction) {
+    this._pipe = function(iterable, mapFunction) {
         //TODO finish _pipe, check yield support carefully
         var version = this.state.nodejs.version;
         if (this._state.production) {
@@ -363,8 +363,8 @@ var Shell = function() {
             //need at least 0.11.2 for v8 generators
             this.log('dev', '_pipe', ['Need v8 generators which are unsupported in node ', process.version, '. Exiting.'].join(''));
             return;
-        } else if (!this._validTypes.isCollection(collection)) {
-            this.log('dev', 'chmod', this._messages.notCollection);
+        } else if (!this._validTypes.isIterable(iterable)) {
+            this.log('dev', 'chmod', this._messages.isIterable);
         }
     };
 
