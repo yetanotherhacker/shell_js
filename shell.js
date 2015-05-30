@@ -25,7 +25,7 @@ var Shell = function() {
         //assuming a nodejs environment
         this._environment = root;
         this._state.nodejs = {};
-        this._state.nodejs.version =  process.version
+        this._state.nodejs.version = process.version
                                     .substr(1)
                                     .split('.')
                                     .map(function(element) { return Number(element);});
@@ -380,7 +380,7 @@ var Shell = function() {
     };
 
     this._reference = function(pathString) {
-        //find and return property of named path object if possible
+        //find and return property of named path property if possible
         var mapMethod = function(entry) {
             var arrayRegex = /\[([^\]]+)\]/g,
                 startRegex = /^(\w+)\[/,
@@ -390,6 +390,7 @@ var Shell = function() {
                 pathArray = entry.split('.');
                 deepRef = this._environment;
                 //if next token is an object, shift to it and repeat
+                //handle arrays sufficiently
                 while ((pathArray.length) && (deepRef instanceof Object)) {
                     currentContext = pathArray.shift();
                     outerArrayRef = startRegex.exec(currentContext);
