@@ -431,6 +431,7 @@ var Shell = function() {
             return;
         }
         this._state[mode] = value;
+        this.log('dev', 'setMode', mode + ': ' + value);
         if (!(this._logs[mode] instanceof Array) && value) {
             this._logs[mode] = [];
         }
