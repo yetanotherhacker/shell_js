@@ -389,13 +389,12 @@ var Shell = function() {
             if (entry) {
                 pathArray = entry.split('.');
                 deepRef = this._environment;
-                //if next token is an object, shift to it and repeat
-                //handle arrays sufficiently
+                //if next token is an object, shift to it and repeat (arrays included)
                 while ((pathArray.length) && (deepRef instanceof Object)) {
                     currentContext = pathArray.shift();
                     outerArrayRef = startRegex.exec(currentContext);
 
-                    outerArrayRef = outerArrayRef && outerArrayRef[1];  //regex group capture of inner array
+                    outerArrayRef = outerArrayRef && outerArrayRef[1];  //regex group capture for inside of []'s'
                     multiArrayRef = (currentContext.match(arrayRegex) || []).map(function(i){ return i.slice(1, i.length - 1);});
                     deepRef = deepRef[outerArrayRef || currentContext];
 
