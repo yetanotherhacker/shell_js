@@ -446,7 +446,7 @@ var Shell = function() {
         }
 
         if (!(callable instanceof Function) && (intervalTime instanceof Number) && (intervalTime > 0)) {
-            //exit if no function to call or valid time interval
+            //exit if no function to call or invalid time interval
             return;
         } else if ((typeof altName !== 'string') || !Number.isNaN(Number(altName))) {
             //kick out non-string altnames
@@ -455,16 +455,20 @@ var Shell = function() {
         }
         var procName = this._inferMethodName(callable, true),
             intervalRef = intervalTime ? setInterval(function(){ return callable.bind(this, callParameters);}, intervalTime) : undefined,
-            tuple = [this._process.counter, intervalRef, callable];
+            dataObj = {
+                'counter': this._process.counter,
+                'callable': callable,
+                'intervalReference': intervalRef
+            };
 
         if (!intervalRef) {
             return callable.call(this, args);
         }
         this._process.collection[procName] = this._process.collection[procName] || [];
-        this._process.collection[procName].push(tuple);
-        this._process.collection[this._process.counter] = tuple;    //overwrite by default for process IDs
+        this._process.collection[procName].push(dataObj);
+        this._process.collection[this._process.counter] = dataObj;    //overwrite by default for process IDs
         if (altName) {
-            this._process.collection[altName] = tuple;
+            this._process.collection[altName] = dataObj;
             if (this._process.collection[altName]) {
                 this.log('dev','shell', ['altName', altName, 'overwritten for process', this._process.counter].join(' '));
             }
