@@ -5,6 +5,7 @@ var Shell = function() {
     this._logs = {};
     this._messages = {
         notCollection: 'Need an array or object.',
+        notIterable: 'Not an iterable collection or function.',
         production: 'In a production environment. Exiting.'
     };
     this._path = '';
@@ -14,7 +15,7 @@ var Shell = function() {
     };
     this._signals = {kill: 1, terminate: 2};
     this._state = { dev: true, production: false};
-    this._validTypes = {
+    this._validMaps = {
         isIterable: function(element) {
             //TODO: generalize safely to iterable functions
             return (element instanceof Object);
@@ -363,8 +364,8 @@ var Shell = function() {
             //need at least 0.11.2 for v8 generators
             this.log('dev', '_pipe', ['Need v8 generators which are unsupported in node ', process.version, '. Exiting.'].join(''));
             return;
-        } else if (!this._validTypes.isIterable(iterable)) {
-            this.log('dev', 'chmod', this._messages.isIterable);
+        } else if (!this._validMaps.isIterable(iterable)) {
+            this.log('dev', 'chmod', this._messages.notIterable);
         }
     };
 
