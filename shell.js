@@ -44,13 +44,7 @@ var Shell = function() {
             //move up the object chain: x.y.z -> x.y
             pathArray = this._path.split('.');
             pathArray.pop();
-            if (pathArray.length) {
-                this._path = pathArray.reduce(function(pathChain, pathLink) {
-                    return pathChain.concat('.', pathLink);
-                });
-            } else {
-                this._path = '';
-            }
+            this._path = pathArray.join('.');
         } else if (this._reference([this._path, '.', objName].join('')) instanceof Object) {
             this._path = [this._path, '.', objName].join(''); //move to local object
         } else if (this._reference(objName) instanceof Object) {
@@ -372,7 +366,7 @@ var Shell = function() {
     this.pwd = function(returnStringFlag) {
         var result;
         if (returnStringFlag) {
-            result = this._path ? this._path : 'this';
+            result = this._path || 'this';
         } else {
             result = this._path ? this._objScope(this._path) : this;
         }
