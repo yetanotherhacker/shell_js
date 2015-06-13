@@ -215,11 +215,15 @@ var Shell = function() {
             return this._logs[logType];
         }
 
-        var logTuple = [[name, '():\t'].join(''), message, new Date()];
+        var logObj = {
+            method: [name, '():\t'].join(''),
+            message: message,
+            time: new Date()
+        };
 
-        console.log(logTuple[0], logTuple[1]);
+        console.log(logObj.method, logObj.message);
         if (this._logs[logType] && (this._logs[logType] instanceof Array)) {
-            this._logs[logType].push(logTuple);
+            this._logs[logType].push(logObj);
         }
     };
 
