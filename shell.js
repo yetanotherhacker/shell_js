@@ -51,7 +51,10 @@ var Shell = function() {
             this._path = objName; //move to global object
         } else {
             this.log('dev','cd', 'No such object exists.');
+            return;
         }
+
+        return true;
     };
 
     this.chmod = function(rightsObj, chmodString) {
@@ -109,6 +112,8 @@ var Shell = function() {
                 };
             });
         }
+
+        return true;
     };
 
     this._chmodCheck = function(rightsObj, permission, userClass) {
@@ -225,6 +230,7 @@ var Shell = function() {
         if (this._logs[logType] && (this._logs[logType] instanceof Array)) {
             this._logs[logType].push(logObj);
         }
+        return true;
     };
 
     this.ls = function(key, paramString) {
@@ -328,7 +334,10 @@ var Shell = function() {
             }
         } else {
             this.log('dev','_objScope', ['Scoping failure for ', objName].join(''));
+            return;
         }
+
+        return true;
     };
 
     this._pathFilter = function(filterString) {
