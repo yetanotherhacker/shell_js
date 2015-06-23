@@ -261,7 +261,7 @@ var Shell = function() {
                 objCreated;
 
             if (!context) {
-                this.log('dev', 'mkdir', 'Cannot make a valid object with given path.');
+                this.log('dev', 'mkdir', ['Cannot make a valid object with given path:', newObjPath].join(''));
                 return;     //quit if no valid new object can be made
             } else if (protoObjPath instanceof Array) {
                 if (!isValidProtoArray) {
@@ -390,7 +390,7 @@ var Shell = function() {
     this._reference = function(pathString) {
         //find and return property of named path property if possible
         var mapMethod = function(entry) {
-            var arrayRegex = /\[([^\]]+)\]/g,
+            var arrayCaptureRegex = /\[([^\]]+)\]/g,
                 startRegex = /^(\w+)\[/,
                 currentContext, deepRef, headNode, multiArrayRef, outerArrayRef, pathArray;
 
@@ -403,7 +403,7 @@ var Shell = function() {
                     outerArrayRef = startRegex.exec(currentContext);
 
                     outerArrayRef = outerArrayRef && outerArrayRef[1];  //regex group capture for inside of []'s'
-                    multiArrayRef = (currentContext.match(arrayRegex) || []).map(function(i){ return i.slice(1, i.length - 1);});
+                    multiArrayRef = (currentContext.match(arrayCaptureRegex) || []).map(function(i){ return i.slice(1, i.length - 1);});
                     deepRef = deepRef[outerArrayRef || currentContext];
 
                     if (!outerArrayRef) {
