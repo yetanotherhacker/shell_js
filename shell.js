@@ -346,19 +346,7 @@ var Shell = function() {
             this.log('dev','_pathFilter', ['Given value is not a string: ', filterString].join(''));
             return;
         }
-        var regexArray = [],
-            filterRegex;
-        for(var i = 0; filterString.length > i; ++i) {
-            if (filterString[i] === '*') {
-                regexArray.push('.');
-                regexArray.push('*');
-            } else if (filterString[i] === '.') {
-                regexArray.push('.');
-            } else {
-                regexArray.push(filterString[i]);
-            }
-        }
-        return RegExp(regexArray.join(''));
+        return RegExp(filterString.replace(/\*/g, '.*'));
     };
 
     this._pipe = function(iterable, mapFunction) {
