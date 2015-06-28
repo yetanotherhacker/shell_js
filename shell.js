@@ -434,13 +434,15 @@ var Shell = function() {
         return value;
     };
 
-    this.shell = function(callable, intervalTime, callParameters, altName) {
+    this.shell = function(callable, intervalTime, callParameters, altName, thisContext) {
         //NOTE - currently in stasis, not production safe
         //TODO tests
         if (this._state.production) {
             this.log('dev', 'chmod', this._messages.production);
             return;
         }
+
+        thisContext = thisContext || this;
 
         if (!(callable instanceof Function) && (intervalTime instanceof Number) && (intervalTime > 0)) {
             //exit if no function to call or invalid time interval
@@ -451,10 +453,10 @@ var Shell = function() {
             return;
         }
         var procName = this._inferMethodName(callable, true),
-            intervalRef = intervalTime ? setInterval(function(){ return callable.bind(this, callParameters);}, intervalTime) : undefined,
+            intervalRef = intervalTime ? setInterval(function(){ return callable.bind(thisContext, callParameters);}, intervalTime) : undefined,
             dataObj = {
-                'counter': this._process.counter,
                 'callable': callable,
+                'counter': this._process.counter,
                 'intervalReference': intervalRef
             };
 
