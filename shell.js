@@ -9,12 +9,12 @@ var Shell = function() {
         production: 'In a production environment. Exiting.'
     };
     this._path = '';
-    this._process = {
+    this._processObj = {
         collection: {},
         counter: 0
     };
-    this._signals = {kill: 1, terminate: 2};
-    this._state = { dev: true, production: false};
+    this._signalsObj = {kill: 1, terminate: 2};
+    this._stateObj = { dev: true, production: false};
     this._validMaps = {
         isIterable: function(element) {
             //TODO: generalize safely to iterable functions
@@ -25,11 +25,11 @@ var Shell = function() {
     if (typeof root === 'object' && typeof process === 'object') {
         //assuming a nodejs environment
         this._environment = root;
-        this._state.nodejs = {};
-        this._state.nodejs.version = process.version
+        this._stateObj.nodejs = {};
+        this._stateObj.nodejs.version = process.version
                                     .substr(1)
                                     .split('.')
-                                    .map(function(element) { return Number(element);});
+                                    .map(Number);
     } else if (typeof window === 'object') {
         //assuming a browser environment
         this._environment = window;
@@ -60,7 +60,7 @@ var Shell = function() {
     this.chmod = function(rightsObj, chmodString) {
         //TODO: check versus chmod specs, get working correctly
         //TODO: design question: long-form alts for unix-style properties e.g. 'user' for 'u'?
-        if (this._state.production) {
+        if (this._stateObj.production) {
             this.log('dev', 'chmod', this._messages.production);
             return;
         } else if ((typeof chmodString !== 'string') || !(rightsObj instanceof Object)) {
@@ -120,7 +120,7 @@ var Shell = function() {
         //virtual chmod property checks
         //NOTE: the return range of {true, false, undefined} is intentional
         userClass = userClass || 'u';
-        if (this._state.production) {
+        if (this._stateObj.production) {
             this.log('dev', 'chmod', this._messages.production);
             return;
         } else if (!rightsObj || !(rightsObj instanceof Object)) {
@@ -168,16 +168,16 @@ var Shell = function() {
 
     this.kill = function(processName, finishFlag) {
         //NOTE - currently in stasis, obviously not production safe
-        if (this._state.production) {
+        if (this._stateObj.production) {
             this.log('dev', 'chmod', this._messages.production);
             return;
         }
         var localProcess, processID, intervalRef, callable, finalCall, terminationCall,
             message = ['no', 'onPlaceholder()', ' method for', 'process with the name or processID of', processName];
-        if (!this._process.collection[processName]) {
+        if (!this._processObj.collection[processName]) {
             this.log('dev','kill', message.join(' '));
         }
-        localProcess = this._process.collection[processName];
+        localProcess = this._processObj.collection[processName];
 
         if (!(localProcess instanceof Array)) {
             this.log('dev', 'kill', ['localProcess for', processName, 'is invalid.'].join(' '));
@@ -196,7 +196,7 @@ var Shell = function() {
                 this.log('dev','kill', message);
             } else {
                 callable.onFinish(localProcess);
-                this._signals[processID] = this._signals.kill;
+                this._signalsObj[processID] = this._signalsObj.kill;
             }
         } else if (finishFlag && terminationCall) {
             if (!finalCall) {
@@ -204,16 +204,16 @@ var Shell = function() {
                 this.log('dev','kill', message);
             } else {
                 callable.onDestroyed(localProcess);
-                this._signals[processID] = this._signals.terminate;
+                this._signalsObj[processID] = this._signalsObj.terminate;
             }
             clearInterval(intervalRef);
-            delete this._process.collection[processName];
-            delete this._process.collection[processID];
+            delete this._processObj.collection[processName];
+            delete this._processObj.collection[processID];
         }
     };
 
     this.log = function(logType, name, message) {
-        if (!logType || !this._state[logType]) {
+        if (!logType || !this._stateObj[logType]) {
             console.log('log(): Need a proper type.');
             return;
         } else if (!(name && message)) {
@@ -352,7 +352,7 @@ var Shell = function() {
     this._pipe = function(iterable, mapFunction) {
         //TODO finish _pipe, check yield support carefully
         var version = this.state.nodejs.version;
-        if (this._state.production) {
+        if (this._stateObj.production) {
             this.log('dev', 'chmod', this._messages.production);
             return;
         } else if (!(version[0] >= 0 && version[1] >= 11 && version[2] > 2)) {
@@ -422,11 +422,11 @@ var Shell = function() {
         } else if (value !== Boolean(value)) {
             this.log('dev','setMode', 'Value must be either true or false.');
             return;
-        } else if (this._state[mode] !== Boolean(this._state[mode])) {
+        } else if (this._stateObj[mode] !== Boolean(this._stateObj[mode])) {
             this.log('dev','setMode', 'No such mode.');
             return;
         }
-        this._state[mode] = value;
+        this._stateObj[mode] = value;
         this.log('dev', 'setMode', mode + ': ' + value);
         if (!(this._logs[mode] instanceof Array) && value) {
             this._logs[mode] = [];
@@ -437,7 +437,7 @@ var Shell = function() {
     this.shell = function(callable, intervalTime, callParameters, altName, thisContext) {
         //NOTE - currently in stasis, not production safe
         //TODO tests
-        if (this._state.production) {
+        if (this._stateObj.production) {
             this.log('dev', 'chmod', this._messages.production);
             return;
         }
@@ -456,23 +456,23 @@ var Shell = function() {
             intervalRef = intervalTime ? setInterval(function(){ return callable.bind(thisContext, callParameters);}, intervalTime) : undefined,
             dataObj = {
                 'callable': callable,
-                'counter': this._process.counter,
+                'counter': this._processObj.counter,
                 'intervalReference': intervalRef
             };
 
         if (!intervalRef) {
             return callable.call(this, args);
         }
-        this._process.collection[procName] = this._process.collection[procName] || [];
-        this._process.collection[procName].push(dataObj);
-        this._process.collection[this._process.counter] = dataObj;    //overwrite by default for process IDs
+        this._processObj.collection[procName] = this._processObj.collection[procName] || [];
+        this._processObj.collection[procName].push(dataObj);
+        this._processObj.collection[this._processObj.counter] = dataObj;    //overwrite by default for process IDs
         if (altName) {
-            this._process.collection[altName] = dataObj;
-            if (this._process.collection[altName]) {
-                this.log('dev','shell', ['altName', altName, 'overwritten for process', this._process.counter].join(' '));
+            this._processObj.collection[altName] = dataObj;
+            if (this._processObj.collection[altName]) {
+                this.log('dev','shell', ['altName', altName, 'overwritten for process', this._processObj.counter].join(' '));
             }
         }
-        return this._process.counter++;
+        return this._processObj.counter++;
     };
 
     this._validateParameterOptions = function(paramString) {
