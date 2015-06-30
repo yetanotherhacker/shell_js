@@ -13,20 +13,24 @@ var Shell = function() {
         collection: {},
         counter: 0
     };
-    this._signalsObj = {kill: 1, terminate: 2};
-    this._stateObj = { dev: true, production: false};
+    this._signalsObj = {};
+    ['kill', 'terminate'].forEach(function(key) {
+        //initial config
+        this._signalsObj[key] = key;
+    }.bind(this));
+    this._configObj = { dev: true, production: false};
     this._validMaps = {
         isIterable: function(element) {
             //TODO: generalize safely to iterable functions
             return (element instanceof Object);
         }
-    }
+    };
     this.version = 0.82;
     if (typeof root === 'object' && typeof process === 'object') {
         //assuming a nodejs environment
         this._environment = root;
-        this._stateObj.nodejs = {};
-        this._stateObj.nodejs.version = process.version
+        this._configObj.nodejs = {};
+        this._configObj.nodejs.version = process.version
                                     .substr(1)
                                     .split('.')
                                     .map(Number);
@@ -60,7 +64,7 @@ var Shell = function() {
     this.chmod = function(rightsObj, chmodString) {
         //TODO: check versus chmod specs, get working correctly
         //TODO: design question: long-form alts for unix-style properties e.g. 'user' for 'u'?
-        if (this._stateObj.production) {
+        if (this._configObj.production) {
             this.log('dev', 'chmod', this._messages.production);
             return;
         } else if ((typeof chmodString !== 'string') || !(rightsObj instanceof Object)) {
@@ -120,7 +124,7 @@ var Shell = function() {
         //virtual chmod property checks
         //NOTE: the return range of {true, false, undefined} is intentional
         userClass = userClass || 'u';
-        if (this._stateObj.production) {
+        if (this._configObj.production) {
             this.log('dev', 'chmod', this._messages.production);
             return;
         } else if (!rightsObj || !(rightsObj instanceof Object)) {
@@ -168,7 +172,7 @@ var Shell = function() {
 
     this.kill = function(processName, finishFlag) {
         //NOTE - currently in stasis, obviously not production safe
-        if (this._stateObj.production) {
+        if (this._configObj.production) {
             this.log('dev', 'chmod', this._messages.production);
             return;
         }
@@ -213,7 +217,7 @@ var Shell = function() {
     };
 
     this.log = function(logType, name, message) {
-        if (!logType || !this._stateObj[logType]) {
+        if (!logType || !this._configObj[logType]) {
             console.log('log(): Need a proper type.');
             return;
         } else if (!(name && message)) {
@@ -352,7 +356,7 @@ var Shell = function() {
     this._pipe = function(iterable, mapFunction) {
         //TODO finish _pipe, check yield support carefully
         var version = this.state.nodejs.version;
-        if (this._stateObj.production) {
+        if (this._configObj.production) {
             this.log('dev', 'chmod', this._messages.production);
             return;
         } else if (!(version[0] >= 0 && version[1] >= 11 && version[2] > 2)) {
@@ -422,11 +426,11 @@ var Shell = function() {
         } else if (value !== Boolean(value)) {
             this.log('dev','setMode', 'Value must be either true or false.');
             return;
-        } else if (this._stateObj[mode] !== Boolean(this._stateObj[mode])) {
+        } else if (this._configObj[mode] !== Boolean(this._configObj[mode])) {
             this.log('dev','setMode', 'No such mode.');
             return;
         }
-        this._stateObj[mode] = value;
+        this._configObj[mode] = value;
         this.log('dev', 'setMode', mode + ': ' + value);
         if (!(this._logs[mode] instanceof Array) && value) {
             this._logs[mode] = [];
@@ -437,7 +441,7 @@ var Shell = function() {
     this.shell = function(callable, intervalTime, callParameters, altName, thisContext) {
         //NOTE - currently in stasis, not production safe
         //TODO tests
-        if (this._stateObj.production) {
+        if (this._configObj.production) {
             this.log('dev', 'chmod', this._messages.production);
             return;
         }
