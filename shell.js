@@ -124,20 +124,21 @@ var Shell = function() {
         //virtual chmod property checks
         //NOTE: the return range of {true, false, undefined} is intentional
         userClass = userClass || 'u';
+        var localLog = this.log.bind(this, 'dev', 'chmod');
         if (this._configObj.production) {
-            this.log('dev', 'chmod', this._messages.production);
+            localLog(this._messages.production);
             return;
         } else if (!rightsObj || !(rightsObj instanceof Object)) {
-            this.log('dev', 'chmod', 'Not a valid object.');
+            localLog('Not a valid object.');
             return;
         } else if (userClass && (!(typeof userClass === 'string') || /^[rwx]$/.test(userClass))) {
-            this.log('dev', 'chmod', 'Invalid user class.');
+            localLog('Invalid user class.');
             return;
         } else if (!permission || !((typeof permission === 'string') || /^[gou]$/.test(permission))) {
-            this.log('dev', 'chmod', 'Invalid permission type.');
+            localLog('Invalid permission type.');
             return;
         } else if (!rightsObj._chmod) {
-            this.log('dev', 'chmod', 'Object does not currently support virtual chmod. Please define its rights.');
+            localLog('Object does not currently support virtual chmod. Please define its rights.');
             return;
         } else if (rightsObj._chmod[userClass] && rightsObj._chmod[userClass][permission]) {
             return true;
