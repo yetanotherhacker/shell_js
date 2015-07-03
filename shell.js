@@ -64,11 +64,12 @@ var Shell = function() {
     this.chmod = function(rightsObj, chmodString) {
         //TODO: check versus chmod specs, get working correctly
         //TODO: design question: long-form alts for unix-style properties e.g. 'user' for 'u'?
+        var localLog = this.log.bind(this, 'dev', 'chmod');
         if (this._configObj.production) {
-            this.log('dev', 'chmod', this._messages.production);
+            localLog(this._messages.production);
             return;
         } else if ((typeof chmodString !== 'string') || !(rightsObj instanceof Object)) {
-            this.log('dev', 'chmod', 'Invalid type for parameters.');
+            localLog('Invalid type for parameters.');
             return;
         }
         var modifierArray = chmodString.match(/^([+-])([rwx]+)$/),
@@ -79,7 +80,7 @@ var Shell = function() {
             isPlus;
 
         if (!numericArray && !modifierArray) {
-            this.log('dev', 'chmod', 'Invalid permissions string.');
+            localLog('Invalid permissions string.');
             return;
         }
 
@@ -124,7 +125,7 @@ var Shell = function() {
         //virtual chmod property checks
         //NOTE: the return range of {true, false, undefined} is intentional
         userClass = userClass || 'u';
-        var localLog = this.log.bind(this, 'dev', 'chmod');
+        var localLog = this.log.bind(this, 'dev', 'chmodCheck');
         if (this._configObj.production) {
             localLog(this._messages.production);
             return;
@@ -173,8 +174,9 @@ var Shell = function() {
 
     this.kill = function(processName, finishFlag) {
         //NOTE - currently in stasis, obviously not production safe
+        var localLog = this.log.bind(this, 'dev', 'kill');
         if (this._configObj.production) {
-            this.log('dev', 'chmod', this._messages.production);
+            localLog(this._messages.production);
             return;
         }
         var localProcess, processID, intervalRef, callable, finalCall, terminationCall,
@@ -185,7 +187,7 @@ var Shell = function() {
         localProcess = this._processObj.collection[processName];
 
         if (!(localProcess instanceof Array)) {
-            this.log('dev', 'kill', ['localProcess for', processName, 'is invalid.'].join(' '));
+            localLog(['localProcess for', processName, 'is invalid.'].join(' '));
             return;
         }
         processID = localProcess[0];
@@ -198,7 +200,7 @@ var Shell = function() {
         if (!finishFlag) {
             if (!finalCall) {
                 message[1] = 'onFinish()';
-                this.log('dev','kill', message);
+                localLog(message);
             } else {
                 callable.onFinish(localProcess);
                 this._signalsObj[processID] = this._signalsObj.kill;
@@ -206,7 +208,7 @@ var Shell = function() {
         } else if (finishFlag && terminationCall) {
             if (!finalCall) {
                 message[1] = 'onDestroyed()';
-                this.log('dev','kill', message);
+                localLog(message);
             } else {
                 callable.onDestroyed(localProcess);
                 this._signalsObj[processID] = this._signalsObj.terminate;
@@ -258,7 +260,8 @@ var Shell = function() {
         //mkdir(newObjPath) creates an empty object
         //mkdir(newObjPath, protoObjPath) creates an object newObj with protoObj as the prototype
         var mapMethod = function(newEntry, index) {
-            var newObjKey = newEntry.split('.').pop(),
+            var localLog = this.log.bind(this, 'dev', 'mkdir'),
+                newObjKey = newEntry.split('.').pop(),
                 context = this._newContext(newEntry),
                 isValidProtoArray = protoObjPath instanceof Array &&
                                     newObjPath instanceof Array &&
@@ -266,11 +269,11 @@ var Shell = function() {
                 objCreated;
 
             if (!context) {
-                this.log('dev', 'mkdir', ['Cannot make a valid object with given path:', newObjPath].join(''));
+                localLog(['Cannot make a valid object with given path:', newObjPath].join(''));
                 return;     //quit if no valid new object can be made
             } else if (protoObjPath instanceof Array) {
                 if (!isValidProtoArray) {
-                    this.log('dev', 'mkdir', 'Given array lengths need to match.');
+                    localLog('Given array lengths need to match.');
                     return; //quit if newObj and protoObj array lengths mismatch
                 }                   
                 objCreated = Object.create(this._objScope(protoObjPath[index]));
@@ -356,17 +359,18 @@ var Shell = function() {
 
     this._pipe = function(iterable, mapFunction) {
         //TODO finish _pipe, check yield support carefully
-        var version = this.state.nodejs.version;
+        var localLog = this.log.bind(this, 'dev', '_pipe'),
+            version = this.state.nodejs.version;
         if (this._configObj.production) {
-            this.log('dev', 'chmod', this._messages.production);
+            localLog(this._messages.production);
             return;
         } else if (!(version[0] >= 0 && version[1] >= 11 && version[2] > 2)) {
             //TODO: redo version checking for io.js compatibility
             //need at least 0.11.2 for v8 generators
-            this.log('dev', '_pipe', ['Need v8 generators which are unsupported in node ', process.version, '. Exiting.'].join(''));
+            localLog(['Need v8 generators which are unsupported in node ', process.version, '. Exiting.'].join(''));
             return;
         } else if (!this._validMaps.isIterable(iterable)) {
-            this.log('dev', 'chmod', this._messages.notIterable);
+            localLog(this._messages.notIterable);
         }
     };
 
@@ -421,18 +425,19 @@ var Shell = function() {
     };
 
     this.setMode = function(mode, value) {
+        var localLog = this.log.bind(this, 'dev', 'setMode');
         if (typeof mode !== 'string') {
-            this.log('dev','setMode', 'Mode name needs to be a string.');
+            localLog('Mode name needs to be a string.');
             return;
         } else if (value !== Boolean(value)) {
-            this.log('dev','setMode', 'Value must be either true or false.');
+            localLog('Value must be either true or false.');
             return;
         } else if (this._configObj[mode] !== Boolean(this._configObj[mode])) {
-            this.log('dev','setMode', 'No such mode.');
+            localLog('No such mode.');
             return;
         }
         this._configObj[mode] = value;
-        this.log('dev', 'setMode', mode + ': ' + value);
+        localLog(mode + ': ' + value);
         if (!(this._logs[mode] instanceof Array) && value) {
             this._logs[mode] = [];
         }
@@ -443,7 +448,7 @@ var Shell = function() {
         //NOTE - currently in stasis, not production safe
         //TODO tests
         if (this._configObj.production) {
-            this.log('dev', 'chmod', this._messages.production);
+            this.log('dev', 'shell', this._messages.production);
             return;
         }
 
