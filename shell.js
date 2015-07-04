@@ -179,7 +179,7 @@ var Shell = function() {
             localLog(this._messages.production);
             return;
         }
-        var localProcess, processID, intervalRef, callable, finalCall, terminationCall,
+        var finalCall, localProcess, terminationCall,
             message = ['no', 'onPlaceholder()', ' method for', 'process with the name or processID of', processName];
         if (!this._processObj.collection[processName]) {
             this.log('dev','kill', message.join(' '));
@@ -190,32 +190,29 @@ var Shell = function() {
             localLog(['localProcess for', processName, 'is invalid.'].join(' '));
             return;
         }
-        processID = localProcess[0];
-        intervalRef = localProcess[1];
-        callable = localProcess[2];
 
-        finalCall = callable.onFinish && callable.onFinish instanceof Function;
-        terminationCall = callable.onDestroyed && callable.onDestroyed instanceof Function;
+        finalCall = localProcess.callable.onFinish && localProcess.callable.onFinish instanceof Function;
+        terminationCall = localProcess.callable.onDestroyed && localProcess.callable.onDestroyed instanceof Function;
 
         if (!finishFlag) {
             if (!finalCall) {
                 message[1] = 'onFinish()';
                 localLog(message);
             } else {
-                callable.onFinish(localProcess);
-                this._signalsObj[processID] = this._signalsObj.kill;
+                localProcess.callable.onFinish(localProcess);
+                this._signalsObj[localProcess.counter] = this._signalsObj.kill;
             }
         } else if (finishFlag && terminationCall) {
             if (!finalCall) {
                 message[1] = 'onDestroyed()';
                 localLog(message);
             } else {
-                callable.onDestroyed(localProcess);
-                this._signalsObj[processID] = this._signalsObj.terminate;
+                localProcess.callable.onDestroyed(localProcess);
+                this._signalsObj[localProcess.counter] = this._signalsObj.terminate;
             }
-            clearInterval(intervalRef);
+            clearInterval(localProcess.intervalRef);
             delete this._processObj.collection[processName];
-            delete this._processObj.collection[processID];
+            delete this._processObj.collection[localProcess.counter];
         }
     };
 
