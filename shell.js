@@ -174,15 +174,19 @@ var Shell = function() {
 
     this.kill = function(processName, finishFlag) {
         //NOTE - currently in stasis, obviously not production safe
-        var localLog = this.log.bind(this, 'dev', 'kill');
         if (this._configObj.production) {
             localLog(this._messages.production);
             return;
         }
-        var finalCall, localProcess, terminationCall,
-            message = ['no', 'onPlaceholder()', ' method for', 'process with the name or processID of', processName];
+
+        var localLog = this.log.bind(this, 'dev', 'kill'),
+            finalCall, localProcess, terminationCall,
+            logTermination = function (methodName) {
+                localLog(['no', methodName, '() method for process with the name or processID of', processName].join());
+            }.bind(this);
+
         if (!this._processObj.collection[processName]) {
-            this.log('dev','kill', message.join(' '));
+            logTermination('onPlaceholder');
         }
         localProcess = this._processObj.collection[processName];
 
@@ -196,16 +200,14 @@ var Shell = function() {
 
         if (!finishFlag) {
             if (!finalCall) {
-                message[1] = 'onFinish()';
-                localLog(message);
+                logTermination('onFinish');
             } else {
                 localProcess.callable.onFinish(localProcess);
                 this._signalsObj[localProcess.counter] = this._signalsObj.kill;
             }
         } else if (finishFlag && terminationCall) {
             if (!finalCall) {
-                message[1] = 'onDestroyed()';
-                localLog(message);
+                logTermination('onDestroyed');
             } else {
                 localProcess.callable.onDestroyed(localProcess);
                 this._signalsObj[localProcess.counter] = this._signalsObj.terminate;
