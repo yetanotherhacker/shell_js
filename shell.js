@@ -76,8 +76,7 @@ var Shell = function() {
             ownersArray = ['g', 'o', 'u'],
             numericArray = chmodString.match(/^([0-7]{3})$/),
             defaultRights = {r: true, w: true, x: true},
-            matchArray = [],
-            isPlus;
+            matchArray = [];
 
         if (!numericArray && !modifierArray) {
             localLog('Invalid permissions string.');
@@ -98,9 +97,8 @@ var Shell = function() {
         if (modifierArray) {
             //may be esoteric, check verses specs
             matchArray = modifierArray[2];
-            isPlus = modifierArray[1] === '+';
             matchArray.split('').forEach(function(rightsKey) {
-                rightsObj._chmod.u[rightsKey] = isPlus;
+                rightsObj._chmod.u[rightsKey] = modifierArray[1] === '+';
             });
         } else if (numericArray) {
             matchArray = chmodString.split('');
