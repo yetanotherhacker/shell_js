@@ -247,7 +247,7 @@ var Shell = function() {
             keyFilter = this._pathFilter(key);
 
         if (keyFilter && !this._objScope(key)) {
-            return lsMethod(this._objScope(this._path)).filter(function(i) { return keyFilter.test(i)}).sort();
+            return lsMethod(this._objScope(this._path)).filter(RegExp.prototype.test.bind(keyFilter)).sort();
         } else {
             return lsMethod(currentObj).sort();
         }
