@@ -385,33 +385,32 @@ var Shell = function() {
     this._reference = function(pathString) {
         //find and return property of named path property if possible
         var mapMethod = function(entry) {
-            var arrayCaptureRegex = /\[([^\]]+)\]/g,
-                startRegex = /^(\w+)\[/,
-                currentContext, deepRef, headNode, multiArrayRef, outerArrayRef, pathArray;
-
-            if (entry) {
-                pathArray = entry.split('.');
-                deepRef = this._environment;
-                //if next token is an object, shift to it and repeat (arrays included)
-                while ((pathArray.length) && (deepRef instanceof Object)) {
-                    currentContext = pathArray.shift();
-                    outerArrayRef = startRegex.exec(currentContext);
-
-                    outerArrayRef = outerArrayRef && outerArrayRef[1];  //regex group capture for inside of []'s'
-                    multiArrayRef = (currentContext.match(arrayCaptureRegex) || []).map(function(i){ return i.slice(1, i.length - 1);});
-                    deepRef = deepRef[outerArrayRef || currentContext];
-
-                    if (!outerArrayRef) {
-                        continue;
-                    }
-                    while (multiArrayRef.length && deepRef && deepRef[multiArrayRef[0]]) {
-                        deepRef = deepRef[multiArrayRef.shift()];
-                    }
-                }
-                return deepRef;
-            } else {
+            if (!entry) {
                 return this._environment;
             }
+            var arrayCaptureRegex = /\[([^\]]+)\]/g,
+                deepRef = this._environment,
+                pathArray = entry.split('.'),
+                startRegex = /^(\w+)\[/,
+                currentContext, multiArrayRef, outerArrayRef;
+
+            //if next token is an object, shift to it and repeat (arrays included)
+            while ((pathArray.length) && (deepRef instanceof Object)) {
+                currentContext = pathArray.shift();
+                outerArrayRef = startRegex.exec(currentContext);
+
+                outerArrayRef = outerArrayRef && outerArrayRef[1];  //regex group capture for inside of []'s'
+                multiArrayRef = (currentContext.match(arrayCaptureRegex) || []).map(function(i){ return i.slice(1, i.length - 1);});
+                deepRef = deepRef[outerArrayRef || currentContext];
+
+                if (!outerArrayRef) {
+                    continue;
+                }
+                while (multiArrayRef.length && deepRef && deepRef[multiArrayRef[0]]) {
+                    deepRef = deepRef[multiArrayRef.shift()];
+                }
+            }
+            return deepRef;
         }.bind(this);
         return this._vectorMap(pathString, mapMethod);
     };
