@@ -459,7 +459,7 @@ var Shell = function() {
             return;
         }
         var procName = this._inferMethodName(callable, true),
-            intervalRef = intervalTime ? setInterval(function(){ return callable.bind(thisContext, callParameters);}, intervalTime) : undefined,
+            intervalRef = intervalTime ? setInterval(callable.bind(thisContext, callParameters), intervalTime) : undefined,
             dataObj = {
                 'callable': callable,
                 'counter': this._processObj.counter,
