@@ -371,15 +371,11 @@ var Shell = function() {
         }
     };
 
-    this.pwd = function(returnStringFlag) {
-        var result;
-        if (returnStringFlag) {
-            result = this._path || 'this';
-        } else {
-            result = this._path ? this._objScope(this._path) : this;
+    this.pwd = function(stringFlag) {
+        if (!this._path) {
+            return stringFlag ? 'this' : this;
         }
-
-        return result;
+        return stringFlag ? this._path : this._objScope(this._path);
     };
 
     this._reference = function(pathString) {
