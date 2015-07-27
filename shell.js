@@ -289,19 +289,18 @@ var Shell = function() {
         //ensure that the property to be made doesn't exist yet but has a valid path
         var pathArray = pathString.split('.'),
             pathEnd = pathArray.pop(),
-            context;
+            context, contextPathString;
 
-        pathArray = pathArray.join('.');
-        if (pathArray) {
-            context = this._objScope(pathArray);
-            if (context[pathEnd]) {
-                this.log('dev','_newContext', ['Object already exists in ', pathString, '.'].join(''));
-                return;
-            }
-            return context;
-        } else {
+        contextPathString = pathArray.join('.');
+        if (!contextPathString) {
             return this._reference(this._path);
         }
+        context = this._objScope(contextPathString);
+        if (context[pathEnd]) {
+            this.log('dev','_newContext', ['Object already exists in ', contextPathString, '.'].join(''));
+            return;
+        }
+        return context;
     };
 
     this._objScope = function(objName, newValue, deleteFlag) {
