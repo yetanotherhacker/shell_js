@@ -490,9 +490,10 @@ var Shell = function() {
         if (item instanceof Array) {
             return item.map(mapMethod);
         } else if (item instanceof Object) {
-            return Object.keys(item).forEach(function(key){
+            Object.keys(item).forEach(function(key){
                 mapObj[key] = mapMethod(item[key]);
             });
+            return mapObj;
         } else {
             return mapMethod(item);
         }
