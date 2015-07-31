@@ -485,17 +485,17 @@ var Shell = function() {
         return isValid;
     };
 
-    this._vectorMap = function(item, mapMethod) {
+    this._vectorMap = function(vectorizable, mapMethod) {
         var mapObj = {};
-        if (item instanceof Array) {
-            return item.map(mapMethod);
-        } else if (item instanceof Object) {
-            Object.keys(item).forEach(function(key){
-                mapObj[key] = mapMethod(item[key]);
+        if (vectorizable instanceof Array) {
+            return vectorizable.map(mapMethod);
+        } else if (vectorizable instanceof Object) {
+            Object.keys(vectorizable).forEach(function(key){
+                mapObj[key] = mapMethod(vectorizable[key]);
             });
             return mapObj;
         } else {
-            return mapMethod(item);
+            return mapMethod(vectorizable);
         }
     };
 }
