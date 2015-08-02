@@ -62,7 +62,6 @@ var Shell = function() {
     };
 
     this.chmod = function(rightsObj, chmodString) {
-        //TODO: check versus chmod specs, get working correctly
         //TODO: design question: long-form alts for unix-style properties e.g. 'user' for 'u'?
         var localLog = this.log.bind(this, 'dev', 'chmod');
         if (this._configObj.production) {
@@ -310,7 +309,7 @@ var Shell = function() {
         }
         var globalPathEnvironment = objName.split('.'),
             globalPathObject = globalPathEnvironment.pop(),
-            localPathEnvironment = [this._path, objName].join('.').split('.'),  //lazy string concatenate
+            localPathEnvironment = [this._path, objName].join('.').split('.'),
             localPathObject = localPathEnvironment.pop(),
             isLocalObj;
 
