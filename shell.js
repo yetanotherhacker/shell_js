@@ -55,7 +55,7 @@ var Shell = function() {
             this._path = objName; //move to global object
         } else {
             this.log('dev','cd', 'No such object exists.');
-            return;
+            return false;
         }
 
         return true;
@@ -66,10 +66,10 @@ var Shell = function() {
         var localLog = this.log.bind(this, 'dev', 'chmod');
         if (this._configObj.production) {
             localLog(this._messages.production);
-            return;
+            return false;
         } else if ((typeof chmodString !== 'string') || !(rightsObj instanceof Object)) {
             localLog('Invalid type for parameters.');
-            return;
+            return false;
         }
         var modifierArray = chmodString.match(/^([+-])([rwx]+)$/),
             ownersArray = ['g', 'o', 'u'],
@@ -79,7 +79,7 @@ var Shell = function() {
 
         if (!numericArray && !modifierArray) {
             localLog('Invalid permissions string.');
-            return;
+            return false;
         }
 
         if (!rightsObj._chmod) {
@@ -125,19 +125,19 @@ var Shell = function() {
         var localLog = this.log.bind(this, 'dev', 'chmodCheck');
         if (this._configObj.production) {
             localLog(this._messages.production);
-            return;
+            return false;
         } else if (!rightsObj || !(rightsObj instanceof Object)) {
             localLog('Not a valid object.');
-            return;
+            return false;
         } else if (userClass && (!(typeof userClass === 'string') || /^[rwx]$/.test(userClass))) {
             localLog('Invalid user class.');
-            return;
+            return false;
         } else if (!permission || !((typeof permission === 'string') || /^[gou]$/.test(permission))) {
             localLog('Invalid permission type.');
-            return;
+            return false;
         } else if (!rightsObj._chmod) {
             localLog('Object does not currently support virtual chmod. Please define its rights.');
-            return;
+            return false;
         } else if (rightsObj._chmod[userClass] && rightsObj._chmod[userClass][permission]) {
             return true;
         }
@@ -158,7 +158,7 @@ var Shell = function() {
         var methodName, strForm;
         if (!method instanceof Function) {
             this.log('dev', '_inferMethodName', 'Need a function.');
-            return;
+            return false;
         }
 
         strForm = String(method);
@@ -173,7 +173,7 @@ var Shell = function() {
         //NOTE - currently in stasis, obviously not production safe
         if (this._configObj.production) {
             localLog(this._messages.production);
-            return;
+            return false;
         }
 
         var localLog = this.log.bind(this, 'dev', 'kill'),
@@ -189,7 +189,7 @@ var Shell = function() {
 
         if (!(localProcess instanceof Array)) {
             localLog(['localProcess for', processName, 'is invalid.'].join(' '));
-            return;
+            return false;
         }
 
         finalCall = localProcess.callable.onFinish && localProcess.callable.onFinish instanceof Function;
@@ -218,7 +218,7 @@ var Shell = function() {
     this.log = function(logType, name, message) {
         if (!logType || !this._configObj[logType]) {
             console.log('log(): Need a proper type.');
-            return;
+            return false;
         } else if (!(name && message)) {
             return this._logs[logType];
         }
@@ -266,11 +266,11 @@ var Shell = function() {
 
             if (!context) {
                 localLog(['Cannot make a valid object with given path:', newObjPath].join(''));
-                return;     //quit if no valid new object can be made
+                return false;     //quit if no valid new object can be made
             } else if (protoObjPath instanceof Array) {
                 if (!isValidProtoArray) {
                     localLog('Given array lengths need to match.');
-                    return; //quit if newObj and protoObj array lengths mismatch
+                    return false; //quit if newObj and protoObj array lengths mismatch
                 }                   
                 objCreated = Object.create(this._objScope(protoObjPath[index]));
             } else if (typeof protoObjPath === 'string' && this._objScope(protoObjPath)) {
@@ -297,7 +297,7 @@ var Shell = function() {
         context = this._objScope(contextPathString);
         if (context[pathEnd]) {
             this.log('dev','_newContext', ['Object already exists in ', contextPathString, '.'].join(''));
-            return;
+            return false;
         }
         return context;
     };
@@ -337,7 +337,7 @@ var Shell = function() {
             }
         } else {
             this.log('dev','_objScope', ['Scoping failure for ', objName].join(''));
-            return;
+            return false;
         }
 
         return true;
@@ -347,7 +347,7 @@ var Shell = function() {
         //checks for *'s and .'s for filtering cli-style
         if (typeof filterString !== 'string') {
             this.log('dev','_pathFilter', ['Given value is not a string: ', filterString].join(''));
-            return;
+            return false;
         }
         return RegExp(filterString.replace(/\*/g, '.*'));
     };
@@ -358,12 +358,12 @@ var Shell = function() {
             version = this.state.nodejs.version;
         if (this._configObj.production) {
             localLog(this._messages.production);
-            return;
+            return false;
         } else if (!(version[0] >= 0 && version[1] >= 11 && version[2] > 2)) {
             //TODO: redo version checking for io.js compatibility
             //need at least 0.11.2 for v8 generators
             localLog(['Need v8 generators which are unsupported in node ', process.version, '. Exiting.'].join(''));
-            return;
+            return false;
         } else if (!this._validMaps.isIterable(iterable)) {
             localLog(this._messages.notIterable);
         }
@@ -418,13 +418,13 @@ var Shell = function() {
         var localLog = this.log.bind(this, 'dev', 'setMode');
         if (typeof mode !== 'string') {
             localLog('Mode name needs to be a string.');
-            return;
+            return false;
         } else if (value !== Boolean(value)) {
             localLog('Value must be either true or false.');
-            return;
+            return false;
         } else if (this._configObj[mode] !== Boolean(this._configObj[mode])) {
             localLog('No such mode.');
-            return;
+            return false;
         }
         this._configObj[mode] = value;
         localLog(mode + ': ' + value);
@@ -439,18 +439,18 @@ var Shell = function() {
         //TODO tests
         if (this._configObj.production) {
             this.log('dev', 'shell', this._messages.production);
-            return;
+            return false;
         }
 
         thisContext = thisContext || this;
 
         if (!(callable instanceof Function) && (intervalTime instanceof Number) && (intervalTime > 0)) {
             //exit if no function to call or invalid time interval
-            return;
+            return false;
         } else if ((typeof altName !== 'string') || !Number.isNaN(Number(altName))) {
             //kick out non-string altnames
             //do not accept numbers as shorthand names since they override counter-generated identifiers
-            return;
+            return false;
         }
         var procName = this._inferMethodName(callable, true),
             intervalRef = intervalTime ? setInterval(callable.bind(thisContext, callParameters), intervalTime) : undefined,
