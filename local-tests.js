@@ -119,14 +119,15 @@ tests = {
     }
 };
 
-for (testName in tests) {
-    result = tests[testName]();
+Object.keys(tests).map(function(element) {
+    var testFunction = tests[element];
+    result = testFunction && (testFunction instanceof Function) && testFunction();
     //result is equal to [didTestPass, test description]
     if (!result[0]) {
         testsPass = false;
-        console.log('fail', '-', testName, '-', result[1]);
+        console.log('fail', '-', element, '-', result[1]);
     }
-}
+});
 
 if (testsPass) {
     console.log('All tests passed!');
