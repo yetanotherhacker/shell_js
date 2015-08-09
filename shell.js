@@ -83,7 +83,7 @@ var Shell = function() {
         }
 
         if (!rightsObj._chmod) {
-            //prefill chmod rights
+            //prefill empty chmod rights
             rightsObj._chmod = {};
             ownersArray.forEach(function(userClass) {
                 rightsObj._chmod[userClass] = {};
@@ -142,7 +142,7 @@ var Shell = function() {
             return true;
         }
 
-        return false;
+        return undefined;
     };
 
     this.cp = function(origin, destination) {
