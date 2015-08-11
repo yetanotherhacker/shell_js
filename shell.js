@@ -120,7 +120,7 @@ var Shell = function() {
 
     this._chmodCheck = function(rightsObj, permission, userClass) {
         //virtual chmod property checks
-        //NOTE: the return range of {true, false, undefined} is intentional
+        //NOTE: the return range of {true, false, null} is intentional
         userClass = userClass || 'u';
         var localLog = this.log.bind(this, 'dev', 'chmodCheck');
         if (this._configObj.production) {
@@ -142,7 +142,7 @@ var Shell = function() {
             return true;
         }
 
-        return undefined;
+        return null;
     };
 
     this.cp = function(origin, destination) {
