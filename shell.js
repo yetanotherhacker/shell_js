@@ -353,7 +353,8 @@ var Shell = function() {
     };
 
     this._pipe = function(iterable, mapFunction) {
-        //TODO finish _pipe, check yield support carefully
+        //TODO: finish
+        //are abitrary yields possible?
         var localLog = this.log.bind(this, 'dev', '_pipe'),
             version = this.state.nodejs.version;
         if (this._configObj.production) {
