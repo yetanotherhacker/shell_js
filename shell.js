@@ -198,6 +198,7 @@ var Shell = function() {
         if (!finishFlag) {
             if (!finalCall) {
                 logTermination('onFinish');
+                return false;
             } else {
                 localProcess.callable.onFinish(localProcess);
                 this._signalsObj[localProcess.counter] = this._signalsObj.kill;
@@ -205,6 +206,7 @@ var Shell = function() {
         } else if (finishFlag && terminationCall) {
             if (!finalCall) {
                 logTermination('onDestroyed');
+                return false;
             } else {
                 localProcess.callable.onDestroyed(localProcess);
                 this._signalsObj[localProcess.counter] = this._signalsObj.terminate;
@@ -213,6 +215,7 @@ var Shell = function() {
             delete this._processObj.collection[processName];
             delete this._processObj.collection[localProcess.counter];
         }
+        return true;
     };
 
     this.log = function(logType, name, message) {

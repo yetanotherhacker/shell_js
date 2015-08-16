@@ -21,7 +21,7 @@ i.e.
 
 -- the entire script runs in local scope
 
--- `local-tests.js` has more tests
+-- `local-tests.js` has basic tests
 
 Current quirks:
 
@@ -35,6 +35,6 @@ Piping is in the works.
 
 `pwd()` returns a reference to the current path by default
 
-`_reference()` passes the last valid object encountered in the path
+`_reference()` passes the last valid object encountered in the given path
 
-Dev. mode is available. Use `setMode('dev', true)`
+Dev. mode is available with logging. Use `setMode('dev', true)`
