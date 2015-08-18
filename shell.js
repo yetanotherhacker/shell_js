@@ -229,7 +229,7 @@ var Shell = function() {
         var logObj = {
             method: [name, '():\t'].join(''),
             message: message,
-            time: new Date()
+            time: (new Date()).toUTCString()
         };
 
         console.log(logObj.method, logObj.message);
