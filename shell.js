@@ -256,8 +256,8 @@ var Shell = function() {
     };
 
     this.mkdir = function(newObjPath, protoObjPath) {
-        //mkdir(newObjPath) creates an empty object
-        //mkdir(newObjPath, protoObjPath) creates an object newObj with protoObj as the prototype
+        //mkdir(newObjPath) returns an empty object
+        //mkdir(newObjPath, protoObjPath) returns an object newObj with protoObj as the prototype
         var mapMethod = function(newEntry, index) {
             var localLog = this.log.bind(this, 'dev', 'mkdir'),
                 newObjKey = newEntry.split('.').pop(),
@@ -370,7 +370,9 @@ var Shell = function() {
             return false;
         } else if (!this._validMaps.isIterable(iterable)) {
             localLog(this._messages.notIterable);
+            return false;
         }
+        return undefined;   //undefined for now until it's ready
     };
 
     this.pwd = function(stringFlag) {
