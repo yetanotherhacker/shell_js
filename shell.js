@@ -25,7 +25,7 @@ var Shell = function() {
             return (element instanceof Object);
         }
     };
-    this.version = 0.82;
+    this.version = 0.83;
     if (typeof root === 'object' && typeof process === 'object') {
         //assuming a nodejs environment
         this._environment = root;
