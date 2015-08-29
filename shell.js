@@ -357,7 +357,7 @@ var Shell = function() {
 
     this._pipe = function(iterable, mapFunction) {
         //TODO: finish
-        //are abitrary yields possible?
+        //are arbitrary yields possible?
         var localLog = this.log.bind(this, 'dev', '_pipe'),
             version = this.state.nodejs.version;
         if (this._configObj.production) {
@@ -421,6 +421,7 @@ var Shell = function() {
     };
 
     this.setMode = function(mode, value) {
+        //set a boolean property of the internal configuration object
         var localLog = this.log.bind(this, 'dev', 'setMode');
         if (typeof mode !== 'string') {
             localLog('Mode name needs to be a string.');
@@ -433,7 +434,7 @@ var Shell = function() {
             return false;
         }
         this._configObj[mode] = value;
-        localLog(mode + ': ' + value);
+        localLog(mode + ': ' + value);  //log mode changes if in dev mode
         if (!(this._logs[mode] instanceof Array) && value) {
             this._logs[mode] = [];
         }
@@ -441,6 +442,7 @@ var Shell = function() {
     };
 
     this.shell = function(callable, intervalTime, callParameters, altName, thisContext) {
+        //execute function with a certain interval, keep the reference in the internal process object
         //NOTE - currently in stasis, not production safe
         //TODO tests
         if (this._configObj.production) {
