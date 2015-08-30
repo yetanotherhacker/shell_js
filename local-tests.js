@@ -5,8 +5,8 @@ shell.setMode('dev', true);
 shell.setMode('production', false);
 
 testHash = {
-    a: [1, [2], {
-            b: [3, [4,5]]
+    child: [1, [2], {
+            key: [3, [4,5]]
         }]
     };
 testsPass = true;
@@ -23,18 +23,18 @@ tests = {
         //freshly created objects should be empty
         passTest &= !Object.keys(testHashA).length;
         passTest &= !Object.keys(testHashB).length;
-        shell.mkdir('testHashA.c');
+        shell.mkdir('testHashA.firstNode');
         passTest &= Object.keys(testHashA).length === 1;
 
         shell.cd('testHashA');
-        shell.mkdir('d');
+        shell.mkdir('child');
         passTest &= Object.keys(testHashA).length === 2;
-        shell.mkdir('d.e');
-        passTest &= Object.keys(testHashA.d).length === 1;
-        shell.mkdir('testHashB.d');
+        shell.mkdir('child.key');
+        passTest &= Object.keys(testHashA.child).length === 1;
+        shell.mkdir('testHashB.child');
         passTest &= Object.keys(testHashB).length === 1;
-        shell.mkdir('testHashB.d.e');
-        passTest &= Object.keys(testHashB.d).length === 1;
+        shell.mkdir('testHashB.child.key');
+        passTest &= Object.keys(testHashB.child).length === 1;
 
         shell.cd();
         shell.rm(['testHashA', 'testHashB']);
@@ -44,7 +44,7 @@ tests = {
         var passTest = true;
         shell.cd();
         shell.mkdir('protoTest', 'testHash');
-        passTest &= (protoTest.a && protoTest.a[0]) === 1;
+        passTest &= (protoTest.child && protoTest.child[0]) === 1;
         shell.rm('protoTest');
         return [passTest, 'mkdir() prototyping'];
     },
@@ -78,11 +78,11 @@ tests = {
         var passTest = true;
         shell.cd();
         shell.mkdir(['testHashA', 'testHashB']);
-        testHashA.a = {b: 3};
+        testHashA.child = {key: 3};
 
         shell.cd('testHashA');
-        shell.rm('a.b');
-        passTest &= !Object.keys(testHashA.a).length;
+        shell.rm('child.key');
+        passTest &= !Object.keys(testHashA.child).length;
         shell.cd('..');
         shell.rm(['testHashA', 'testHashB']);
         passTest &= shell._reference(['testHashA', 'testHashB']).every(function(i) { return !i;});
@@ -103,19 +103,19 @@ tests = {
     cpChecks: function() {
         var passTest = true;
         shell.cd();
-        shell.cp('testHash.a', 'testHash.x');
-        passTest = passTest && shell._reference('testHash.x');
+        shell.cp('testHash.child', 'testHash.twin');
+        passTest = passTest && shell._reference('testHash.twin');
 
         shell.cd('testHash');
-        shell.cp('x', 'z');
-        passTest = passTest && shell._reference('testHash.z');
-        shell.rm(['x', 'z']);
+        shell.cp('twin', 'triplet');
+        passTest = passTest && shell._reference('testHash.triplet');
+        shell.rm(['twin', 'triplet']);
         return [passTest, 'global and local scoping with cp()'];
     },
     checkRefs: function() {
         //simple does reference() work check
         shell.cd();
-        return [4 === shell._reference('testHash.a[2].b[1][0]'), 'array and object mixed referencing'];
+        return [4 === shell._reference('testHash.child[2].key[1][0]'), 'array and object mixed referencing'];
     }
 };
 
