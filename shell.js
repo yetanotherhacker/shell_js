@@ -258,23 +258,26 @@ var Shell = function() {
     this.mkdir = function(newObjPath, protoObjPath) {
         //mkdir(newObjPath) returns an empty object
         //mkdir(newObjPath, protoObjPath) returns an object newObj with protoObj as the prototype
-        var mapMethod = function(newEntry, index) {
-            var localLog = this.log.bind(this, 'dev', 'mkdir'),
-                newObjKey = newEntry.split('.').pop(),
-                context = this._newContext(newEntry),
-                isValidProtoArray = protoObjPath instanceof Array &&
+        var isValidProtoArray = protoObjPath instanceof Array &&
                                     newObjPath instanceof Array &&
                                     (protoObjPath.length === newObjPath.length),
+            localLog = this.log.bind(this, 'dev', 'mkdir'),
+            mapMethod;
+
+        if (protoObjPath instanceof Array && !isValidProtoArray) {
+            localLog('Given array lengths need to match.');
+            return false; //quit if newObj and protoObj array lengths mismatch
+        }
+
+        mapMethod = function(newEntry, index) {
+            var newObjKey = newEntry.split('.').pop(),
+                context = this._newContext(newEntry),
                 objCreated;
 
             if (!context) {
                 localLog(['Cannot make a valid object with given path:', newObjPath].join(''));
                 return false;     //quit if no valid new object can be made
             } else if (protoObjPath instanceof Array) {
-                if (!isValidProtoArray) {
-                    localLog('Given array lengths need to match.');
-                    return false; //quit if newObj and protoObj array lengths mismatch
-                }                   
                 objCreated = Object.create(this._objScope(protoObjPath[index]));
             } else if (typeof protoObjPath === 'string' && this._objScope(protoObjPath)) {
                 objCreated = Object.create(this._objScope(protoObjPath));
@@ -284,6 +287,7 @@ var Shell = function() {
 
             context[newObjKey] = objCreated;
         }.bind(this);
+
         return this._vectorMap(newObjPath, mapMethod);
     };
 
@@ -364,7 +368,6 @@ var Shell = function() {
             localLog(this._messages.production);
             return false;
         } else if (!(version[0] >= 0 && version[1] >= 11 && version[2] > 2)) {
-            //TODO: redo version checking for io.js compatibility
             //need at least 0.11.2 for v8 generators
             localLog(['Need v8 generators which are unsupported in node ', process.version, '. Exiting.'].join(''));
             return false;
